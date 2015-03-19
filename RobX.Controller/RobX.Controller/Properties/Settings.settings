@@ -1,0 +1,54 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RobX_Controller.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SimulatorIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">127.0.0.1</Value>
+    </Setting>
+    <Setting Name="RealIP" Type="System.String" Scope="User">
+      <Value Profile="(Default)">172.20.62.204</Value>
+    </Setting>
+    <Setting Name="SimulatorPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1371</Value>
+    </Setting>
+    <Setting Name="RealPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1371</Value>
+    </Setting>
+    <Setting Name="RobotType" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ForwardKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Up</Value>
+    </Setting>
+    <Setting Name="BackwardKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Down</Value>
+    </Setting>
+    <Setting Name="RotateClockwiseKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Right</Value>
+    </Setting>
+    <Setting Name="RotateCounterClockwiseKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Left</Value>
+    </Setting>
+    <Setting Name="StopKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">ShiftKey</Value>
+    </Setting>
+    <Setting Name="FormSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">480, 561</Value>
+    </Setting>
+    <Setting Name="FormPosition" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="SimulationSpeed" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="GlobalStopKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">F10</Value>
+    </Setting>
+    <Setting Name="StartKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">F5</Value>
+    </Setting>
+    <Setting Name="ToggleKeyboardControl" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">F12</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,75 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RobX_Simulator_v2" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="GroundColor" Type="Microsoft.Xna.Framework.Color" Scope="Application">
+      <Value Profile="(Default)">32, 178, 170, 255</Value>
+    </Setting>
+    <Setting Name="GridLineColor" Type="Microsoft.Xna.Framework.Color" Scope="Application">
+      <Value Profile="(Default)">211, 211, 211, 255</Value>
+    </Setting>
+    <Setting Name="GridFontColor" Type="Microsoft.Xna.Framework.Color" Scope="Application">
+      <Value Profile="(Default)">255, 255, 255, 255</Value>
+    </Setting>
+    <Setting Name="StatisticsFontColor" Type="Microsoft.Xna.Framework.Color" Scope="Application">
+      <Value Profile="(Default)">255, 255, 0, 255</Value>
+    </Setting>
+    <Setting Name="RobotTraceColor" Type="Microsoft.Xna.Framework.Color" Scope="Application">
+      <Value Profile="(Default)">255, 0, 0, 255</Value>
+    </Setting>
+    <Setting Name="ServerPort" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1371</Value>
+    </Setting>
+    <Setting Name="UpdateRate" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="DrawGrids" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DrawStatistics" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DrawObstacles" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="DrawRobotTrace" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="FormSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">499, 568</Value>
+    </Setting>
+    <Setting Name="KeepAspectRatio" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="FormPosition" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
+    <Setting Name="DefaultSimulationSpeed" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="SimulationSpeedColor" Type="Microsoft.Xna.Framework.Color" Scope="Application">
+      <Value Profile="(Default)">255, 0, 0, 255</Value>
+    </Setting>
+    <Setting Name="ForwardKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Up</Value>
+    </Setting>
+    <Setting Name="BackwardKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Down</Value>
+    </Setting>
+    <Setting Name="RotateClockwiseKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Right</Value>
+    </Setting>
+    <Setting Name="RotateCounterClockwiseKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">Left</Value>
+    </Setting>
+    <Setting Name="StopKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">ShiftKey</Value>
+    </Setting>
+    <Setting Name="GlobalStopKey" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">F10</Value>
+    </Setting>
+    <Setting Name="ToggleKeyboardControl" Type="System.Windows.Forms.Keys" Scope="Application">
+      <Value Profile="(Default)">F12</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
