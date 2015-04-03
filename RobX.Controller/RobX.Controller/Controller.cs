@@ -11,72 +11,83 @@ using RobX.Library.Communication;
 namespace RobX.Controller
 {
     /// <summary>
-    /// Class to control robot at a higher level
+    /// Class to control robot at high level.
     /// </summary>
     public class Controller
     {
-        // ------------------------------------------- Public Variables ---------------------------------------- //
+        # region Public Fields
 
         /// <summary>
-        /// Low-level interface for robot control
+        /// Low-level interface for robot control.
         /// </summary>
         public Robot Robot;
 
         /// <summary>
-        /// Type of robot: Real robot / Simulation
+        /// Type of robot: Real robot / Simulation.
         /// </summary>
         public Library.Commons.Robot.RobotType RobotType;
 
-        public bool IsConnected = false;
-
-        // ------------------------------------------- Private Variables --------------------------------------- //
-
         /// <summary>
-        /// String containing the error detected in the robot at the last health checking
+        /// Indicates whether the controller is connected to the robot (via network) or not.
         /// </summary>
-        private string ErrorString = "";
+        public bool IsConnected;
+
+        # endregion
+
+        # region Private Fields
 
         /// <summary>
-        /// Contains controller commands in queue for processing
+        /// String containing the error detected in the robot at the last health checking.
         /// </summary>
-        private LinkedList<Command> Commands = new LinkedList<Command>();
+        private string _errorString = "";
 
-        private object CommandsLock = new object();
-
-        # region Event Handlers
         /// <summary>
-        /// Event handler for ReceivedData event (will be invoked after data is received)
+        /// Contains controller commands in queue for processing.
+        /// </summary>
+        private readonly LinkedList<Command> _commands = new LinkedList<Command>();
+
+        private readonly object _commandsLock = new object();
+
+        # endregion
+
+        # region Events
+
+        /// <summary>
+        /// ReceivedData event (will be invoked after data is received).
         /// </summary>
         public event CommunicationEventHandler ReceivedData;
 
         /// <summary>
-        /// Event handler for SentData event (will be invoked after data is sent)
+        /// SentData event (will be invoked after data is sent).
         /// </summary>
         public event CommunicationEventHandler SentData;
 
         /// <summary>
-        /// Event handler for BeforeSendingData event (will be invoked when server is ready to send data)
+        /// BeforeSendingData event (will be invoked when server is ready to send data).
         /// </summary>
         public event CommunicationEventHandler BeforeSendingData;
 
         /// <summary>
-        /// Event handler for CommunicationStatusChanged event (will be invoked after anything new happens in the communications)
+        /// CommunicationStatusChanged event (will be invoked after anything new happens in the communications).
         /// </summary>
         public event CommunicationStatusEventHandler CommunicationStatusChanged;
 
         /// <summary>
-        /// Event handler for RobotStatusChanged event (will be invoked after anything new happens to the robot)
+        /// RobotStatusChanged event (will be invoked after anything new happens to the robot).
         /// </summary>
         public event CommunicationStatusEventHandler RobotStatusChanged;
 
+        /// <summary>
+        /// Event that is invoked when an error is occured.
+        /// </summary>
         public event EventHandler ErrorOccured;
 
         # endregion
 
-        // ------------------------------------------- Constructors and Events --------------------------------- //
+        # region Constructor
 
         /// <summary>
-        /// Constructor for the Controller class
+        /// Constructor for the Controller class.
         /// </summary>
         /// <param name="robotType"></param>
         public Controller(Library.Commons.Robot.RobotType robotType)
@@ -92,13 +103,15 @@ namespace RobX.Controller
             Robot.ErrorOccured += RobotErrorOccured;
         }
 
-        # region Controller Events
+        # endregion
+
+        # region Controller Event Handlers
 
         /// <summary>
-        /// Invokes the ReceivedData event when data is received from the robot (over the network)
+        /// Invokes the ReceivedData event when data is received from the robot (over the network).
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the received data</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the received data.</param>
         private void RobotReceivedData(object sender, CommunicationEventArgs e)
         {
             if (ReceivedData != null)
@@ -106,10 +119,10 @@ namespace RobX.Controller
         }
 
         /// <summary>
-        /// Invokes the SentData event when data is sent to the robot (over the network)
+        /// Invokes the SentData event when data is sent to the robot (over the network).
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the sent data</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the sent data.</param>
         private void RobotSentData(object sender, CommunicationEventArgs e)
         {
             if (SentData != null)
@@ -117,10 +130,10 @@ namespace RobX.Controller
         }
 
         /// <summary>
-        /// Invokes the StatusChanged event when the robot connection state is changed
+        /// Invokes the StatusChanged event when the robot connection state is changed.
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the status change message</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the status change message.</param>
         private void RobotCommunicationStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
             if (CommunicationStatusChanged != null)
@@ -128,47 +141,59 @@ namespace RobX.Controller
         }
 
         /// <summary>
-        /// Invokes the BeforeSendingData event when data is ready to be sent to the robot (over the network)
+        /// Invokes the BeforeSendingData event when data is ready to be sent to the robot (over the network).
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the sent data</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the sent data.</param>
         private void RobotBeforeSendingData(object sender, CommunicationEventArgs e)
         {
             if (BeforeSendingData != null)
                 BeforeSendingData(this, e);
         }
 
+        /// <summary>
+        /// Invokes the ErrorOccured event when any error occures in the robot or connection.
+        /// </summary>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event argument.</param>
         private void RobotErrorOccured(object sender, EventArgs e)
         {
             if (ErrorOccured != null)
                 ErrorOccured(this, e);
-            
+
             // Stop execution when error occures
             StopExecution();
         }
 
         # endregion
 
-        // ------------------------------------------- Public Functions ---------------------------------------- //
+        # region Public Functions
 
         /// <summary>
-        /// Connect to robot or simulator over the network
+        /// Connect to robot or simulator over the network.
         /// </summary>
-        /// <param name="IPAddress">IP address of the robot (or simulator)</param>
-        /// <param name="Port">Port number of the robot (or simulator)</param>
-        /// <returns>Returns true if successfully connected to the robot</returns>
-        public bool Connect(String IPAddress, int Port)
+        /// <param name="ipAddress">IP address of the robot (or simulator).</param>
+        /// <param name="port">Port number of the robot (or simulator).</param>
+        /// <returns>Returns true if successfully connected to the robot.</returns>
+        public bool Connect(String ipAddress, int port)
         {
-            IsConnected = Robot.Connect(IPAddress, Port);
+            IsConnected = Robot.Connect(ipAddress, port);
             return IsConnected;
         }
 
+        /// <summary>
+        /// Adds a command to the command processing queue.
+        /// </summary>
+        /// <param name="cmd">Command to be added.</param>
         public void AddCommandToQueue(Command cmd)
         {
-            lock (CommandsLock)
-                Commands.AddLast(cmd);
+            lock (_commandsLock)
+                _commands.AddLast(cmd);
         }
 
+        /// <summary>
+        /// Executes sequentially all the high-level commands in the queue.
+        /// </summary>
         public void ExecuteCommandQueue()
         {
             if (RobotStatusChanged != null)
@@ -177,61 +202,78 @@ namespace RobX.Controller
             while (true)
             {
                 Command cmd;
-                lock (CommandsLock)
+                lock (_commandsLock)
                 {
-                    if (Commands.Count == 0) return;
-                    cmd = Commands.First.Value;
+                    if (_commands.Count == 0) return;
+                    cmd = _commands.First.Value;
                 }
 
-                if (cmd.Type == Command.Types.SetSpeedForTime)
-                    SetSpeedMilliseconds(cmd.Amount, cmd.Speed1, cmd.Speed2);
-                if (cmd.Type == Command.Types.SetSpeedForDistance)
-                    SetSpeedMillimeters(cmd.Amount, cmd.Speed1, cmd.Speed2);
-                else if (cmd.Type == Command.Types.SetSpeedForDegrees)
-                    SetSpeedDegrees(cmd.Amount, cmd.Speed1, cmd.Speed2);
-                else if (cmd.Type == Command.Types.MoveForwardForTime)
-                    MoveForwardMilliseconds(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.MoveForwardForDistance)
-                    MoveForwardMillimeters(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.MoveBackwardForTime)
-                    MoveBackwardMilliseconds(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.MoveBackwardForDistance)
-                    MoveBackwardMillimeters(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.RotateLeftForTime)
-                    RotateLeftMilliseconds(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.RotateLeftForDegrees)
-                    RotateLeftDegrees(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.RotateRightForTime)
-                    RotateRightMilliseconds(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.RotateRightForDegrees)
-                    RotateRightDegrees(cmd.Amount, cmd.Speed1);
-                else if (cmd.Type == Command.Types.Stop)
-                    StopRobot();
+                switch (cmd.Type)
+                {
+                    case Command.Types.SetSpeedForTime:
+                        SetSpeedMilliseconds(cmd.Amount, cmd.Speed1, cmd.Speed2);
+                        break;
+                    case Command.Types.SetSpeedForDistance:
+                        SetSpeedMillimeters(cmd.Amount, cmd.Speed1, cmd.Speed2);
+                        break;
+                    case Command.Types.SetSpeedForDegrees:
+                        SetSpeedDegrees(cmd.Amount, cmd.Speed1, cmd.Speed2);
+                        break;
+                    case Command.Types.MoveForwardForTime:
+                        MoveForwardMilliseconds(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.MoveForwardForDistance:
+                        MoveForwardMillimeters(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.MoveBackwardForTime:
+                        MoveBackwardMilliseconds(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.MoveBackwardForDistance:
+                        MoveBackwardMillimeters(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.RotateLeftForTime:
+                        RotateLeftMilliseconds(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.RotateLeftForDegrees:
+                        RotateLeftDegrees(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.RotateRightForTime:
+                        RotateRightMilliseconds(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.RotateRightForDegrees:
+                        RotateRightDegrees(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.Stop:
+                        StopRobot();
+                        break;
+                }
 
                 // Delete the first command from queue
-                lock (CommandsLock)
+                lock (_commandsLock)
                 {
-                    if (Commands.Count > 0)
-                        Commands.RemoveFirst();
-                }
-            }
-        }
-
-        public void StopExecution()
-        {
-            lock (CommandsLock)
-            {
-                if (Commands.Count > 0)
-                {
-                    if (RobotStatusChanged != null)
-                        RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopped execution of command queue."));
-                    Commands.Clear();
+                    if (_commands.Count > 0)
+                        _commands.RemoveFirst();
                 }
             }
         }
 
         /// <summary>
-        /// Prepares robot controller for execution of commands
+        /// Stops execution of commands in the processing queue immediately. Clears the processing queue.
+        /// </summary>
+        public void StopExecution()
+        {
+            lock (_commandsLock)
+            {
+                if (_commands.Count <= 0) return;
+
+                if (RobotStatusChanged != null)
+                    RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopped execution of command queue."));
+                _commands.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Prepares robot controller for execution of commands.
         /// </summary>
         public void PrepareForExecution()
         {
@@ -240,60 +282,79 @@ namespace RobX.Controller
         }
 
         /// <summary>
-        /// Set robot wheel speeds (can block execution for a specified amount of time)
+        /// Sets robot wheel speeds for a specified amount of time.
         /// </summary>
-        /// <param name="Milliseconds">Execution blocking time (in milliseconds)</param>
-        /// <param name="Wheel1_Speed">Speed of wheel 1 (in the range -127 to 127)</param>
-        /// <param name="Wheel2_Speed">Speed of wheel 2 (in the range -127 to 127)</param>
-        public void SetSpeedMilliseconds(double Milliseconds, sbyte Wheel1_Speed, sbyte Wheel2_Speed, bool ShowMessage = true)
+        /// <param name="milliseconds">Execution time in milliseconds.</param>
+        /// <param name="wheel1Speed">Speed of wheel 1 (in the range -127 to 127).</param>
+        /// <param name="wheel2Speed">Speed of wheel 2 (in the range -127 to 127).</param>
+        /// <param name="showMessage">If true, invoke RobotStatusChanged event with a message.</param>
+        public void SetSpeedMilliseconds(double milliseconds, sbyte wheel1Speed, sbyte wheel2Speed,
+            bool showMessage = true)
         {
-            if (Milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
 
-            if (ShowMessage && RobotStatusChanged != null)
+            if (showMessage && RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Setting the speed of the left wheel to " + Wheel1_Speed +
-                    " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s) and the right wheel to " + 
-                    Wheel2_Speed + " (" + (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + 
-                    " mm/s) for " + Milliseconds.ToString("0.00") + " milliseconds."));
+                    "Setting the speed of the left wheel to " + wheel1Speed +
+                    " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
+                    wheel2Speed + " (" + (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + milliseconds.ToString("0.00") + " milliseconds."));
 
-            Robot.SetSpeeds((byte)(Wheel1_Speed + 128), (byte)(Wheel2_Speed + 128));
+            Robot.SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
 
-            if (Milliseconds > 0)
-                Thread.Sleep(TimeSpan.FromMilliseconds(Milliseconds / Settings.Default.SimulationSpeed));
+            if (milliseconds > 0)
+                Thread.Sleep(TimeSpan.FromMilliseconds(milliseconds/Settings.Default.SimulationSpeed));
         }
 
-        public void SetSpeedDegrees(double Degrees, sbyte Wheel1_Speed, sbyte Wheel2_Speed, bool ShowMessage = true)
+        /// <summary>
+        /// Sets robot wheel speeds and turns for a specified amount of degrees.
+        /// </summary>
+        /// <param name="degrees">Turn amount in degrees.</param>
+        /// <param name="wheel1Speed">Speed of wheel 1 (in the range -127 to 127).</param>
+        /// <param name="wheel2Speed">Speed of wheel 2 (in the range -127 to 127).</param>
+        /// <param name="showMessage">If true, invoke RobotStatusChanged event with a message.</param>
+        public void SetSpeedDegrees(double degrees, sbyte wheel1Speed, sbyte wheel2Speed, bool showMessage = true)
         {
-            if (ShowMessage && RobotStatusChanged != null)
+            if (showMessage && RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Turning robot " + ((Wheel1_Speed < Wheel2_Speed)?"counter-":"") + "clockwise " + 
-                    Degrees.ToString("0.0") + " degrees with the speed of the left wheel set to " + 
-                    Wheel1_Speed + " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + 
-                    " mm/s) and the right wheel set to " +  Wheel2_Speed + " (" + 
-                    (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s)."));
+                    "Turning robot " + ((wheel1Speed < wheel2Speed) ? "counter-" : "") + "clockwise " +
+                    degrees.ToString("0.0") + " degrees with the speed of the left wheel set to " +
+                    wheel1Speed + " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) and the right wheel set to " + wheel2Speed + " (" +
+                    (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
-            var deltaV = (Wheel1_Speed - Wheel2_Speed) * Robot.RobotSpeedToMMpS / 1000F;
-            var Radians = Degrees * Math.PI / 180F;
-            var milliseconds = Math.Abs(2 * Robot.Radius * Radians / deltaV);
+            var deltaV = (wheel1Speed - wheel2Speed)*Robot.RobotSpeedToMmpS/1000F;
+            var radians = degrees*Math.PI/180F;
+            var milliseconds = Math.Abs(2*Robot.Radius*radians/deltaV);
 
-            Robot.SetSpeeds((byte)(Wheel1_Speed + 128), (byte)(Wheel2_Speed + 128));
-            SetSpeedMilliseconds(milliseconds, Wheel1_Speed, Wheel2_Speed, false);
+            Robot.SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
+            SetSpeedMilliseconds(milliseconds, wheel1Speed, wheel2Speed, false);
         }
 
-        public void SetSpeedMillimeters(double Distance, sbyte Wheel1_Speed, sbyte Wheel2_Speed, bool ShowMessage = true)
+        /// <summary>
+        /// Sets robot wheel speeds and turns for a specified distance.
+        /// </summary>
+        /// <param name="distance">Distance in millimeters.</param>
+        /// <param name="wheel1Speed">Speed of wheel 1 (in the range -127 to 127).</param>
+        /// <param name="wheel2Speed">Speed of wheel 2 (in the range -127 to 127).</param>
+        /// <param name="showMessage">If true, invoke RobotStatusChanged event with a message.</param>
+        public void SetSpeedMillimeters(double distance, sbyte wheel1Speed, sbyte wheel2Speed, bool showMessage = true)
         {
-            if (Distance < 0) throw new Exception("Error! Distance can't be negative!");
+            if (distance < 0) throw new Exception("Error! Distance can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Setting the speed of the left wheel to " + Wheel1_Speed +
-                    " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s) and the right wheel to " +
-                    Wheel2_Speed + " (" + (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) for " + Distance.ToString("0.0") + " millimeters."));
+                    "Setting the speed of the left wheel to " + wheel1Speed +
+                    " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
+                    wheel2Speed + " (" + (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
             throw new NotImplementedException("Error! This function is not implemented yet!");
         }
 
+        /// <summary>
+        /// Stops robot. 
+        /// </summary>
         public void StopRobot()
         {
             if (RobotStatusChanged != null)
@@ -302,160 +363,218 @@ namespace RobX.Controller
             SetSpeedMilliseconds(0, 0, 0, false);
         }
 
-        public void MoveForwardMilliseconds(double Milliseconds, sbyte Speed)
-        {
-            if (Milliseconds < 0) throw new Exception("Error! Time can't be negative!");
-
-            if (RobotStatusChanged != null)
-                RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Moving straight forward with the speed of both wheels set to " + 
-                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) for " + Milliseconds.ToString("0.00") + " milliseconds."));
-
-            SetSpeedMilliseconds(Milliseconds, Speed, Speed, false);
-        }
-
-        public void MoveBackwardMilliseconds(double Milliseconds, sbyte Speed)
-        {
-            if (Milliseconds < 0) throw new Exception("Error! Time can't be negative!");
-
-            if (RobotStatusChanged != null)
-                RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Moving straight backward with the speed of both wheels set to " +
-                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) for " + Milliseconds.ToString("0.00") + " milliseconds."));
-
-            SetSpeedMilliseconds(Milliseconds, (sbyte)(-Speed), (sbyte)(-Speed), false);
-        }
-
         /// <summary>
-        /// Move robot in forward direction with specified speed (-128 to 127) for specified distance in millimeters
+        /// Moves robot in forward direction for a specified amount of time in milliseconds.
         /// </summary>
-        /// <param name="Distance">Distance to go in millimeters</param>
-        /// <param name="Speed">Speed of the robot (negative for backward, positive for forward move)</param>
-        public void MoveForwardMillimeters(double Distance, sbyte Speed)
+        /// <param name="milliseconds">Amount of time in milliseconds.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void MoveForwardMilliseconds(double milliseconds, sbyte speed)
         {
-            if (Distance < 0) throw new Exception("Error! Distance can't be negative!");
+            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " +
-                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) for " + Distance.ToString("0.0") + " millimeters."));
+                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + milliseconds.ToString("0.00") + " milliseconds."));
 
-            var timeout = Distance / (Robot.RobotSpeedToMMpS * Math.Abs(Speed)) * 1000F;
-            SetSpeedMilliseconds(timeout, Speed, Speed, false);
+            SetSpeedMilliseconds(milliseconds, speed, speed, false);
         }
 
-        public void MoveBackwardMillimeters(double Distance, sbyte Speed)
+        /// <summary>
+        /// Moves robot in backward direction for a specified amount of time in milliseconds.
+        /// </summary>
+        /// <param name="milliseconds">Amount of time in milliseconds.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void MoveBackwardMilliseconds(double milliseconds, sbyte speed)
         {
-            if (Distance < 0) throw new Exception("Error! Distance can't be negative!");
+            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) for " + Distance.ToString("0.0") + " millimeters."));
+                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + milliseconds.ToString("0.00") + " milliseconds."));
 
-            var timeout = Distance / (Robot.RobotSpeedToMMpS * Math.Abs(Speed)) * 1000F;
-            SetSpeedMilliseconds(timeout, (sbyte)(-Speed), (sbyte)(-Speed), false);
+            SetSpeedMilliseconds(milliseconds, (sbyte) (-speed), (sbyte) (-speed), false);
         }
 
-        public void RotateLeftDegrees(double Degrees, sbyte Speed)
+        /// <summary>
+        /// Moves robot in forward direction with specified speed for specified distance in millimeters.
+        /// </summary>
+        /// <param name="distance">Distance to go in millimeters.</param>
+        /// <param name="speed">Speed of the robot (in the range of -127 to 127).</param>
+        public void MoveForwardMillimeters(double distance, sbyte speed)
+        {
+            if (distance < 0) throw new Exception("Error! Distance can't be negative!");
+
+            if (RobotStatusChanged != null)
+                RobotStatusChanged(this, new CommunicationStatusEventArgs(
+                    "Moving straight forward with the speed of both wheels set to " +
+                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + distance.ToString("0.0") + " millimeters."));
+
+            var timeout = distance/(Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
+            SetSpeedMilliseconds(timeout, speed, speed, false);
+        }
+
+        /// <summary>
+        /// Moves robot in backward direction with specified speed for specified distance in millimeters.
+        /// </summary>
+        /// <param name="distance">Distance to go in millimeters.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void MoveBackwardMillimeters(double distance, sbyte speed)
+        {
+            if (distance < 0) throw new Exception("Error! Distance can't be negative!");
+
+            if (RobotStatusChanged != null)
+                RobotStatusChanged(this, new CommunicationStatusEventArgs(
+                    "Moving straight backward with the speed of both wheels set to " +
+                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + distance.ToString("0.0") + " millimeters."));
+
+            var timeout = distance/(Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
+            SetSpeedMilliseconds(timeout, (sbyte) (-speed), (sbyte) (-speed), false);
+        }
+
+        /// <summary>
+        /// Rotates robot in counter-clockwise direction for a specified degrees.
+        /// </summary>
+        /// <param name="degrees">Amount of degrees to turn.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void RotateLeftDegrees(double degrees, sbyte speed)
         {
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Turning robot counter-clockwise around center of robot " + 
-                    Degrees.ToString("0.0") + " degrees with the speed set to " + Speed +
-                    " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s)."));
+                    "Turning robot counter-clockwise around center of robot " +
+                    degrees.ToString("0.0") + " degrees with the speed set to " + speed +
+                    " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
-            SetSpeedDegrees(Degrees, (sbyte)(-Speed), Speed, false);
+            SetSpeedDegrees(degrees, (sbyte) (-speed), speed, false);
         }
 
-        public void RotateRightDegrees(double Degrees, sbyte Speed)
+        /// <summary>
+        /// Rotates robot in clockwise direction for a specified degrees.
+        /// </summary>
+        /// <param name="degrees">Amount of degrees to turn.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void RotateRightDegrees(double degrees, sbyte speed)
         {
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot " +
-                    Degrees.ToString("0.0") + " degrees with the speed set to " + Speed +
-                    " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s)."));
+                    degrees.ToString("0.0") + " degrees with the speed set to " + speed +
+                    " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
-            SetSpeedDegrees(Degrees, Speed, (sbyte)(-Speed), false);
+            SetSpeedDegrees(degrees, speed, (sbyte) (-speed), false);
         }
 
-        public void RotateLeftMilliseconds(double Milliseconds, sbyte Speed)
+        /// <summary>
+        /// Rotates robot in counter-clockwise direction for a specified distance.
+        /// </summary>
+        /// <param name="milliseconds">Distance to turn in millimeters.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void RotateLeftMilliseconds(double milliseconds, sbyte speed)
         {
-            if (Milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Turning robot counter-clockwise around center of robot with the speed set to " + 
-                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) + for " + Milliseconds.ToString("0.00") + " milliseconds."));
+                    "Turning robot counter-clockwise around center of robot with the speed set to " +
+                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) + for " + milliseconds.ToString("0.00") + " milliseconds."));
 
-            SetSpeedMilliseconds(Milliseconds, (sbyte)(-Speed), Speed, false);
+            SetSpeedMilliseconds(milliseconds, (sbyte) (-speed), speed, false);
         }
 
-        public void RotateRightMilliseconds(double Milliseconds, sbyte Speed)
+        /// <summary>
+        /// Rotates robot in clockwise direction for a specified distance.
+        /// </summary>
+        /// <param name="milliseconds">Distance to turn in millimeters.</param>
+        /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        public void RotateRightMilliseconds(double milliseconds, sbyte speed)
         {
-            if (Milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot with the speed set to " +
-                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
-                    " mm/s) + for " + Milliseconds.ToString("0.00") + " milliseconds."));
+                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) + for " + milliseconds.ToString("0.00") + " milliseconds."));
 
-            SetSpeedMilliseconds(Milliseconds, Speed, (sbyte)(-Speed), false);
+            SetSpeedMilliseconds(milliseconds, speed, (sbyte) (-speed), false);
         }
 
+        /// <summary>
+        /// Check health state of the robot.
+        /// </summary>
+        /// <returns>Returns true if there are no errors. If there is an error, it is possible to 
+        /// get the error string using <see cref="GetErrorDescription"/> function.</returns>
+        // ReSharper disable once FunctionComplexityOverflow
         public bool CheckHealth()
         {
-            bool VoltsUnder16 = false, VoltsOver30 = false, Motor1Trip = false;
-            bool Motor2Trip = false, Motor1Short = false, Motor2Short = false;
-            ErrorString = "";
+            bool voltsUnder16, voltsOver30, motor1Trip;
+            bool motor2Trip, motor1Short, motor2Short;
+            _errorString = "";
 
-            if (Robot.GetError(out VoltsUnder16, out VoltsOver30, out Motor1Trip,
-                out Motor2Trip, out Motor1Short, out Motor2Short) == false)
-            {
-                if (VoltsOver30)
-                    ErrorString = "Voltage is over 30 Volts! ";
-                if (VoltsUnder16)
-                    ErrorString += "Voltage is under 16 Volts! ";
-                if (Motor1Trip)
-                    ErrorString += "Motor 1 tripped! ";
-                if (Motor2Trip)
-                    ErrorString += "Motor 2 tripped! ";
-                if (Motor1Short)
-                    ErrorString += "Motor 1 is short-circuited! ";
-                if (Motor2Short)
-                    ErrorString += "Motor 2 is short-circuited! ";
-                return false;
-            }
-            return true;
+            if (Robot.GetError(out voltsUnder16, out voltsOver30, out motor1Trip,
+                out motor2Trip, out motor1Short, out motor2Short)) return true;
+
+            if (voltsOver30)
+                _errorString = "Voltage is over 30 Volts! ";
+            if (voltsUnder16)
+                _errorString += "Voltage is under 16 Volts! ";
+            if (motor1Trip)
+                _errorString += "Motor 1 tripped! ";
+            if (motor2Trip)
+                _errorString += "Motor 2 tripped! ";
+            if (motor1Short)
+                _errorString += "Motor 1 is short-circuited! ";
+            if (motor2Short)
+                _errorString += "Motor 2 is short-circuited! ";
+            return false;
         }
 
+        /// <summary>
+        /// Returns a string containing the errors occured in the recent <see cref="CheckHealth"/> function call.
+        /// </summary>
+        /// <returns>The string describing the error occured.</returns>
         public string GetErrorDescription()
         {
-            return ErrorString;
+            return _errorString;
         }
 
-        public static int MMpsToWheelSpeed(double MillimetersPerSecond)
+        /// <summary>
+        /// Converts real speed (millimeters per second) to robot wheel speed.
+        /// </summary>
+        /// <param name="millimetersPerSecond">Real speed in millimeters per second.</param>
+        /// <returns>Robot wheel speed (in range -127 to 127).</returns>
+        public static int MMpsToWheelSpeed(double millimetersPerSecond)
         {
-            return (int)(MillimetersPerSecond / Robot.RobotSpeedToMMpS);
+            return (int) (millimetersPerSecond/Robot.RobotSpeedToMmpS);
         }
 
+        /// <summary>
+        /// Estimates the delay of communication with robot by sending a single command and calculating the responce time.
+        /// </summary>
+        /// <returns>Estimated delay of communication with robot in milliseconds.</returns>
         public TimeSpan CalculateDelay()
         {
-            var Now = DateTime.Now;
+            var now = DateTime.Now;
             Robot.GetVersion();
-            return DateTime.Now - Now;
+            return DateTime.Now - now;
         }
 
-        public void SetSimulationSpeed(ushort Speed)
+        /// <summary>
+        /// Sets the simulator's simulation speed. Works only when connected to simulator.
+        /// </summary>
+        /// <param name="speed">Simulation speed (Real-time simulation speed = 1.0).</param>
+        public void SetSimulationSpeed(ushort speed)
         {
-            Settings.Default.SimulationSpeed = Speed / 10F;
-            Robot.SetSimulationSpeed(Speed);
+            Settings.Default.SimulationSpeed = speed/10F;
+            Robot.SetSimulationSpeed(speed);
         }
+
+        # endregion
     }
 }

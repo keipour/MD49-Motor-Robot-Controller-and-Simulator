@@ -1,5 +1,6 @@
 ﻿# region Includes
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -111,7 +112,7 @@ namespace RobX.Simulator
 
         public static void DrawLineSegment(this SpriteBatch Sprite, Vector2 point1, Vector2 point2, Color color, int lineWidth)
         {
-            var angle = (float)System.Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
             var length = Vector2.Distance(point1, point2);
 
             Sprite.Draw(pixel, point1, null, color, angle, Vector2.Zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);

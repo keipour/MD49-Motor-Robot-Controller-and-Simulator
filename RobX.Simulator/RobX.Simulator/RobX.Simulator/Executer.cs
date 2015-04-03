@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 # endregion
 
@@ -80,7 +81,7 @@ namespace RobX.Simulator
                         // Use lock to avoid multithreading issues
                         lock (Simulator.SendByteLock)
                         {
-                            SendBytes.AddLast((byte)Robot.Speed1);
+                            SendBytes.AddLast(Robot.Speed1);
                         }
                         break;
 
@@ -88,7 +89,7 @@ namespace RobX.Simulator
                         // Use lock to avoid multithreading issues
                         lock (Simulator.SendByteLock)
                         {
-                            SendBytes.AddLast((byte)Robot.Speed2);
+                            SendBytes.AddLast(Robot.Speed2);
                         }
                         break;
 
@@ -362,7 +363,7 @@ namespace RobX.Simulator
                         Environment.Robot.Trace.Clear();
 
                         // Calculate the new robot X position
-                        Environment.Robot.X = (((int)XPositionHigh.Code) << 8) + XPositionLow.Code;
+                        Environment.Robot.X = (XPositionHigh.Code << 8) + XPositionLow.Code;
 
                         break;
 
@@ -390,7 +391,7 @@ namespace RobX.Simulator
                         Environment.Robot.Trace.Clear();
 
                         // Calculate the new robot Y position
-                        Environment.Robot.Y = (((int)YPositionHigh.Code) << 8) + YPositionLow.Code;
+                        Environment.Robot.Y = (YPositionHigh.Code << 8) + YPositionLow.Code;
 
                         break;
 
@@ -415,7 +416,7 @@ namespace RobX.Simulator
                         }
 
                         // Calculate the new robot Y position
-                        Environment.Robot.Angle = ((((int)AngleHigh.Code) << 8) + AngleLow.Code) / 10.0F;
+                        Environment.Robot.Angle = ((AngleHigh.Code << 8) + AngleLow.Code) / 10.0F;
 
                         break;
                     case 0x51: // Set simulation speed (10 = 1.0x is real-time)
@@ -439,7 +440,7 @@ namespace RobX.Simulator
                         }
 
                         // Calculate the new robot Y position
-                        Simulator.SimulationSpeed = ((((int)SimSpeedHigh.Code) << 8) + SimSpeedLow.Code) / 10.0F;
+                        Simulator.SimulationSpeed = ((SimSpeedHigh.Code << 8) + SimSpeedLow.Code) / 10.0F;
 
                         break;
 
@@ -496,7 +497,7 @@ namespace RobX.Simulator
         private void UpdateRobotState(ref Robot Robot, ref Environment Environment, DateTime starttime, DateTime endtime)
         {
             // Add robot trace to traces list
-            var trace = new System.Drawing.PointF((float)Environment.Robot.X, (float)Environment.Robot.Y);
+            var trace = new PointF((float)Environment.Robot.X, (float)Environment.Robot.Y);
             if (Environment.Robot.Trace.Count == 0 || Environment.Robot.Trace[Environment.Robot.Trace.Count - 1].X != trace.X ||
                 Environment.Robot.Trace[Environment.Robot.Trace.Count - 1].Y != trace.Y)
                 Environment.Robot.Trace.Add(trace);

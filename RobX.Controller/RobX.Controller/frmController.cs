@@ -1,8 +1,10 @@
 ﻿# region Includes
 
 using System;
-using System.Windows.Forms;
+using System.Net;
 using System.Threading;
+using System.Windows.Forms;
+using RobX.Controller.Properties;
 using RobX.Library.Commons;
 using RobX.Library.Communication;
 using RobX.Library.Tools;
@@ -14,12 +16,19 @@ namespace RobX.Controller
     /// <summary>
     /// This class defines the visual form for controller of the robot.
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public partial class frmController : Form
     {
-        private Log CommunicationLog = new Log();
-        private Log MessageLog = new Log();
-        private Controller Controller = new Controller(Library.Commons.Robot.RobotType.Simulation);
-        private Thread ExecutionThread = null; 
+        # region Private Fields
+
+        private readonly Log _communicationLog = new Log();
+        private readonly Log _messageLog = new Log();
+        private Controller _controller = new Controller(Library.Commons.Robot.RobotType.Simulation);
+        private Thread _executionThread;
+
+        # endregion
+
+        # region Form Methods and Events
 
         /// <summary>
         /// This is the constructor for the form class of the controller of the robot.
@@ -29,8 +38,6 @@ namespace RobX.Controller
             InitializeComponent();
         }
 
-        // ---------------------------------------- Form Events ---------------------------------------- //
-
         private void frmLog_Load(object sender, EventArgs e)
         {
             // Reload last used settings
@@ -39,14 +46,14 @@ namespace RobX.Controller
             txtIPAddress.Select();
 
             // Add events
-            CommunicationLog.ItemsAdded += txtLogUpdate;
-            CommunicationLog.LogCleared += txtLogUpdate;
-            MessageLog.ItemsAdded += txtMessageUpdate;
-            MessageLog.LogCleared += txtMessageUpdate;
-            Controller.ReceivedData += RobotReceivedData;
-            Controller.SentData += RobotSentData;
-            Controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
-            Controller.RobotStatusChanged += RobotStatusChanged;
+            _communicationLog.ItemsAdded += txtLogUpdate;
+            _communicationLog.LogCleared += txtLogUpdate;
+            _messageLog.ItemsAdded += txtMessageUpdate;
+            _messageLog.LogCleared += txtMessageUpdate;
+            _controller.ReceivedData += RobotReceivedData;
+            _controller.SentData += RobotSentData;
+            _controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
+            _controller.RobotStatusChanged += RobotStatusChanged;
         }
 
         private void frmLog_FormClosing(object sender, FormClosingEventArgs e)
@@ -54,135 +61,68 @@ namespace RobX.Controller
             SaveProperties();
         }
 
-        private void HandleHotKeys(KeyEventArgs e)
-        {
-            if (e.KeyCode == Properties.Settings.Default.StartKey)
-                cmdStart_Click(this, e);
-            else if (e.KeyCode == Properties.Settings.Default.ToggleKeyboardControl)
-                chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
-            else if (e.KeyCode == Keys.Escape)
-                Application.Exit();
-
-            if (chkKeyboardControl.Checked || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
-            {
-                if (e.KeyCode == Properties.Settings.Default.ForwardKey || e.KeyCode == Properties.Settings.Default.BackwardKey ||
-                    e.KeyCode == Properties.Settings.Default.RotateClockwiseKey || e.KeyCode == Properties.Settings.Default.StopKey ||
-                    e.KeyCode == Properties.Settings.Default.RotateCounterClockwiseKey)
-                {
-                    // Connect if is not connected yet
-                    if (Controller.IsConnected == false) return;
-                    
-                    // Stop current execution
-                    Controller.StopExecution();
-                }
-
-
-                if (e.KeyCode == Properties.Settings.Default.ForwardKey)
-                    Controller.MoveForwardMilliseconds(500, 20);
-                else if (e.KeyCode == Properties.Settings.Default.BackwardKey)
-                    Controller.MoveBackwardMilliseconds(500, 20);
-                else if (e.KeyCode == Properties.Settings.Default.RotateClockwiseKey)
-                    Controller.SetSpeedMilliseconds(500, 20, -20);
-                else if (e.KeyCode == Properties.Settings.Default.RotateCounterClockwiseKey)
-                    Controller.SetSpeedMilliseconds(500, -20, 20);
-                else if (e.KeyCode == Properties.Settings.Default.StopKey || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
-                    Controller.StopRobot();
-
-                e.SuppressKeyPress = true;
-            }
-        }
-
         private void frmLog_KeyDown(object sender, KeyEventArgs e)
         {
             HandleHotKeys(e);
         }
 
-        // ---------------------------------------- Communication Events ------------------------------- //
-
-        private void RobotReceivedData(object sender, CommunicationEventArgs e)
+        private void frmLog_Resize(object sender, EventArgs e)
         {
-            CommunicationLog.AddBytes(e.Data);
+            const int spacing = 6;
+            txtMessage.Height = ClientSize.Height - pnlController.Height - tabController.Height;
+            tabController.Top = txtMessage.Height + spacing;
+            tabController.Width = ClientSize.Width;
+
+            cmdStart.Left = pnlController.Width - cmdStart.Width - spacing;
+            cmdConnect.Left = cmdStart.Left;
+            cboRobotType.Width = cmdConnect.Left - cboRobotType.Left - spacing;
         }
 
-        private void RobotSentData(object sender, CommunicationEventArgs e)
-        {
-            CommunicationLog.AddBytes(e.Data);
-        }
+        # endregion
 
-        private void RobotCommunicationStatusChanged(object sender, CommunicationStatusEventArgs e)
-        {
-            CommunicationLog.AddItem(e.Status, true);
-        }
+        # region Private Methods
 
-        private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
+        private void HandleHotKeys(KeyEventArgs e)
         {
-            MessageLog.AddItem(e.Status, true);
-            MessageLog.AddItem();
-        }
+            if (e.KeyCode == Settings.Default.StartKey)
+                cmdStart_Click(this, e);
+            else if (e.KeyCode == Settings.Default.ToggleKeyboardControl)
+                chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
+            else if (e.KeyCode == Keys.Escape)
+                Application.Exit();
 
-        // ----------------------------------------------- Log Events ---------------------------------- //
+            if (!chkKeyboardControl.Checked && e.KeyCode != Settings.Default.GlobalStopKey) return;
 
-        private delegate void SetTextCallback(string str);
-        private void txtLogUpdate(string LogText)
-        {
-            try
+            if (e.KeyCode == Settings.Default.ForwardKey || e.KeyCode == Settings.Default.BackwardKey ||
+                e.KeyCode == Settings.Default.RotateClockwiseKey || e.KeyCode == Settings.Default.StopKey ||
+                e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
             {
-                if (txtLog.InvokeRequired)
-                {
-                    var d = new SetTextCallback(txtLogUpdate);
-                    Invoke(d, new object[] { LogText });
-                }
-                else
-                {
-                    if (txtLog.Text != LogText)
-                    {
-                        txtLog.Text = LogText;
-                        txtLog.Select(txtLog.Text.Length, 0);
-                        txtLog.ScrollToCaret();
-                    }
-                }
+                // Connect if is not connected yet
+                if (_controller.IsConnected == false) return;
+
+                // Stop current execution
+                _controller.StopExecution();
             }
-            catch { }
-        }
 
-        private void txtLogUpdate(object sender, LogEventArgs e)
-        {
-            txtLogUpdate(CommunicationLog.Text);
-        }
 
-        private void txtMessageUpdate(string LogText)
-        {
-            try
-            {
-                if (txtMessage.InvokeRequired)
-                {
-                    var d = new SetTextCallback(txtMessageUpdate);
-                    Invoke(d, new object[] { LogText });
-                }
-                else
-                {
-                    if (txtMessage.Text != LogText)
-                    {
-                        txtMessage.Text = LogText;
-                        txtMessage.Select(txtMessage.Text.Length, 0);
-                        txtMessage.ScrollToCaret();
-                    }
-                }
-            }
-            catch { }
-        }
+            if (e.KeyCode == Settings.Default.ForwardKey)
+                _controller.MoveForwardMilliseconds(500, 20);
+            else if (e.KeyCode == Settings.Default.BackwardKey)
+                _controller.MoveBackwardMilliseconds(500, 20);
+            else if (e.KeyCode == Settings.Default.RotateClockwiseKey)
+                _controller.SetSpeedMilliseconds(500, 20, -20);
+            else if (e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
+                _controller.SetSpeedMilliseconds(500, -20, 20);
+            else if (e.KeyCode == Settings.Default.StopKey || e.KeyCode == Settings.Default.GlobalStopKey)
+                _controller.StopRobot();
 
-        private void txtMessageUpdate(object sender, LogEventArgs e)
-        {
-            txtMessageUpdate(MessageLog.Text);
+            e.SuppressKeyPress = true;
         }
-
-        // ------------------------------------------ Private Functions -------------------------------- //
 
         private void StartExecution()
         {
             // Return if still is not connected
-            if (Controller.IsConnected == false) return;
+            if (_controller.IsConnected == false) return;
 
             //Controller.Robot.ResetEncoders();
 
@@ -199,36 +139,198 @@ namespace RobX.Controller
             //txtMessage.AddLine("Encoder 1: " + enc1.ToString());
             //txtMessage.AddLine("Encoder 2: " + enc2.ToString());
 
-            UserCommands.AddCommands(ref Controller);
+            UserCommands.AddCommands(ref _controller);
 
-            Controller.ExecuteCommandQueue();
+            _controller.ExecuteCommandQueue();
         }
+
+        private bool CheckInputErrors()
+        {
+            var ipValid = true;
+
+            IPAddress ip;
+            if (IPAddress.TryParse(txtIPAddress.Text, out ip) == false)
+            {
+                txtMessage.AddLine("Invalid IP address format!");
+                ipValid = false;
+            }
+
+            ushort port;
+            if (ushort.TryParse(txtPort.Text, out port) && port >= 2) return ipValid;
+
+            txtMessage.AddLine("Invalid port number!");
+
+            return false;
+        }
+
+        private void Connect()
+        {
+            SaveProperties();
+            if (!CheckInputErrors()) return;
+            _controller.Connect(txtIPAddress.Text, Int32.Parse(txtPort.Text));
+        }
+
+        private void LoadProperties()
+        {
+            Size = Settings.Default.FormSize;
+            Location = Settings.Default.FormPosition;
+            txtSimSpeed.Text = Settings.Default.SimulationSpeed.ToString("0.0");
+
+            if (Settings.Default.RobotType == 1)
+            {
+                txtIPAddress.Text = Settings.Default.SimulatorIP;
+                txtPort.Text = Settings.Default.SimulatorPort;
+            }
+            else
+            {
+                txtIPAddress.Text = Settings.Default.RealIP;
+                txtPort.Text = Settings.Default.RealPort;
+            }
+            cboRobotType.SelectedIndex = Settings.Default.RobotType;
+        }
+
+        private void SaveProperties()
+        {
+            if (cboRobotType.SelectedIndex == 0) // if simulation
+            {
+                Settings.Default.SimulatorIP = txtIPAddress.Text;
+                Settings.Default.SimulatorPort = txtPort.Text;
+            }
+            else
+            {
+                Settings.Default.RealIP = txtIPAddress.Text;
+                Settings.Default.RealPort = txtPort.Text;
+            }
+            Settings.Default.SimulationSpeed = double.Parse(txtSimSpeed.Text);
+            Settings.Default.RobotType = cboRobotType.SelectedIndex;
+            Settings.Default.FormPosition = Location;
+            Settings.Default.FormSize = Size;
+            Settings.Default.Save();
+        }
+
+        # endregion
+
+        #region Communication Events
+
+        private void RobotReceivedData(object sender, CommunicationEventArgs e)
+        {
+            _communicationLog.AddBytes(e.Data);
+        }
+
+        private void RobotSentData(object sender, CommunicationEventArgs e)
+        {
+            _communicationLog.AddBytes(e.Data);
+        }
+
+        private void RobotCommunicationStatusChanged(object sender, CommunicationStatusEventArgs e)
+        {
+            _communicationLog.AddItem(e.Status, true);
+        }
+
+        private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
+        {
+            _messageLog.AddItem(e.Status, true);
+            _messageLog.AddItem();
+        }
+
+        # endregion
+
+        # region Log Events
+
+        private delegate void SetTextCallback(string str);
+
+        // ReSharper disable once InconsistentNaming
+        private void txtLogUpdate(string logText)
+        {
+            try
+            {
+                if (txtLog.InvokeRequired)
+                {
+                    var d = new SetTextCallback(txtLogUpdate);
+                    Invoke(d, logText);
+                }
+                else
+                {
+                    if (txtLog.Text == logText) return;
+
+                    txtLog.Text = logText;
+                    txtLog.Select(txtLog.Text.Length, 0);
+                    txtLog.ScrollToCaret();
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void txtLogUpdate(object sender, LogEventArgs e)
+        {
+            txtLogUpdate(_communicationLog.Text);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void txtMessageUpdate(string logText)
+        {
+            try
+            {
+                if (txtMessage.InvokeRequired)
+                {
+                    var d = new SetTextCallback(txtMessageUpdate);
+                    Invoke(d, logText);
+                }
+                else
+                {
+                    if (txtMessage.Text == logText) return;
+
+                    txtMessage.Text = logText;
+                    txtMessage.Select(txtMessage.Text.Length, 0);
+                    txtMessage.ScrollToCaret();
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void txtMessageUpdate(object sender, LogEventArgs e)
+        {
+            txtMessageUpdate(_messageLog.Text);
+        }
+
+        # endregion
+
+        # region Form Component Events
 
         private void cmdStart_Click(object sender, EventArgs e)
         {
             SaveProperties();
 
-            if (Controller.IsConnected == false)
+            if (_controller.IsConnected == false)
                 cmdConnect_Click(sender, e);
 
             // Define execution thread
-            if (ExecutionThread != null)
+            if (_executionThread != null)
             {
-                Controller.StopExecution();
-                ExecutionThread.Abort();
+                _controller.StopExecution();
+                _executionThread.Abort();
             }
 
-            ExecutionThread = new Thread(StartExecution);
-            ExecutionThread.IsBackground = true;
-            var SimSpeed = (ushort)(Math.Round(Properties.Settings.Default.SimulationSpeed * 10));
-            if (SimSpeed != 10)
-                Controller.SetSimulationSpeed(SimSpeed);
-            ExecutionThread.Start();
+            _executionThread = new Thread(StartExecution) {IsBackground = true};
+
+            var simSpeed = (ushort) (Math.Round(Settings.Default.SimulationSpeed*10));
+            if (simSpeed != 10)
+                _controller.SetSimulationSpeed(simSpeed);
+            _executionThread.Start();
         }
 
         private void cmdConnect_Click(object sender, EventArgs e)
         {
-            if (Connect() == false) return;
+            Connect();
+
             //TimeSpan TotalDelay = TimeSpan.Zero;
             //int NumOfTestPackets = 5;
             //for (int i = 0; i < NumOfTestPackets; ++i)
@@ -245,99 +347,19 @@ namespace RobX.Controller
         {
             if (cboRobotType.SelectedIndex == 0) // if simulation
             {
-                Properties.Settings.Default.RealIP = txtIPAddress.Text;
-                Properties.Settings.Default.RealPort = txtPort.Text;
-                txtIPAddress.Text = Properties.Settings.Default.SimulatorIP;
-                txtPort.Text = Properties.Settings.Default.SimulatorPort;
+                Settings.Default.RealIP = txtIPAddress.Text;
+                Settings.Default.RealPort = txtPort.Text;
+                txtIPAddress.Text = Settings.Default.SimulatorIP;
+                txtPort.Text = Settings.Default.SimulatorPort;
             }
             else
             {
-                Properties.Settings.Default.SimulatorIP = txtIPAddress.Text;
-                Properties.Settings.Default.SimulatorPort = txtPort.Text;
-                txtIPAddress.Text = Properties.Settings.Default.RealIP;
-                txtPort.Text = Properties.Settings.Default.RealPort;
+                Settings.Default.SimulatorIP = txtIPAddress.Text;
+                Settings.Default.SimulatorPort = txtPort.Text;
+                txtIPAddress.Text = Settings.Default.RealIP;
+                txtPort.Text = Settings.Default.RealPort;
             }
-            Properties.Settings.Default.RobotType = cboRobotType.SelectedIndex;
-        }
-
-        private bool CheckInputErrors()
-        {
-            var ipValid = true;
-            var portValid = true;
-
-            System.Net.IPAddress ip;
-            if (System.Net.IPAddress.TryParse(txtIPAddress.Text, out ip) == false)
-            {
-                txtMessage.AddLine("Invalid IP address format!");
-                ipValid = false;
-            }
-
-            ushort port;
-            if (ushort.TryParse(txtPort.Text, out port) == false || port < 2)
-            {
-                txtMessage.AddLine("Invalid port number!");
-                portValid = false;
-            }
-
-            return ipValid && portValid;
-        }
-
-        private bool Connect()
-        {
-            SaveProperties();
-            if (CheckInputErrors())
-                return Controller.Connect(txtIPAddress.Text, Int32.Parse(txtPort.Text));
-            return false;
-        }
-
-        private void LoadProperties()
-        {
-            Size = Properties.Settings.Default.FormSize;
-            Location = Properties.Settings.Default.FormPosition;
-            txtSimSpeed.Text = Properties.Settings.Default.SimulationSpeed.ToString("0.0");
-
-            if (Properties.Settings.Default.RobotType == 1)
-            {
-                txtIPAddress.Text = Properties.Settings.Default.SimulatorIP;
-                txtPort.Text = Properties.Settings.Default.SimulatorPort;
-            }
-            else
-            {
-                txtIPAddress.Text = Properties.Settings.Default.RealIP;
-                txtPort.Text = Properties.Settings.Default.RealPort;
-            }
-            cboRobotType.SelectedIndex = Properties.Settings.Default.RobotType;
-        }
-
-        private void SaveProperties()
-        {
-            if (cboRobotType.SelectedIndex == 0) // if simulation
-            {
-                Properties.Settings.Default.SimulatorIP = txtIPAddress.Text;
-                Properties.Settings.Default.SimulatorPort = txtPort.Text;
-            }
-            else
-            {
-                Properties.Settings.Default.RealIP = txtIPAddress.Text;
-                Properties.Settings.Default.RealPort = txtPort.Text;
-            }
-            Properties.Settings.Default.SimulationSpeed = double.Parse(txtSimSpeed.Text);
-            Properties.Settings.Default.RobotType = cboRobotType.SelectedIndex;
-            Properties.Settings.Default.FormPosition = Location;
-            Properties.Settings.Default.FormSize = Size;
-            Properties.Settings.Default.Save();
-        }
-
-        private void frmLog_Resize(object sender, EventArgs e)
-        {
-            var Spacing = 6;
-            txtMessage.Height = ClientSize.Height - pnlController.Height - tabController.Height;
-            tabController.Top = txtMessage.Height + Spacing;
-            tabController.Width = ClientSize.Width;
-
-            cmdStart.Left = pnlController.Width - cmdStart.Width - Spacing;
-            cmdConnect.Left = cmdStart.Left;
-            cboRobotType.Width = cmdConnect.Left - cboRobotType.Left - Spacing;
+            Settings.Default.RobotType = cboRobotType.SelectedIndex;
         }
 
         private void txtPort_KeyPress(object sender, KeyPressEventArgs e)
@@ -359,5 +381,7 @@ namespace RobX.Controller
         {
             (sender as TextBox).SaveTextBox_CtrlS(e);
         }
+
+        # endregion
     }
 }

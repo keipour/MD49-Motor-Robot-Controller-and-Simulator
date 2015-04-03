@@ -1,6 +1,7 @@
 ﻿# region Includes
 
 using System.Collections.Generic;
+using System.Drawing;
 using RobX.Library.Commons;
 
 # endregion
@@ -80,7 +81,7 @@ namespace RobX.Simulator
             /// <summary>
             /// The trace (path) of the robot in the simulation
             /// </summary>
-            public List<System.Drawing.PointF> Trace = new List<System.Drawing.PointF>();
+            public List<PointF> Trace = new List<PointF>();
         }
     }
 }

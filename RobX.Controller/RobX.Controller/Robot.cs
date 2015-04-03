@@ -9,92 +9,101 @@ using RobX.Library.Communication.TCP;
 namespace RobX.Controller
 {
     /// <summary>
-    /// Class that contains robot hardware-level commands and general robot specifications
+    /// Class that contains robot hardware-level commands and general robot specifications.
     /// </summary>
     public class Robot
     {
-        // -------------------------------------- Public Constants ------------------------------ //
+        # region Public Constants
 
         /// <summary>
-        /// Motor encoder count per shaft turn
+        /// Motor encoder count per shaft turn.
         /// </summary>
         public const int EncoderCountPerTurn = 980;
 
         /// <summary>
-        /// Converts robot speed to millimeters per second
+        /// Converts robot speed to millimeters per second.
         /// </summary>
-        public const double RobotSpeedToMMpS = 6.25F;
+        public const double RobotSpeedToMmpS = 6.25F;
 
         /// <summary>
-        /// Converts encoder count to millimeters
+        /// Converts encoder count to millimeters.
         /// </summary>
-        public const double EncoderCount2mM = WheelDiameter * Math.PI / EncoderCountPerTurn;
+        public const double EncoderCount2mM = WheelDiameter*Math.PI/EncoderCountPerTurn;
 
         /// <summary>
-        /// Diameter of robot wheels in millimeters
+        /// Diameter of robot wheels in millimeters.
         /// </summary>
         public const double WheelDiameter = 125.0F;
 
         /// <summary>
-        /// The robot radius in millimeters
+        /// The robot radius in millimeters.
         /// </summary>
         public const int Radius = 250;
 
-        // ------------------------------------------- Private Variables --------------------------------------- //
+        # endregion
 
-        private TCPClient RobotClient;
-        private Library.Commons.Robot.RobotType RobotType;
+        # region Private Variables 
 
-        // ------------------------------------------- Event Handlers ------------------------------------------ //
+        private readonly TCPClient _robotClient;
+        private readonly Library.Commons.Robot.RobotType _robotType;
+
+        # endregion
+
+        # region Event Handlers
 
         /// <summary>
-        /// Event handler for ReceivedData event (will be invoked after data is received)
+        /// Event handler for ReceivedData event (will be invoked after data is received).
         /// </summary>
         public event CommunicationEventHandler ReceivedData;
 
         /// <summary>
-        /// Event handler for SentData event (will be invoked after data is sent)
+        /// Event handler for SentData event (will be invoked after data is sent).
         /// </summary>
         public event CommunicationEventHandler SentData;
 
         /// <summary>
-        /// Event handler for BeforeSendingData event (will be invoked when server is ready to send data)
+        /// Event handler for BeforeSendingData event (will be invoked when server is ready to send data).
         /// </summary>
         public event CommunicationEventHandler BeforeSendingData;
 
         /// <summary>
-        /// Event handler for StatusChange event (will be invoked after anything new happens in the communication)
+        /// Event handler for StatusChange event (will be invoked after anything new happens in the communication).
         /// </summary>
         public event CommunicationStatusEventHandler StatusChanged;
 
+        /// <summary>
+        /// Event that is invoked when an error is occured.
+        /// </summary>
         public event EventHandler ErrorOccured;
 
-        // ------------------------------------------- Constructors and Events --------------------------------- //
+        # endregion
+
+        # region Constructors and Events
 
         /// <summary>
-        /// Constructor for the robot class
+        /// Constructor for the robot class.
         /// </summary>
-        /// <param name="robotType">Specifies robot type (Simulation vs. Real)</param>
+        /// <param name="robotType">Specifies robot type (Simulation vs. Real).</param>
         public Robot(Library.Commons.Robot.RobotType robotType)
         {
-            RobotType = robotType;
+            _robotType = robotType;
 
             // Initialize robot's network interface
-            RobotClient = new TCPClient();
+            _robotClient = new TCPClient();
 
             // Add event handlers
-            RobotClient.ReceivedData += RobotReceivedData;
-            RobotClient.SentData += RobotSentData;
-            RobotClient.StatusChanged += RobotStatusChanged;
-            RobotClient.BeforeSendingData += RobotBeforeSendingData;
-            RobotClient.ErrorOccured += RobotErrorOccured;
+            _robotClient.ReceivedData += RobotReceivedData;
+            _robotClient.SentData += RobotSentData;
+            _robotClient.StatusChanged += RobotStatusChanged;
+            _robotClient.BeforeSendingData += RobotBeforeSendingData;
+            _robotClient.ErrorOccured += RobotErrorOccured;
         }
 
         /// <summary>
-        /// Invokes the ReceivedData event when data is received from the robot (over the network)
+        /// Invokes the ReceivedData event when data is received from the robot (over the network).
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the received data</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the received data.</param>
         private void RobotReceivedData(object sender, CommunicationEventArgs e)
         {
             if (ReceivedData != null)
@@ -102,10 +111,10 @@ namespace RobX.Controller
         }
 
         /// <summary>
-        /// Invokes the SentData event when data is sent to the robot (over the network)
+        /// Invokes the SentData event when data is sent to the robot (over the network).
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the sent data</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the sent data.</param>
         private void RobotSentData(object sender, CommunicationEventArgs e)
         {
             if (SentData != null)
@@ -113,10 +122,10 @@ namespace RobX.Controller
         }
 
         /// <summary>
-        /// Invokes the StatusChanged event when the robot connection state is changed
+        /// Invokes the StatusChanged event when the robot connection state is changed.
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the status change message</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the status change message.</param>
         private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
             if (StatusChanged != null)
@@ -125,10 +134,10 @@ namespace RobX.Controller
 
 
         /// <summary>
-        /// Invokes the BeforeSendingData event when data is ready to be sent to the robot (over the network)
+        /// Invokes the BeforeSendingData event when data is ready to be sent to the robot (over the network).
         /// </summary>
-        /// <param name="sender">The sender object</param>
-        /// <param name="e">Event arguments including the sent data</param>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="e">Event arguments including the sent data.</param>
         private void RobotBeforeSendingData(object sender, CommunicationEventArgs e)
         {
             if (BeforeSendingData != null)
@@ -141,81 +150,83 @@ namespace RobX.Controller
                 ErrorOccured(this, e);
         }
 
-        // ------------------------------------------- Public Functions ---------------------------------------- //
+        # endregion
+
+        # region Public Functions
 
         /// <summary>
-        /// Connect to robot or simulator over the network
+        /// Connect to robot or simulator over the network.
         /// </summary>
-        /// <param name="IPAddress">IP address of the robot (or simulator)</param>
-        /// <param name="Port">Port number of the robot (or simulator)</param>
-        /// <returns>Returns true if successfully connected to the robot</returns>
-        public Boolean Connect(String IPAddress, int Port)
+        /// <param name="ipAddress">IP address of the robot (or simulator).</param>
+        /// <param name="port">Port number of the robot (or simulator).</param>
+        /// <returns>Returns true if successfully connected to the robot.</returns>
+        public Boolean Connect(String ipAddress, int port)
         {
-            return RobotClient.Connect(IPAddress, Port);
+            return _robotClient.Connect(ipAddress, port);
         }
 
         /// <summary>
-        /// Get voltage of the robot batteries
+        /// Get voltage of the robot batteries.
         /// </summary>
-        /// <returns>The voltage of the robot batteries (in volts)</returns>
+        /// <returns>The voltage of the robot batteries (in volts).</returns>
         public byte GetVolts()
         {
-            byte[] Buffer = { 0x00, 0x26 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x26};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
-        /// Get current drawn by the motor 1 of the robot (1 Amperes = 10)
+        /// Get current drawn by the motor 1 of the robot (1 Amperes = 10).
         /// </summary>
-        /// <returns>Ten times the amperage of the robot motor 1</returns>
+        /// <returns>Ten times the amperage of the robot motor 1.</returns>
         public byte GetCurrent1()
         {
-            byte[] Buffer = { 0x00, 0x27 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x27};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
-        /// Get current drawn by the motor 2 of the robot (1 Amperes = 10)
+        /// Get current drawn by the motor 2 of the robot (1 Amperes = 10).
         /// </summary>
-        /// <returns>Ten times the amperage of the robot motor 2</returns>
+        /// <returns>Ten times the amperage of the robot motor 2.</returns>
         public byte GetCurrent2()
         {
-            byte[] Buffer = { 0x00, 0x28 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x28};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
-        /// Get the voltage of the batteries and the current drawn by the robot motors
+        /// Get the voltage of the batteries and the current drawn by the robot motors.
         /// </summary>
-        /// <param name="Volts">Voltage of the robot batteries</param>
-        /// <param name="Current1">Ten times the amperage of the robot motor 1</param>
-        /// <param name="Current2">Ten times the amperage of the robot motor 2</param>
-        public void GetVI(out int Volts, out int Current1, out int Current2)
+        /// <param name="volts">Voltage of the robot batteries.</param>
+        /// <param name="current1">Ten times the amperage of the robot motor 1.</param>
+        /// <param name="current2">Ten times the amperage of the robot motor 2.</param>
+        public void GetVi(out int volts, out int current1, out int current2)
         {
-            byte[] Buffer = { 0x00, 0x2C };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 3);
-            Volts = Buffer[0];
-            Current1 = Buffer[1];
-            Current2 = Buffer[2];
+            byte[] buffer = {0x00, 0x2C};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 3);
+            volts = buffer[0];
+            current1 = buffer[1];
+            current2 = buffer[2];
         }
 
         /// <summary>
-        /// Get the version of the robot motor firmware
+        /// Get the version of the robot motor firmware.
         /// </summary>
-        /// <returns>The version of the robot motor firmware</returns>
+        /// <returns>The version of the robot motor firmware.</returns>
         public byte GetVersion()
         {
-            byte[] Buffer = { 0x00, 0x29 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x29};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
@@ -223,13 +234,13 @@ namespace RobX.Controller
         /// In mode 0 or 1 gets the speed and direction of wheel 1. 
         /// In mode 2 or 3 gets the speed and direction of both wheels (subject to effect of turn register).
         /// </summary>
-        /// <returns>Speed1 value of the robot</returns>
+        /// <returns>Speed1 value of the robot.</returns>
         public short GetSpeed1()
         {
-            byte[] Buffer = { 0x00, 0x21 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x21};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
@@ -237,77 +248,77 @@ namespace RobX.Controller
         /// In mode 0 or 1 gets the speed and direction of wheel 2. 
         /// In mode 2 or 3 becomes a Turn value, and is combined with Speed 1 to steer the device. 
         /// </summary>
-        /// <returns>Speed2 value of the robot</returns>
+        /// <returns>Speed2 value of the robot.</returns>
         public short GetSpeed2()
         {
-            byte[] Buffer = { 0x00, 0x22 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x22};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
-        /// Get the encoder value of wheel 1 of the robot
+        /// Get the encoder value of wheel 1 of the robot.
         /// </summary>
-        /// <returns>Encoder value of wheel 1 of the robot</returns>
+        /// <returns>Encoder value of wheel 1 of the robot.</returns>
         public int GetEncoder1()
         {
-            byte[] Buffer = { 0x00, 0x23 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 4);
-            int result = Buffer[3];
-            result += Buffer[2] << 8;
-            result += Buffer[1] << 16;
-            result += Buffer[0] << 24;
+            byte[] buffer = {0x00, 0x23};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 4);
+            int result = buffer[3];
+            result += buffer[2] << 8;
+            result += buffer[1] << 16;
+            result += buffer[0] << 24;
             return result;
         }
 
         /// <summary>
-        /// Get the encoder value of wheel 2 of the robot
+        /// Get the encoder value of wheel 2 of the robot.
         /// </summary>
-        /// <returns>Encoder value of wheel 2 of the robot</returns>
+        /// <returns>Encoder value of wheel 2 of the robot.</returns>
         public int GetEncoder2()
         {
-            byte[] Buffer = { 0x00, 0x24 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 4);
-            int result = Buffer[3];
-            result += Buffer[2] << 8;
-            result += Buffer[1] << 16;
-            result += Buffer[0] << 24;
+            byte[] buffer = {0x00, 0x24};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 4);
+            int result = buffer[3];
+            result += buffer[2] << 8;
+            result += buffer[1] << 16;
+            result += buffer[0] << 24;
             return result;
         }
 
         /// <summary>
-        /// Get the encoder values of both wheels of the robot
+        /// Get the encoder values of both wheels of the robot.
         /// </summary>
-        /// <param name="Encoder1">Encoder value of wheel 1 of the robot</param>
-        /// <param name="Encoder2">Encoder value of wheel 2 of the robot</param>
-        public void GetEncoders(out int Encoder1, out int Encoder2)
+        /// <param name="encoder1">Encoder value of wheel 1 of the robot.</param>
+        /// <param name="encoder2">Encoder value of wheel 2 of the robot.</param>
+        public void GetEncoders(out int encoder1, out int encoder2)
         {
-            byte[] Buffer = { 0x00, 0x25 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 8);
-            Encoder1 = Buffer[3];
-            Encoder1 += Buffer[2] << 8;
-            Encoder1 += Buffer[1] << 16;
-            Encoder1 += Buffer[0] << 24;
-            Encoder2 = Buffer[7];
-            Encoder2 += Buffer[6] << 8;
-            Encoder2 += Buffer[5] << 16;
-            Encoder2 += Buffer[4] << 24;
+            byte[] buffer = {0x00, 0x25};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 8);
+            encoder1 = buffer[3];
+            encoder1 += buffer[2] << 8;
+            encoder1 += buffer[1] << 16;
+            encoder1 += buffer[0] << 24;
+            encoder2 = buffer[7];
+            encoder2 += buffer[6] << 8;
+            encoder2 += buffer[5] << 16;
+            encoder2 += buffer[4] << 24;
         }
 
         /// <summary>
-        /// Get acceleration level (1 - 10) for robot motors
+        /// Get acceleration level (1 - 10) for robot motors.
         /// </summary>
-        /// <returns>Acceleration level for robot motors</returns>
+        /// <returns>Acceleration level for robot motors.</returns>
         public byte GetAcceleration()
         {
-            byte[] Buffer = { 0x00, 0x2A };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x2A};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
@@ -319,38 +330,38 @@ namespace RobX.Controller
         /// <para>3 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. 
         /// Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).</para>
         /// </summary>
-        /// <returns>Mode of the motor (0 - 3)</returns>
+        /// <returns>Mode of the motor (0 - 3).</returns>
         public byte GetMode()
         {
-            byte[] Buffer = { 0x00, 0x2B };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            return Buffer[0];
+            byte[] buffer = {0x00, 0x2B};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            return buffer[0];
         }
 
         /// <summary>
-        /// Get the error state of the robot
+        /// Get the error state of the robot.
         /// </summary>
-        /// <param name="VoltsUnder16">If true, voltage of the robot batteries is under 16 volts</param>
-        /// <param name="VoltsOver30">If true, voltage of the robot batteries is over 30 volts</param>
-        /// <param name="Motor1Trip">If true, wheel 1 of the robot is tripping</param>
-        /// <param name="Motor2Trip">If true, wheel 2 of the robot is tripping</param>
-        /// <param name="Motor1Short">If true, motor 1 of the robot is short-circuited (draws large current)</param>
-        /// <param name="Motor2Short">If true, motor 2 of the robot is short-circuited (draws large current)</param>
-        /// <returns>Returns false if no errors occured; otherwise returns true</returns>
-        public bool GetError(out bool VoltsUnder16, out bool VoltsOver30, out bool Motor1Trip,
-            out bool Motor2Trip, out bool Motor1Short, out bool Motor2Short)
+        /// <param name="voltsUnder16">If true, voltage of the robot batteries is under 16 volts.</param>
+        /// <param name="voltsOver30">If true, voltage of the robot batteries is over 30 volts.</param>
+        /// <param name="motor1Trip">If true, wheel 1 of the robot is tripping.</param>
+        /// <param name="motor2Trip">If true, wheel 2 of the robot is tripping.</param>
+        /// <param name="motor1Short">If true, motor 1 of the robot is short-circuited (draws large current).</param>
+        /// <param name="motor2Short">If true, motor 2 of the robot is short-circuited (draws large current).</param>
+        /// <returns>Returns false if no errors occured; otherwise returns true.</returns>
+        public bool GetError(out bool voltsUnder16, out bool voltsOver30, out bool motor1Trip,
+            out bool motor2Trip, out bool motor1Short, out bool motor2Short)
         {
-            byte[] Buffer = { 0x00, 0x2D };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 1);
-            VoltsUnder16 = (Buffer[0] & (1 << 7)) == 1;
-            VoltsOver30 = (Buffer[0] & (1 << 6)) == 1;
-            Motor1Trip = (Buffer[0] & (1 << 2)) == 1;
-            Motor2Trip = (Buffer[0] & (1 << 3)) == 1;
-            Motor1Short = (Buffer[0] & (1 << 4)) == 1;
-            Motor2Short = (Buffer[0] & (1 << 5)) == 1;
-            return (VoltsOver30 && VoltsUnder16 && Motor1Short && Motor1Trip && Motor2Short && Motor2Trip);
+            byte[] buffer = {0x00, 0x2D};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 1);
+            voltsUnder16 = (buffer[0] & (1 << 7)) == 1;
+            voltsOver30 = (buffer[0] & (1 << 6)) == 1;
+            motor1Trip = (buffer[0] & (1 << 2)) == 1;
+            motor2Trip = (buffer[0] & (1 << 3)) == 1;
+            motor1Short = (buffer[0] & (1 << 4)) == 1;
+            motor2Short = (buffer[0] & (1 << 5)) == 1;
+            return (voltsOver30 && voltsUnder16 && motor1Short && motor1Trip && motor2Short && motor2Trip);
         }
 
         /// <summary>
@@ -358,11 +369,11 @@ namespace RobX.Controller
         /// In mode 0 or 1 sets the speed and direction of wheel 1. 
         /// In mode 2 or 3 sets the speed and direction of both wheels (subject to effect of turn register).
         /// </summary>
-        /// <param name="Speed">Speed1 value of the robot</param>
-        public void SetSpeed1(short Speed)
+        /// <param name="speed">Speed1 value of the robot.</param>
+        public void SetSpeed1(short speed)
         {
-            byte[] Buffer = { 0x00, 0x31, (byte)Speed };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x31, (byte) speed};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
@@ -370,11 +381,11 @@ namespace RobX.Controller
         /// In mode 0 or 1 sets the speed and direction of wheel 2. 
         /// In mode 2 or 3 becomes a turn value, and is combined with Speed 1 to steer the device. 
         /// </summary>
-        /// <param name="Speed">Speed2 value of the robot</param>
-        public void SetSpeed2(short Speed)
+        /// <param name="speed">Speed2 value of the robot.</param>
+        public void SetSpeed2(short speed)
         {
-            byte[] Buffer = { 0x00, 0x32, (byte)Speed };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x32, (byte) speed};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
@@ -383,21 +394,21 @@ namespace RobX.Controller
         /// In mode 2 or 3 Speed1 sets the speed and direction of both wheels (subject to effect of Spees2 register) and Speed 2
         /// becomes a turn value, and is combined with Speed1 to steer the device.
         /// </summary>
-        /// <param name="Speed1">Speed1 value of the robot</param>
-        /// <param name="Speed2">Speed2 value of the robot</param>
-        public void SetSpeeds(short Speed1, short Speed2)
+        /// <param name="speed1">Speed1 value of the robot.</param>
+        /// <param name="speed2">Speed2 value of the robot.</param>
+        public void SetSpeeds(short speed1, short speed2)
         {
-            byte[] Buffer = { 0x00, 0x31, (byte)Speed1, 0x00, 0x32, (byte)Speed2 };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x31, (byte) speed1, 0x00, 0x32, (byte) speed2};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
-        /// Set acceleration level (1 - 10) for robot motors
+        /// Set acceleration level (1 - 10) for robot motors.
         /// </summary>
-        public void SetAcceleration(byte Acceleration)
+        public void SetAcceleration(byte acceleration)
         {
-            byte[] Buffer = { 0x00, 0x33, Acceleration };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x33, acceleration};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
@@ -407,40 +418,40 @@ namespace RobX.Controller
         /// 2 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
         /// 3 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
         /// </summary>
-        /// <returns>Mode of the motor (0 - 3)</returns>
-        public void SetMode(Library.Commons.Robot.SpeedModes Mode)
+        /// <returns>Mode of the motor (0 - 3).</returns>
+        public void SetMode(Library.Commons.Robot.SpeedModes mode)
         {
-            byte[] Buffer = { 0x00, 0x34, (byte)Mode };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x34, (byte) mode};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
-        /// Reset (set to zero) the values of robot wheel encoders
+        /// Reset (set to zero) the values of robot wheel encoders.
         /// </summary>
         public void ResetEncoders()
         {
-            byte[] Buffer = { 0x00, 0x35 };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x35};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
         /// Turn off speed regulation: If the required speed is not being achieved, increase power to the motors 
-        /// until it reaches the desired rate (or the motors reach the maximum output)
+        /// until it reaches the desired rate (or the motors reach the maximum output).
         /// </summary>
         public void DisableRegulator()
         {
-            byte[] Buffer = { 0x00, 0x36 };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x36};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
         /// Turn on speed regulation: If the required speed is not being achieved, increase power to the motors 
-        /// until it reaches the desired rate (or the motors reach the maximum output)
+        /// until it reaches the desired rate (or the motors reach the maximum output).
         /// </summary>
         public void EnableRegulator()
         {
-            byte[] Buffer = { 0x00, 0x37 };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x37};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
@@ -448,8 +459,8 @@ namespace RobX.Controller
         /// </summary>
         public void DisableTimeout()
         {
-            byte[] Buffer = { 0x00, 0x38 };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x38};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
@@ -457,91 +468,103 @@ namespace RobX.Controller
         /// </summary>
         public void EnableTimeout()
         {
-            byte[] Buffer = { 0x00, 0x39 };
-            RobotClient.SendData(Buffer);
+            byte[] buffer = {0x00, 0x39};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
-        /// Set x position of the robot in the environment in millimeters (works only in simulation mode)
+        /// Set x position of the robot in the environment in millimeters (works only in simulation mode).
         /// </summary>
-        /// <param name="X">X position of the robot in the environment in millimeters</param>
-        public void SetX(short X)
+        /// <param name="x">X position of the robot in the environment in millimeters.</param>
+        public void SetX(short x)
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return;
-            byte[] Buffer = { 0x00, 0x41, (byte)(X >> 8), (byte)(X & 0xFF) };
-            RobotClient.SendData(Buffer);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            byte[] buffer = {0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF)};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
         /// Set y position of the robot in the environment in millimeters (works only in simulation mode)
         /// </summary>
-        /// <param name="Y">Y position of the robot in the environment in millimeters</param>
-        public void SetY(short Y)
+        /// <param name="y">Y position of the robot in the environment in millimeters.</param>
+        public void SetY(short y)
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return;
-            byte[] Buffer = { 0x00, 0x42, (byte)(Y >> 8), (byte)(Y & 0xFF) };
-            RobotClient.SendData(Buffer);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            byte[] buffer = {0x00, 0x42, (byte) (y >> 8), (byte) (y & 0xFF)};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
-        /// Set angle of the robot in the environment in degrees (works only in simulation mode)
+        /// Set angle of the robot in the environment in degrees (works only in simulation mode).
         /// </summary>
-        /// <param name="Angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees)</param>
-        public void SetAngle(short Angle)
+        /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
+        public void SetAngle(short angle)
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return;
-            byte[] Buffer = { 0x00, 0x43, (byte)(Angle >> 8), (byte)(Angle & 0xFF) };
-            RobotClient.SendData(Buffer);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            byte[] buffer = {0x00, 0x43, (byte) (angle >> 8), (byte) (angle & 0xFF)};
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
         /// Set x and y positions of the robot in the environment in millimeters (works only in simulation mode)
         /// </summary>
-        /// <param name="X">X position of the robot in the environment in millimeters</param>
-        /// <param name="Y">Y position of the robot in the environment in millimeters</param>
-        public void SetXY(short X, short Y)
+        /// <param name="x">X position of the robot in the environment in millimeters.</param>
+        /// <param name="y">Y position of the robot in the environment in millimeters.</param>
+        public void SetXy(short x, short y)
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return;
-            byte[] Buffer = {   0x00, 0x41, (byte)(X >> 8), (byte)(X & 0xFF) ,
-                                0x00, 0x42, (byte)(Y >> 8), (byte)(Y & 0xFF) };
-            RobotClient.SendData(Buffer);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            byte[] buffer =
+            {
+                0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
+                0x00, 0x42, (byte) (y >> 8), (byte) (y & 0xFF)
+            };
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
-        /// Set angle (in degrees), x and y positions (in millimeters) of the robot in the environment (works only in simulation mode)
+        /// Set angle (in degrees), x and y positions (in millimeters) of the robot in the environment (works only in simulation mode).
         /// </summary>
-        /// <param name="X">X position of the robot in the environment in millimeters</param>
-        /// <param name="Y">Y position of the robot in the environment in millimeters</param>
-        /// <param name="Angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees)</param>
-        public void SetXYAngle(short X, short Y, short Angle)
+        /// <param name="x">X position of the robot in the environment in millimeters.</param>
+        /// <param name="y">Y position of the robot in the environment in millimeters.</param>
+        /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
+        public void SetXyAngle(short x, short y, short angle)
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return;
-            byte[] Buffer = {   0x00, 0x41, (byte)(X >> 8), (byte)(X & 0xFF) ,
-                                0x00, 0x42, (byte)(Y >> 8), (byte)(Y & 0xFF),
-                                0x00, 0x43, (byte)(Angle >> 8), (byte)(Angle & 0xFF) };
-            RobotClient.SendData(Buffer);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            byte[] buffer =
+            {
+                0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
+                0x00, 0x42, (byte) (y >> 8), (byte) (y & 0xFF),
+                0x00, 0x43, (byte) (angle >> 8), (byte) (angle & 0xFF)
+            };
+            _robotClient.SendData(buffer);
         }
 
         /// <summary>
-        /// Set simulation speed on simulator (works only in simulation mode)
+        /// Set simulation speed on simulator (works only in simulation mode).
         /// </summary>
-        /// <param name="Speed">Ten times the new simulation speed (1 = 0.1x)</param>
-        public void SetSimulationSpeed(ushort Speed)
+        /// <param name="speed">Ten times the new simulation speed (1 = 0.1x).</param>
+        public void SetSimulationSpeed(ushort speed)
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return;
-            byte[] Buffer = { 0x00, 0x51, (byte)(Speed >> 8), (byte)(Speed & 0xFF) };
-            RobotClient.SendData(Buffer);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            byte[] buffer = {0x00, 0x51, (byte) (speed >> 8), (byte) (speed & 0xFF)};
+            _robotClient.SendData(buffer);
         }
 
+        /// <summary>
+        /// Get simulation speed of simulator (works only in simulation mode).
+        /// </summary>
+        /// <returns>Ten time the simulation speed of the simulator (1 = 0.1x).</returns>
         public ushort GetSimulationSpeed()
         {
-            if (RobotType == Library.Commons.Robot.RobotType.Real) return 0;
-            byte[] Buffer = { 0x00, 0x52 };
-            RobotClient.SendData(Buffer);
-            Buffer = RobotClient.ReceiveData(true, 2);
-            ushort result = Buffer[1];
-            result += (ushort)(Buffer[0] << 8);
+            if (_robotType == Library.Commons.Robot.RobotType.Real) return 0;
+            byte[] buffer = {0x00, 0x52};
+            _robotClient.SendData(buffer);
+            buffer = _robotClient.ReceiveData(true, 2);
+            ushort result = buffer[1];
+            result += (ushort) (buffer[0] << 8);
             return result;
         }
+
+        # endregion
     }
 }

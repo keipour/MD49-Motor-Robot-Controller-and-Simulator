@@ -1,6 +1,7 @@
 ﻿# region Includes
 
 using System;
+using Microsoft.Xna.Framework.Graphics;
 using RobX.Library.Commons;
 
 # endregion
@@ -14,7 +15,7 @@ namespace RobX.Simulator
     {
         // -------------------------------------- Public Variables ------------------------------ //
 
-        public Microsoft.Xna.Framework.Graphics.Texture2D[] Image;
+        public Texture2D[] Image;
 
         /// <summary>
         /// The version of the motor controller's software
@@ -193,8 +194,8 @@ namespace RobX.Simulator
 
         // ------------------------------------------ Constructor ------------------------------- //
 
-        private byte previousmode = 0;
-        private byte mode = 0;
+        private byte previousmode;
+        private byte mode;
         private byte speed1 = 128;
         private byte speed2 = 128;
     }

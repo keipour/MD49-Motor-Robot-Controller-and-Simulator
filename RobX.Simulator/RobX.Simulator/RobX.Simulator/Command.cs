@@ -1,4 +1,6 @@
-﻿namespace RobX.Simulator
+﻿using System;
+
+namespace RobX.Simulator
 {
     /// <summary>
     /// This class provides a structure for the commands received by the simulated robot.
@@ -15,7 +17,7 @@
         /// <summary>
         /// Time at which the command is received by the robot.
         /// </summary>
-        public System.DateTime Timestamp;
+        public DateTime Timestamp;
 
         # endregion
 
@@ -26,7 +28,7 @@
         /// </summary>
         /// <param name="code">Code of the received command.</param>
         /// <param name="timestamp">Time of the received command.</param>
-        public Command(byte code, System.DateTime timestamp)
+        public Command(byte code, DateTime timestamp)
         {
             Code = code;
             Timestamp = timestamp;

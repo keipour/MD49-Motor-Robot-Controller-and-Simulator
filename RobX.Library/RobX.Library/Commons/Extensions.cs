@@ -1,7 +1,9 @@
 ﻿# region Includes
 
 using System;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 
 # endregion
@@ -81,8 +83,8 @@ namespace RobX.Library.Commons
             for (var i = dotCount; i < 3; ++i)
                 str += ".0";
 
-            System.Net.IPAddress ip;
-            if (System.Net.IPAddress.TryParse(str, out ip) == false)
+            IPAddress ip;
+            if (IPAddress.TryParse(str, out ip) == false)
                 e.Handled = true;
         }
 
@@ -117,7 +119,7 @@ namespace RobX.Library.Commons
             };
             
             if (sfdSaveLog.ShowDialog() == DialogResult.OK)
-                System.IO.File.WriteAllText(sfdSaveLog.FileName, textBox.Text);
+                File.WriteAllText(sfdSaveLog.FileName, textBox.Text);
             
             sfdSaveLog.Dispose();
         }

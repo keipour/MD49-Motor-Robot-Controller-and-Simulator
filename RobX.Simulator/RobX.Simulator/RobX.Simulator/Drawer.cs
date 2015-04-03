@@ -4,6 +4,7 @@ using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RobX.Library.Commons;
+using RobX.Simulator.Properties;
 
 # endregion
 
@@ -36,7 +37,7 @@ namespace RobX.Simulator
         /// <param name="yscale">Conversion scale of ground height to screen height (converts millimeters to pixels).</param>
         private void DrawGround(SpriteBatch Frame, Color Color, int GroundWidth, int GroundHeight, double xscale, double yscale)
         {
-            GraphicsEngine.FillRect(Frame, new Rectangle(0, 0, (int)(GroundWidth * xscale), (int)(GroundHeight * yscale)), Color);
+            Frame.FillRect(new Rectangle(0, 0, (int)(GroundWidth * xscale), (int)(GroundHeight * yscale)), Color);
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace RobX.Simulator
             double xscale, double yscale, int LineWidth = 1, int VerticalGridDistance = 500, int HorizontalGridDistance = 500)
         {
             // Pattern of the dashed lines of the grids
-            var Pattern = new int[] { 3, 5 };
+            var Pattern = new[] { 3, 5 };
 
             // Calculate distance between vertical grid lines
             var VerticalLines = ScreenWidth / VerticalGridDistance;
@@ -160,7 +161,7 @@ namespace RobX.Simulator
                 var obs = Env.Obstacles[i];
                 Vector2[] points = null;
                 var Rect = new Rectangle();
-                var color = (Color)obs.Color;
+                var color = obs.Color;
 
                 if (obs.Type == Obstacle.ObstacleType.RectangleFilled ||
                     obs.Type == Obstacle.ObstacleType.RectangleBorder)
@@ -248,7 +249,7 @@ namespace RobX.Simulator
 
             // ------------ Print Simulation Speed -------------------
             str = Simulator.SimulationSpeed.ToString("0.0") + "x";
-            Frame.DrawString(str, Properties.Settings.Default.SimulationSpeedColor, GraphicsEngine.SimulationSpeedFont, 30, 
+            Frame.DrawString(str, Settings.Default.SimulationSpeedColor, GraphicsEngine.SimulationSpeedFont, 30, 
                 ScreenHeight, GraphicsEngine.HorizontalTextAlign.Left, GraphicsEngine.VerticalTextAlign.Bottom);
         }
 
@@ -288,20 +289,20 @@ namespace RobX.Simulator
             try
             {
                 // Draw ground
-                DrawGround(SubFrame, Properties.Settings.Default.GroundColor, Environment.Ground.Width, Environment.Ground.Height, xscale, yscale);
+                DrawGround(SubFrame, Settings.Default.GroundColor, Environment.Ground.Width, Environment.Ground.Height, xscale, yscale);
 
                 // Draw obstacles
-                if (Properties.Settings.Default.DrawObstacles)
+                if (Settings.Default.DrawObstacles)
                     DrawObstacles(SubFrame, Environment, xoffset, yoffset, xscale, yscale);
 
                 // Draw grids
-                if (Properties.Settings.Default.DrawGrids)
-                    DrawGrids(SubFrame, Properties.Settings.Default.GridLineColor, Properties.Settings.Default.GridFontColor,
+                if (Settings.Default.DrawGrids)
+                    DrawGrids(SubFrame, Settings.Default.GridLineColor, Settings.Default.GridFontColor,
                         Environment.Ground.Width, Environment.Ground.Height, xoffset, yoffset, xscale, yscale);
 
                 // Draw robot traces
-                if (Properties.Settings.Default.DrawRobotTrace)
-                    DrawRobotTrace(SubFrame, Environment, xoffset, yoffset, Properties.Settings.Default.RobotTraceColor, xscale, yscale);
+                if (Settings.Default.DrawRobotTrace)
+                    DrawRobotTrace(SubFrame, Environment, xoffset, yoffset, Settings.Default.RobotTraceColor, xscale, yscale);
 
                 // Draw robot
                 DrawRobot(SubFrame, Environment, Robot, xoffset, yoffset, xscale, yscale);
@@ -367,8 +368,8 @@ namespace RobX.Simulator
                 RenderSubframe(ref Frame, ScreenWidth, ScreenHeight, ref Environment, Robot, RenderType, xscale, yscale);
 
                 // Draw statistics (simulation time, etc.)
-                if (Properties.Settings.Default.DrawStatistics)
-                    DrawStatistics(Frame, Environment, Robot, Properties.Settings.Default.StatisticsFontColor, TotalTime, xscale, yscale);
+                if (Settings.Default.DrawStatistics)
+                    DrawStatistics(Frame, Environment, Robot, Settings.Default.StatisticsFontColor, TotalTime, xscale, yscale);
             }
             catch { }
 

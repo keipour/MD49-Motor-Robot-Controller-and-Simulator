@@ -1,11 +1,14 @@
-﻿namespace RobX.Controller
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace RobX.Controller
 {
     partial class frmController
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -311,25 +314,25 @@
 
         #endregion
 
-        private System.Windows.Forms.Button cmdStart;
-        private System.Windows.Forms.TextBox txtMessage;
-        private System.Windows.Forms.Button cmdConnect;
-        private System.Windows.Forms.TextBox txtPort;
-        private System.Windows.Forms.Label lblIPAddress;
-        private System.Windows.Forms.Label lblPort;
-        private System.Windows.Forms.ComboBox cboRobotType;
-        private System.Windows.Forms.Panel pnlController;
-        private System.Windows.Forms.TextBox txtIPAddress;
-        private System.Windows.Forms.Label lblSimSpeed;
-        private System.Windows.Forms.TextBox txtSimSpeed;
-        private System.Windows.Forms.CheckBox chkKeyboardControl;
-        private System.Windows.Forms.TabControl tabController;
-        private System.Windows.Forms.TabPage tabLog;
-        private System.Windows.Forms.TabPage tabAbout;
-        private System.Windows.Forms.TextBox txtAbout;
-        private System.Windows.Forms.TabPage tabHelp;
-        private System.Windows.Forms.TextBox txtHelp;
-        private System.Windows.Forms.TextBox txtLog;
+        private Button cmdStart;
+        private TextBox txtMessage;
+        private Button cmdConnect;
+        private TextBox txtPort;
+        private Label lblIPAddress;
+        private Label lblPort;
+        private ComboBox cboRobotType;
+        private Panel pnlController;
+        private TextBox txtIPAddress;
+        private Label lblSimSpeed;
+        private TextBox txtSimSpeed;
+        private CheckBox chkKeyboardControl;
+        private TabControl tabController;
+        private TabPage tabLog;
+        private TabPage tabAbout;
+        private TextBox txtAbout;
+        private TabPage tabHelp;
+        private TextBox txtHelp;
+        private TextBox txtLog;
 
     }
 }

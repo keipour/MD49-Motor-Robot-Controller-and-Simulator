@@ -6,6 +6,7 @@ using RobX.Library.Commons;
 using RobX.Library.Communication;
 using RobX.Library.Communication.TCP;
 using RobX.Library.Tools;
+using RobX.Simulator.Properties;
 
 # endregion
 
@@ -76,7 +77,7 @@ namespace RobX.Simulator
                 RobotServer.StatusChanged += TCPStatusChanged;
                 RobotServer.BeforeSendingData += TCPBeforeSendingData;
             }
-            RobotServer.StartServer(ushort.Parse(Properties.Settings.Default.ServerPort));
+            RobotServer.StartServer(ushort.Parse(Settings.Default.ServerPort));
         }
 
         private void frmSimulator_KeyDown(object sender, KeyEventArgs e)
@@ -89,7 +90,7 @@ namespace RobX.Simulator
             var width = ClientSize.Width;
             var height = tabSimulator.Top;
 
-            if (Properties.Settings.Default.KeepAspectRatio)
+            if (Settings.Default.KeepAspectRatio)
             {
                 picSimulation.Left = 0;
                 picSimulation.Top = 0;
@@ -159,7 +160,7 @@ namespace RobX.Simulator
             if (txtLog.InvokeRequired)
             {
                 var d = new SetTextCallback(UpdateTextBox);
-                Invoke(d, new object[] { ServerLogText });
+                Invoke(d, ServerLogText);
             }
             else
             {
@@ -197,16 +198,16 @@ namespace RobX.Simulator
                 else if (e.KeyCode == Keys.F1)
                     tabSimulator.SelectedTab = tabHelp;
                 else if (e.KeyCode == Keys.G)
-                    Properties.Settings.Default.DrawGrids = !Properties.Settings.Default.DrawGrids;
+                    Settings.Default.DrawGrids = !Settings.Default.DrawGrids;
                 else if (e.KeyCode == Keys.S)
-                    Properties.Settings.Default.DrawStatistics = !Properties.Settings.Default.DrawStatistics;
+                    Settings.Default.DrawStatistics = !Settings.Default.DrawStatistics;
                 else if (e.KeyCode == Keys.O)
-                    Properties.Settings.Default.DrawObstacles = !Properties.Settings.Default.DrawObstacles;
+                    Settings.Default.DrawObstacles = !Settings.Default.DrawObstacles;
                 else if (e.KeyCode == Keys.T)
-                    Properties.Settings.Default.DrawRobotTrace = !Properties.Settings.Default.DrawRobotTrace;
+                    Settings.Default.DrawRobotTrace = !Settings.Default.DrawRobotTrace;
                 else if (e.KeyCode == Keys.A)
                 {
-                    Properties.Settings.Default.KeepAspectRatio = !Properties.Settings.Default.KeepAspectRatio;
+                    Settings.Default.KeepAspectRatio = !Settings.Default.KeepAspectRatio;
                     frmSimulator_Resize(this, new EventArgs());
                 }
             }
@@ -219,14 +220,14 @@ namespace RobX.Simulator
                 Simulator.StopSimulation();
             else if (e.KeyCode == Keys.Escape)
                 Application.Exit();
-            else if (e.KeyCode == Properties.Settings.Default.ToggleKeyboardControl)
+            else if (e.KeyCode == Settings.Default.ToggleKeyboardControl)
                 chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
 
-            if (chkKeyboardControl.Checked || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+            if (chkKeyboardControl.Checked || e.KeyCode == Settings.Default.GlobalStopKey)
             {
-                if (e.KeyCode == Properties.Settings.Default.ForwardKey || e.KeyCode == Properties.Settings.Default.BackwardKey ||
-                    e.KeyCode == Properties.Settings.Default.RotateClockwiseKey || e.KeyCode == Properties.Settings.Default.StopKey ||
-                    e.KeyCode == Properties.Settings.Default.RotateCounterClockwiseKey)
+                if (e.KeyCode == Settings.Default.ForwardKey || e.KeyCode == Settings.Default.BackwardKey ||
+                    e.KeyCode == Settings.Default.RotateClockwiseKey || e.KeyCode == Settings.Default.StopKey ||
+                    e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
                 {
                     // Set robot mode to 0
                     Simulator.AddCommands(new byte[] { 0x00, 0x34, 0x00 });
@@ -235,27 +236,27 @@ namespace RobX.Simulator
                     Simulator.AddCommands(new byte[] { 0x00, 0x39 });
                 }
 
-                if (e.KeyCode == Properties.Settings.Default.ForwardKey)
+                if (e.KeyCode == Settings.Default.ForwardKey)
                 {
                     Simulator.AddCommands(new byte[] { 0x00, 0x31, 148 });
                     Simulator.AddCommands(new byte[] { 0x00, 0x32, 148 });
                 }
-                else if (e.KeyCode == Properties.Settings.Default.BackwardKey)
+                else if (e.KeyCode == Settings.Default.BackwardKey)
                 {
                     Simulator.AddCommands(new byte[] { 0x00, 0x31, 108 });
                     Simulator.AddCommands(new byte[] { 0x00, 0x32, 108 });
                 }
-                else if (e.KeyCode == Properties.Settings.Default.RotateClockwiseKey)
+                else if (e.KeyCode == Settings.Default.RotateClockwiseKey)
                 {
                     Simulator.AddCommands(new byte[] { 0x00, 0x31, 148 });
                     Simulator.AddCommands(new byte[] { 0x00, 0x32, 108 });
                 }
-                else if (e.KeyCode == Properties.Settings.Default.RotateCounterClockwiseKey)
+                else if (e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
                 {
                     Simulator.AddCommands(new byte[] { 0x00, 0x31, 108 });
                     Simulator.AddCommands(new byte[] { 0x00, 0x32, 148 });
                 }
-                else if (e.KeyCode == Properties.Settings.Default.StopKey || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+                else if (e.KeyCode == Settings.Default.StopKey || e.KeyCode == Settings.Default.GlobalStopKey)
                 {
                     Simulator.AddCommands(new byte[] { 0x00, 0x31, 128 });
                     Simulator.AddCommands(new byte[] { 0x00, 0x32, 128 });
@@ -279,18 +280,18 @@ namespace RobX.Simulator
 
         private void SaveSettings()
         {
-            Properties.Settings.Default.ServerPort = txtServerPort.Text;
-            Properties.Settings.Default.FormPosition = Location;
-            Properties.Settings.Default.FormSize = Size;
-            Properties.Settings.Default.Save();
+            Settings.Default.ServerPort = txtServerPort.Text;
+            Settings.Default.FormPosition = Location;
+            Settings.Default.FormSize = Size;
+            Settings.Default.Save();
         }
 
         private void LoadSettings()
         {
             UserDefinitions.DefineSimulation(ref Simulator);
-            Size = Properties.Settings.Default.FormSize;
-            Location = Properties.Settings.Default.FormPosition;
-            txtServerPort.Text = Properties.Settings.Default.ServerPort;
+            Size = Settings.Default.FormSize;
+            Location = Settings.Default.FormPosition;
+            txtServerPort.Text = Settings.Default.ServerPort;
         }
 
         private void txtServerPort_KeyPress(object sender, KeyPressEventArgs e)

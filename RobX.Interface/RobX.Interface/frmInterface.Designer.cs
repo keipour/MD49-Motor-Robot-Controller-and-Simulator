@@ -1,11 +1,14 @@
-﻿namespace RobX.Interface
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace RobX.Interface
 {
     partial class frmInterface
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -272,22 +275,22 @@
 
         #endregion
 
-        private System.Windows.Forms.Button cmdConnect;
-        private System.Windows.Forms.Label lblCOMPort;
-        private System.Windows.Forms.ComboBox cboCOMPorts;
-        private System.Windows.Forms.Button cmdRefresh;
-        private System.Windows.Forms.Panel pnlProperties;
-        private System.Windows.Forms.Label lblServerPort;
-        private System.Windows.Forms.TextBox txtServerPort;
-        private System.Windows.Forms.TextBox txtMessage;
-        private System.Windows.Forms.TextBox txtLog;
-        private System.Windows.Forms.TabControl tabController;
-        private System.Windows.Forms.TabPage tabLog;
-        private System.Windows.Forms.TabPage tabHelp;
-        private System.Windows.Forms.TextBox txtHelp;
-        private System.Windows.Forms.TabPage tabAbout;
-        private System.Windows.Forms.TextBox txtAbout;
-        private System.Windows.Forms.CheckBox chkKeyboardControl;
+        private Button cmdConnect;
+        private Label lblCOMPort;
+        private ComboBox cboCOMPorts;
+        private Button cmdRefresh;
+        private Panel pnlProperties;
+        private Label lblServerPort;
+        private TextBox txtServerPort;
+        private TextBox txtMessage;
+        private TextBox txtLog;
+        private TabControl tabController;
+        private TabPage tabLog;
+        private TabPage tabHelp;
+        private TextBox txtHelp;
+        private TabPage tabAbout;
+        private TextBox txtAbout;
+        private CheckBox chkKeyboardControl;
 
     }
 }

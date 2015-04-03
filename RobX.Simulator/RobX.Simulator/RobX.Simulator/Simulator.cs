@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using RobX.Library.Commons;
+using RobX.Simulator.Properties;
 
 # endregion
 
@@ -29,7 +31,7 @@ namespace RobX.Simulator
         /// <summary>
         /// Sets simulation speed (1.0 = realtime)
         /// </summary>
-        public static double SimulationSpeed = Properties.Settings.Default.DefaultSimulationSpeed;
+        public static double SimulationSpeed = Settings.Default.DefaultSimulationSpeed;
 
         // ------------------------------------------ Public Variables ----------------------------- //
 
@@ -48,7 +50,7 @@ namespace RobX.Simulator
         /// </summary>
         public RenderOptions Render = new RenderOptions();
 
-        public bool IsRunning = false;               // Indicates whether the simulation is running
+        public bool IsRunning;               // Indicates whether the simulation is running
 
         // ------------------------------------------ Private Variables ---------------------------- //
 
@@ -143,7 +145,7 @@ namespace RobX.Simulator
         /// <param name="control">Control to draw simulation that has Graphics (Form, PictureBox, etc.)</param>
         /// <param name="interval">Minimum interval (in milliseconds) between two consecutive simulation frames</param>
         /// <param name="renderType">Render type for simulation frames</param>
-        public void RunSimulation(System.Windows.Forms.Control control, int interval,
+        public void RunSimulation(Control control, int interval,
             RenderOptions.RenderType renderType = RenderOptions.RenderType.StaticAxis_ZeroCentered)
         {
             Render.Type = renderType;
@@ -190,7 +192,7 @@ namespace RobX.Simulator
             public enum RenderType
             {
                 StaticAxis_ZeroCentered = 0,    // The screen is fixed and centered on (0, 0)
-                StaticAxis_ZeroCornered = 1,    // The screen is fixed and (0, 0) is the lower-left corner
+                StaticAxis_ZeroCornered = 1    // The screen is fixed and (0, 0) is the lower-left corner
             }
 
             /// <summary>

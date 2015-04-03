@@ -1,11 +1,14 @@
-﻿namespace RobX.Simulator
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace RobX.Simulator
 {
     partial class frmSimulator
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -264,21 +267,21 @@
 
         #endregion
 
-        private System.Windows.Forms.TabControl tabSimulator;
-        private System.Windows.Forms.TabPage tabServerLog;
-        private System.Windows.Forms.TabPage tabHelp;
-        private System.Windows.Forms.TabPage tabAbout;
-        private System.Windows.Forms.TextBox txtLog;
-        private System.Windows.Forms.TextBox txtHelp1;
-        private System.Windows.Forms.TextBox txtHelp2;
-        private System.Windows.Forms.TextBox txtAbout;
-        public System.Windows.Forms.PictureBox picSimulation;
-        private System.Windows.Forms.TabPage tabSettings;
-        private System.Windows.Forms.Panel pnlSettings;
-        private System.Windows.Forms.CheckBox chkKeyboardControl;
-        private System.Windows.Forms.Label lblServerPort;
-        private System.Windows.Forms.TextBox txtServerPort;
-        private System.Windows.Forms.Button cmdStartServer;
+        private TabControl tabSimulator;
+        private TabPage tabServerLog;
+        private TabPage tabHelp;
+        private TabPage tabAbout;
+        private TextBox txtLog;
+        private TextBox txtHelp1;
+        private TextBox txtHelp2;
+        private TextBox txtAbout;
+        public PictureBox picSimulation;
+        private TabPage tabSettings;
+        private Panel pnlSettings;
+        private CheckBox chkKeyboardControl;
+        private Label lblServerPort;
+        private TextBox txtServerPort;
+        private Button cmdStartServer;
 
     }
 }

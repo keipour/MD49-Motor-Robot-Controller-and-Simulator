@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using RobX.Interface.Properties;
 using RobX.Library.Commons;
 using RobX.Library.Communication;
 using RobX.Library.Communication.COM;
@@ -90,7 +91,7 @@ namespace RobX.Interface
             if (txtLog.InvokeRequired)
             {
                 var d = new SetTextCallback(UpdateTextBox);
-                Invoke(d, new object[] { LogText });
+                Invoke(d, LogText);
             }
             else
             {
@@ -172,13 +173,13 @@ namespace RobX.Interface
             foreach (var comPort in COMPorts)
             {
                 cboCOMPorts.Items.Add(string.Format("{0} – {1}", comPort.Name, comPort.Description));
-                if (comPort.Name == Properties.Settings.Default.COMPort)
+                if (comPort.Name == Settings.Default.COMPort)
                     LastCOMPort = cboCOMPorts.Items.Count - 1;
             }
             cboCOMPorts.SelectedIndex = LastCOMPort;
             
             if (cboCOMPorts.Items.Count > 0)
-                Properties.Settings.Default.COMPort = COMPorts[cboCOMPorts.SelectedIndex].Name;
+                Settings.Default.COMPort = COMPorts[cboCOMPorts.SelectedIndex].Name;
         }
 
         private void frmLog_FormClosing(object sender, FormClosingEventArgs e)
@@ -204,18 +205,18 @@ namespace RobX.Interface
         private void SaveProperties()
         {
             if (cboCOMPorts.Items.Count > 0)
-                Properties.Settings.Default.COMPort = COMPorts[cboCOMPorts.SelectedIndex].Name;
-            Properties.Settings.Default.ServerPort = txtServerPort.Text;
-            Properties.Settings.Default.FormPosition = Location;
-            Properties.Settings.Default.FormSize = Size;
-            Properties.Settings.Default.Save();
+                Settings.Default.COMPort = COMPorts[cboCOMPorts.SelectedIndex].Name;
+            Settings.Default.ServerPort = txtServerPort.Text;
+            Settings.Default.FormPosition = Location;
+            Settings.Default.FormSize = Size;
+            Settings.Default.Save();
         }
 
         private void LoadProperties()
         {
-            Size = Properties.Settings.Default.FormSize;
-            Location = Properties.Settings.Default.FormPosition;
-            txtServerPort.Text = Properties.Settings.Default.ServerPort;
+            Size = Settings.Default.FormSize;
+            Location = Settings.Default.FormPosition;
+            txtServerPort.Text = Settings.Default.ServerPort;
         }
 
         private void txtServerPort_KeyPress(object sender, KeyPressEventArgs e)
@@ -225,30 +226,30 @@ namespace RobX.Interface
 
         private void HandleHotKeys(KeyEventArgs e)
         {
-            if (e.KeyCode == Properties.Settings.Default.ToggleKeyboardControl)
+            if (e.KeyCode == Settings.Default.ToggleKeyboardControl)
                 chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
             else if (e.KeyCode == Keys.Escape)
                 Application.Exit();
 
-            if (chkKeyboardControl.Checked || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+            if (chkKeyboardControl.Checked || e.KeyCode == Settings.Default.GlobalStopKey)
             {
-                if (e.KeyCode == Properties.Settings.Default.ForwardKey || e.KeyCode == Properties.Settings.Default.BackwardKey ||
-                    e.KeyCode == Properties.Settings.Default.RotateClockwiseKey || e.KeyCode == Properties.Settings.Default.StopKey ||
-                    e.KeyCode == Properties.Settings.Default.RotateCounterClockwiseKey)
+                if (e.KeyCode == Settings.Default.ForwardKey || e.KeyCode == Settings.Default.BackwardKey ||
+                    e.KeyCode == Settings.Default.RotateClockwiseKey || e.KeyCode == Settings.Default.StopKey ||
+                    e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
                 {
                     // Set robot mode to 0 and enable timeout
                     Robot.SendData(new byte[] { 0x00, 0x34, 0x00, 0x00, 0x39 });
                 }
 
-                if (e.KeyCode == Properties.Settings.Default.ForwardKey)
+                if (e.KeyCode == Settings.Default.ForwardKey)
                     Robot.SendData(new byte[] { 0x00, 0x31, 148, 0x00, 0x32, 148 });
-                else if (e.KeyCode == Properties.Settings.Default.BackwardKey)
+                else if (e.KeyCode == Settings.Default.BackwardKey)
                     Robot.SendData(new byte[] { 0x00, 0x31, 108, 0x00, 0x32, 108 });
-                else if (e.KeyCode == Properties.Settings.Default.RotateClockwiseKey)
+                else if (e.KeyCode == Settings.Default.RotateClockwiseKey)
                     Robot.SendData(new byte[] { 0x00, 0x31, 148, 0x00, 0x32, 108 });
-                else if (e.KeyCode == Properties.Settings.Default.RotateCounterClockwiseKey)
+                else if (e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
                     Robot.SendData(new byte[] { 0x00, 0x31, 108, 0x00, 0x32, 148 });
-                else if (e.KeyCode == Properties.Settings.Default.StopKey || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+                else if (e.KeyCode == Settings.Default.StopKey || e.KeyCode == Settings.Default.GlobalStopKey)
                     Robot.SendData(new byte[] { 0x00, 0x31, 128, 0x00, 0x32, 128 });
 
                 e.SuppressKeyPress = true;

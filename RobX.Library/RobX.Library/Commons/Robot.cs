@@ -1,4 +1,7 @@
-﻿namespace RobX.Library.Commons
+﻿using System;
+using System.IO.Ports;
+
+namespace RobX.Library.Commons
 {
     /// <summary>
     /// This class keeps all common properties of RobX robot.
@@ -42,7 +45,7 @@
         /// <summary>
         /// Converts encoder count to distance in millimeters for EMG49 motor set used in RobX robot.
         /// </summary>
-        public const double EncoderCount2mM = WheelDiameter * System.Math.PI / EncoderCountPerTurn;
+        public const double EncoderCount2mM = WheelDiameter * Math.PI / EncoderCountPerTurn;
 
         # endregion
 
@@ -56,12 +59,12 @@
         /// <summary>
         /// Parity for connection with COM port of the MD49 motor used in RobX robot.
         /// </summary>
-        public const System.IO.Ports.Parity Parity = System.IO.Ports.Parity.None;
+        public const Parity Parity = System.IO.Ports.Parity.None;
 
         /// <summary>
         /// Number of stop bits for connection with COM port of the MD49 motor used in RobX robot.
         /// </summary>
-        public const System.IO.Ports.StopBits StopBits = System.IO.Ports.StopBits.Two;
+        public const StopBits StopBits = System.IO.Ports.StopBits.Two;
 
         /// <summary>
         /// Baud rate for connection with COM port of the MD49 motor used in RobX robot.

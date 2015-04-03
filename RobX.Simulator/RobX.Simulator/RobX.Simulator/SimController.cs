@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using RobX.Simulator.Properties;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 
 # endregion
 
@@ -25,12 +27,12 @@ namespace RobX.Simulator
         Form SimulatorForm;
         PictureBox SimulatorPictureBox;
 
-        int draw_total_frames = 0;
-        float draw_elapsed_time = 0.0f;
-        int update_total_count = 0;
-        float update_elapsed_time = 0.0f;
-        public static int DrawFPS = 0;
-        public static int UpdateRate = 0;
+        int draw_total_frames;
+        float draw_elapsed_time;
+        int update_total_count;
+        float update_elapsed_time;
+        public static int DrawFPS;
+        public static int UpdateRate;
 
         public SimController(IntPtr DrawingSurface, frmSimulator SimulatorForm, PictureBox SimulatorPictureBox)
         {
@@ -51,7 +53,7 @@ namespace RobX.Simulator
             //Tell the mouse it will be getting it's input through the pictureBox
             Mouse.WindowHandle = DrawingSurface;
 
-            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / Properties.Settings.Default.UpdateRate);
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / Settings.Default.UpdateRate);
 
             graphics.IsFullScreen = false;
             graphics.PreferredBackBufferWidth = SimulatorPictureBox.ClientSize.Width;
@@ -108,7 +110,7 @@ namespace RobX.Simulator
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 Exit();
 
             update_elapsed_time += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
