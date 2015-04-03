@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 # endregion
 
-namespace RobX.Tools
+namespace RobX.Library.Tools
 {
     # region Event Handler Delegate
 
@@ -25,18 +25,18 @@ namespace RobX.Tools
     /// </summary>
     public class LogEventArgs : EventArgs
     {
-        private string mText = "";
-        private List<Log.LogItem> mItems = new List<Log.LogItem>();
+        private readonly string _mText;
+        private readonly List<Log.LogItem> _mItems;
 
         /// <summary>
         /// Text added to the log.
         /// </summary>
-        public string Text { get { return mText; } }
+        public string Text { get { return _mText; } }
 
         /// <summary>
         /// LogItems added to the log.
         /// </summary>
-        public List<Log.LogItem> Items { get { return mItems; } }
+        public List<Log.LogItem> Items { get { return _mItems; } }
 
         /// <summary>
         /// Constructor for LogEventArgs event argument class.
@@ -45,8 +45,8 @@ namespace RobX.Tools
         /// <param name="items">New items added to the log.</param>
         public LogEventArgs(string text, List<Log.LogItem> items)
         {
-            mText = text;
-            mItems = items;
+            _mText = text;
+            _mItems = items;
         }
     }
 

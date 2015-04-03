@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmController));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(frmController));
             this.cmdStart = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.cmdConnect = new System.Windows.Forms.Button();

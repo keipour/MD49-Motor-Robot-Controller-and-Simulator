@@ -52,7 +52,7 @@ namespace RobX.Simulator
                 return;
             }
 
-            int X = StartX;
+            var X = StartX;
             for (; X <= EndX - Pattern[0]; X += Pattern[0] + Pattern[1])
                 Sprite.DrawHorizontalLine(X, X + Pattern[0], Y, Color, LineWidth);
 
@@ -68,7 +68,7 @@ namespace RobX.Simulator
                 return;
             }
 
-            int Y = StartY;
+            var Y = StartY;
             for (; Y <= EndY - Pattern[0]; Y += Pattern[0] + Pattern[1])
                 Sprite.DrawVerticalLine(X, Y, Y + Pattern[0], Color, LineWidth);
 
@@ -84,11 +84,11 @@ namespace RobX.Simulator
             VerticalTextAlign AlignVertical = VerticalTextAlign.Center)
         {
             // Measure size of the drawn string
-            Vector2 strsize = Font.MeasureString(str);
+            var strsize = Font.MeasureString(str);
 
             // Calculate actual x and y positions of upper-left corner of text
-            int x = X;
-            int y = Y;
+            var x = X;
+            var y = Y;
 
             if (AlignHorizontal == HorizontalTextAlign.Center)
                 x -= (int)strsize.X / 2;
@@ -111,23 +111,23 @@ namespace RobX.Simulator
 
         public static void DrawLineSegment(this SpriteBatch Sprite, Vector2 point1, Vector2 point2, Color color, int lineWidth)
         {
-            float angle = (float)System.Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
-            float length = Vector2.Distance(point1, point2);
+            var angle = (float)System.Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            var length = Vector2.Distance(point1, point2);
 
             Sprite.Draw(pixel, point1, null, color, angle, Vector2.Zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
         }
 
         public static void DrawPath(this SpriteBatch Sprite, Vector2[] points, Color color, int lineWidth = 1)
         {
-            int Count = points.Length;
+            var Count = points.Length;
             if (Count >= 2)
-                for (int i = 0; i < Count - 1; i++)
+                for (var i = 0; i < Count - 1; i++)
                     DrawLineSegment(Sprite, points[i], points[i + 1], color, lineWidth);
         }
 
         public static void DrawPolygon(this SpriteBatch Sprite, Vector2[] points, Color color, int lineWidth = 1)
         {
-            int Count = points.Length;
+            var Count = points.Length;
             if (Count >= 2)
             {
                 DrawPath(Sprite, points, color, lineWidth);

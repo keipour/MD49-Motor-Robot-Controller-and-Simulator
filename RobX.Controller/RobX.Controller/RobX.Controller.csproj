@@ -88,9 +88,9 @@
     <Content Include="Controller.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\RobX.Commons\RobX.Commons\RobX.Commons.csproj">
+    <ProjectReference Include="..\..\RobX.Library\RobX.Library\RobX.Library.csproj">
       <Project>{2E943EE5-EECB-4CC0-815A-593B27CD5E5F}</Project>
-      <Name>RobX.Commons</Name>
+      <Name>RobX.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

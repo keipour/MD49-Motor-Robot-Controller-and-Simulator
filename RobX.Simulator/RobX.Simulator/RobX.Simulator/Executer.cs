@@ -39,7 +39,7 @@ namespace RobX.Simulator
             while (Commands.Count > 0 && Commands.First.Value.Timestamp <= time)
             {
                 // Read first command
-                Command command = Commands.First.Value;
+                var command = Commands.First.Value;
 
                 // All valid commands start with 0x00
                 if (command.Code != 0x00)
@@ -51,7 +51,7 @@ namespace RobX.Simulator
                 // All valid commands have at least 2 codes
                 if (Commands.Count < 2)
                 {
-                    if (UpdateState == true)
+                    if (UpdateState)
                     {
                         UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                         lasttime = time;
@@ -65,7 +65,7 @@ namespace RobX.Simulator
                 // Check if command time is before current time
                 if (command.Timestamp > time)
                 {
-                    if (UpdateState == true)
+                    if (UpdateState)
                     {
                         UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                         lasttime = time;
@@ -199,7 +199,7 @@ namespace RobX.Simulator
                     case 0x31: // Set Speed 1
                         if (Commands.Count < 3 || Commands.First.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -208,14 +208,14 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command Speed1 = Commands.First.Next.Next.Value;
-                        if (UpdateState == true)
+                        var Speed1 = Commands.First.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, Speed1.Timestamp);
                             lasttime = time;
                         }
 
-                        byte Mode1 = Robot.Mode;
+                        var Mode1 = Robot.Mode;
                         Robot.Speed1 = Speed1.Code;
 
                         // Remove the additional byte
@@ -229,7 +229,7 @@ namespace RobX.Simulator
                     case 0x32: // Set Speed 2
                         if (Commands.Count < 3 || Commands.First.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -238,14 +238,14 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command Speed2 = Commands.First.Next.Next.Value;
-                        if (UpdateState == true)
+                        var Speed2 = Commands.First.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, Speed2.Timestamp);
                             lasttime = time;
                         }
 
-                        byte Mode2 = Robot.Mode;
+                        var Mode2 = Robot.Mode;
                         Robot.Speed2 = Speed2.Code;
 
                         // Remove the additional byte
@@ -260,7 +260,7 @@ namespace RobX.Simulator
                     case 0x33: // Set Acceleration
                         if (Commands.Count < 3 || Commands.First.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -269,8 +269,8 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command Acceleration = Commands.First.Next.Next.Value;
-                        if (UpdateState == true)
+                        var Acceleration = Commands.First.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, Acceleration.Timestamp);
                             lasttime = time;
@@ -290,7 +290,7 @@ namespace RobX.Simulator
                     case 0x34: // Set Mode
                         if (Commands.Count < 3 || Commands.First.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -299,8 +299,8 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command Mode = Commands.First.Next.Next.Value;
-                        if (UpdateState == true)
+                        var Mode = Commands.First.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, Mode.Timestamp);
                             lasttime = time;
@@ -341,7 +341,7 @@ namespace RobX.Simulator
                     case 0x41: // Set robot x position
                         if (Commands.Count < 4 || Commands.First.Next.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -350,9 +350,9 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command XPositionHigh = Commands.First.Next.Next.Value;
-                        Command XPositionLow = Commands.First.Next.Next.Next.Value;
-                        if (UpdateState == true)
+                        var XPositionHigh = Commands.First.Next.Next.Value;
+                        var XPositionLow = Commands.First.Next.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, XPositionLow.Timestamp);
                             lasttime = time;
@@ -369,7 +369,7 @@ namespace RobX.Simulator
                     case 0x42: // Set robot y position
                         if (Commands.Count < 4 || Commands.First.Next.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -378,9 +378,9 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command YPositionHigh = Commands.First.Next.Next.Value;
-                        Command YPositionLow = Commands.First.Next.Next.Next.Value;
-                        if (UpdateState == true)
+                        var YPositionHigh = Commands.First.Next.Next.Value;
+                        var YPositionLow = Commands.First.Next.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, YPositionLow.Timestamp);
                             lasttime = time;
@@ -397,7 +397,7 @@ namespace RobX.Simulator
                     case 0x43: // Set robot angle (values -3600 to 3600 for -360.0 to 360.0 degrees)
                         if (Commands.Count < 4 || Commands.First.Next.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -406,9 +406,9 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command AngleHigh = Commands.First.Next.Next.Value;
-                        Command AngleLow = Commands.First.Next.Next.Next.Value;
-                        if (UpdateState == true)
+                        var AngleHigh = Commands.First.Next.Next.Value;
+                        var AngleLow = Commands.First.Next.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, AngleLow.Timestamp);
                             lasttime = time;
@@ -421,7 +421,7 @@ namespace RobX.Simulator
                     case 0x51: // Set simulation speed (10 = 1.0x is real-time)
                         if (Commands.Count < 4 || Commands.First.Next.Next.Next.Value.Timestamp > time)
                         {
-                            if (UpdateState == true)
+                            if (UpdateState)
                             {
                                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                                 lasttime = time;
@@ -430,9 +430,9 @@ namespace RobX.Simulator
                         }
 
                         // Read third byte
-                        Command SimSpeedHigh = Commands.First.Next.Next.Value;
-                        Command SimSpeedLow = Commands.First.Next.Next.Next.Value;
-                        if (UpdateState == true)
+                        var SimSpeedHigh = Commands.First.Next.Next.Value;
+                        var SimSpeedLow = Commands.First.Next.Next.Next.Value;
+                        if (UpdateState)
                         {
                             UpdateRobotState(ref Robot, ref Environment, lasttime, SimSpeedLow.Timestamp);
                             lasttime = time;
@@ -447,7 +447,7 @@ namespace RobX.Simulator
                         // Use lock to avoid multithreading issues
                         lock (Simulator.SendByteLock)
                         {
-                            ushort simSpeed = (ushort)(Math.Round(Simulator.SimulationSpeed * 10));
+                            var simSpeed = (ushort)(Math.Round(Simulator.SimulationSpeed * 10));
                             SendBytes.AddLast((byte)(simSpeed >> 8));
                             SendBytes.AddLast((byte)(simSpeed & 0xFF));
                         }
@@ -460,7 +460,7 @@ namespace RobX.Simulator
                 {
                     Commands.RemoveFirst();
                 }
-                DateTime lastcommandtime = Commands.First.Value.Timestamp;
+                var lastcommandtime = Commands.First.Value.Timestamp;
                 // Use lock to avoid multithreading issues
                 lock (Simulator.CommandsLock)
                 {
@@ -476,7 +476,7 @@ namespace RobX.Simulator
             }
 
 
-            if (UpdateState == true)
+            if (UpdateState)
             {
                 UpdateRobotState(ref Robot, ref Environment, lasttime, time);
                 lasttime = time;
@@ -496,14 +496,14 @@ namespace RobX.Simulator
         private void UpdateRobotState(ref Robot Robot, ref Environment Environment, DateTime starttime, DateTime endtime)
         {
             // Add robot trace to traces list
-            System.Drawing.PointF trace = new System.Drawing.PointF((float)Environment.Robot.X, (float)Environment.Robot.Y);
+            var trace = new System.Drawing.PointF((float)Environment.Robot.X, (float)Environment.Robot.Y);
             if (Environment.Robot.Trace.Count == 0 || Environment.Robot.Trace[Environment.Robot.Trace.Count - 1].X != trace.X ||
                 Environment.Robot.Trace[Environment.Robot.Trace.Count - 1].Y != trace.Y)
                 Environment.Robot.Trace.Add(trace);
 
             // Stop if robot timeout is set to true and timeout has happened
-            if ((starttime - LastCommandTime).TotalMilliseconds > Commons.Robot.MotorTimeoutInMS && 
-                Robot.Timeout == true)
+            if ((starttime - LastCommandTime).TotalMilliseconds > Library.Commons.Robot.MotorTimeoutInMs && 
+                Robot.Timeout)
             {
                 if (Robot.Mode == 0 || Robot.Mode == 2)
                 {
@@ -522,7 +522,7 @@ namespace RobX.Simulator
             Robot.WheelSpeeds(out Speed1, out Speed2);
             
             // Calculate elapsed simulation time
-            double totaltime = (endtime - starttime).TotalMilliseconds / 1000.0F * Simulator.SimulationSpeed;
+            var totaltime = (endtime - starttime).TotalMilliseconds / 1000.0F * Simulator.SimulationSpeed;
 
             // --------------------- Forward kinematics for differential drive robot ------------------------ //
 
@@ -534,19 +534,19 @@ namespace RobX.Simulator
             }
             else // if wheel speeds are not equal
             {
-                double L = 2 * Commons.Robot.Radius;                                // Distance between centers of two wheels
-                double R = L / 2 * (Speed1 + Speed2) / (Speed2 - Speed1);   // Radius of rotation
-                double W = (Speed2 - Speed1) / L;                           // Angular velocity of rotation
+                double L = 2 * Library.Commons.Robot.Radius;                                // Distance between centers of two wheels
+                var R = L / 2 * (Speed1 + Speed2) / (Speed2 - Speed1);   // Radius of rotation
+                var W = (Speed2 - Speed1) / L;                           // Angular velocity of rotation
                 
                 // Calculate center of rotation
-                double ICCx = Environment.Robot.X - R * Math.Sin(Math.PI / 180 * Environment.Robot.Angle);
-                double ICCy = Environment.Robot.Y + R * Math.Cos(Math.PI / 180 * Environment.Robot.Angle);
+                var ICCx = Environment.Robot.X - R * Math.Sin(Math.PI / 180 * Environment.Robot.Angle);
+                var ICCy = Environment.Robot.Y + R * Math.Cos(Math.PI / 180 * Environment.Robot.Angle);
 
                 // Calculate new x, y and angle of robot
-                double WT = W * totaltime;
-                double newX = Math.Cos(WT) * (Environment.Robot.X - ICCx) - Math.Sin(WT) * (Environment.Robot.Y - ICCy) + ICCx;
-                double newY = Math.Sin(WT) * (Environment.Robot.X - ICCx) + Math.Cos(WT) * (Environment.Robot.Y - ICCy) + ICCy;
-                double newAngle = (Environment.Robot.Angle + WT * 180 / Math.PI) % 360;
+                var WT = W * totaltime;
+                var newX = Math.Cos(WT) * (Environment.Robot.X - ICCx) - Math.Sin(WT) * (Environment.Robot.Y - ICCy) + ICCx;
+                var newY = Math.Sin(WT) * (Environment.Robot.X - ICCx) + Math.Cos(WT) * (Environment.Robot.Y - ICCy) + ICCy;
+                var newAngle = (Environment.Robot.Angle + WT * 180 / Math.PI) % 360;
 
                 // Replace old position values
                 Environment.Robot.X = newX;
@@ -556,12 +556,12 @@ namespace RobX.Simulator
 
             // ----------------------------- Calculate Wheel Encoder Counts --------------------------------
             // Calculate wheel movement in millimeters
-            double Distance1 = Speed1 * totaltime;
-            double Distance2 = Speed2 * totaltime;
+            var Distance1 = Speed1 * totaltime;
+            var Distance2 = Speed2 * totaltime;
 
             // Calculate encoder counts
-            int Encoder1 = (int)(Distance1 / Commons.Robot.EncoderCount2mM);
-            int Encoder2 = (int)(Distance2 / Commons.Robot.EncoderCount2mM);
+            var Encoder1 = (int)(Distance1 / Library.Commons.Robot.EncoderCount2mM);
+            var Encoder2 = (int)(Distance2 / Library.Commons.Robot.EncoderCount2mM);
 
             Robot.Encoder1 = Robot.Encoder1 + Encoder1;
             Robot.Encoder2 = Robot.Encoder2 + Encoder2;

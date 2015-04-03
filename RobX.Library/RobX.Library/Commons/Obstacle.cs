@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 
 # endregion
 
-namespace RobX.Commons
+namespace RobX.Library.Commons
 {
     /// <summary>
     /// Class that represents an obstacle in the environment.
@@ -52,7 +52,7 @@ namespace RobX.Commons
         /// <summary>
         /// Contains points for the current obstacle (if type is Polygon).
         /// </summary>
-        public Vector2[] Points = null;
+        public Vector2[] Points;
 
         /// <summary>
         /// Color of the obstacle when there is no collision with robot.
@@ -162,14 +162,14 @@ namespace RobX.Commons
         /// Detects collision of the obstacle with a circle (RobX robot). 
         /// WARNING: Currently works only for rectangle obstacles. 
         /// </summary>
-        /// <param name="CenterX">X position of center of the robot circle in millimeters.</param>
-        /// <param name="CenterY">Y position of center of the robot circle in millimeters.</param>
-        /// <param name="Radius">Radius of the robot in millimeters.</param>
+        /// <param name="centerX">X position of center of the robot circle in millimeters.</param>
+        /// <param name="centerY">Y position of center of the robot circle in millimeters.</param>
+        /// <param name="radius">Radius of the robot in millimeters.</param>
         /// <returns>Returns true if a rectangle obstacle is intersected with the robot; otherwise returns false.</returns>
-        public bool IsIntersected(double CenterX, double CenterY, double Radius)
+        public bool IsIntersected(double centerX, double centerY, double radius)
         {
             if (Type == ObstacleType.RectangleFilled || Type == ObstacleType.RectangleBorder)
-                return IsIntersected_Rect_Circle(CenterX, CenterY, Radius);
+                return IsIntersected_Rect_Circle(centerX, centerY, radius);
             return false;
         }
 
@@ -245,27 +245,27 @@ namespace RobX.Commons
         /// <summary>
         /// Detects collision of a rectangle obstacle with a circle. 
         /// </summary>
-        /// <param name="CenterX">X position of center of the circle in millimeters.</param>
-        /// <param name="CenterY">Y position of center of the circle in millimeters.</param>
-        /// <param name="Radius">Radius of the circle in millimeters.</param>
+        /// <param name="centerX">X position of center of the circle in millimeters.</param>
+        /// <param name="centerY">Y position of center of the circle in millimeters.</param>
+        /// <param name="radius">Radius of the circle in millimeters.</param>
         /// <returns>Returns true if the obstacle is intersected with the circle; otherwise returns false.</returns>
-        private bool IsIntersected_Rect_Circle(double CenterX, double CenterY, double Radius)
+        private bool IsIntersected_Rect_Circle(double centerX, double centerY, double radius)
         {
             if (Type == ObstacleType.RectangleFilled)
             {
-                Vector2 rectangleCenter = new Vector2((Rectangle.X + Rectangle.Width / 2),
+                var rectangleCenter = new Vector2((Rectangle.X + Rectangle.Width / 2),
                                                  (Rectangle.Y + Rectangle.Height / 2));
 
-                double width = Rectangle.Width / 2;
-                double height = Rectangle.Height / 2;
+                double width = Rectangle.Width / 2F;
+                double height = Rectangle.Height / 2F;
 
-                double dx = Math.Abs(CenterX - rectangleCenter.X);
-                double dy = Math.Abs(CenterY - rectangleCenter.Y);
+                var dx = Math.Abs(centerX - rectangleCenter.X);
+                var dy = Math.Abs(centerY - rectangleCenter.Y);
 
-                if (dx > (Radius + width) || dy > (Radius + height)) return false;
+                if (dx > (radius + width) || dy > (radius + height)) return false;
 
-                double distX = Math.Abs(CenterX - Rectangle.X - width);
-                double distY = Math.Abs(CenterY - Rectangle.Y - height);
+                var distX = Math.Abs(centerX - Rectangle.X - width);
+                var distY = Math.Abs(centerY - Rectangle.Y - height);
 
                 if (distX <= (width))
                     return true;
@@ -273,23 +273,20 @@ namespace RobX.Commons
                 if (distY <= (height))
                     return true;
 
-                double cornerDistanceSq = Math.Pow(distX - width, 2) + Math.Pow(distY - height, 2);
+                var cornerDistanceSq = Math.Pow(distX - width, 2) + Math.Pow(distY - height, 2);
 
-                return (cornerDistanceSq <= (Math.Pow(Radius, 2)));
+                return (cornerDistanceSq <= (Math.Pow(radius, 2)));
             }
-            else
-            {
-                Vector2 pc = new Vector2((float)CenterX, (float)CenterY);
-                Vector2 p1 = new Vector2(Rectangle.Left, Rectangle.Top);
-                Vector2 p2 = new Vector2(Rectangle.Left, Rectangle.Bottom);
-                Vector2 p3 = new Vector2(Rectangle.Right, Rectangle.Bottom);
-                Vector2 p4 = new Vector2(Rectangle.Right, Rectangle.Top);
-                if (FindDistanceToLine(pc, p1, p2) <= Radius) return true;
-                if (FindDistanceToLine(pc, p1, p4) <= Radius) return true;
-                if (FindDistanceToLine(pc, p2, p3) <= Radius) return true;
-                if (FindDistanceToLine(pc, p3, p4) <= Radius) return true;
-                return false;
-            }
+            
+            var pc = new Vector2((float)centerX, (float)centerY);
+            var p1 = new Vector2(Rectangle.Left, Rectangle.Top);
+            var p2 = new Vector2(Rectangle.Left, Rectangle.Bottom);
+            var p3 = new Vector2(Rectangle.Right, Rectangle.Bottom);
+            var p4 = new Vector2(Rectangle.Right, Rectangle.Top);
+            if (FindDistanceToLine(pc, p1, p2) <= radius) return true;
+            if (FindDistanceToLine(pc, p1, p4) <= radius) return true;
+            if (FindDistanceToLine(pc, p2, p3) <= radius) return true;
+            return FindDistanceToLine(pc, p3, p4) <= radius;
         }
 
         /// <summary>
@@ -301,9 +298,10 @@ namespace RobX.Commons
         /// <returns>The distance between the point pt and the segment p1 --> p2.</returns>
         private static double FindDistanceToLine(Vector2 pt, Vector2 p1, Vector2 p2)
         {
-            float dx = p2.X - p1.X;
-            float dy = p2.Y - p1.Y;
-            if ((dx == 0) && (dy == 0))
+            var dx = p2.X - p1.X;
+            var dy = p2.Y - p1.Y;
+            const double tolerance = .0001;
+            if (Math.Abs(dx) < tolerance && Math.Abs(dy) < tolerance)
             {
                 // It's a point not a line segment.
                 dx = pt.X - p1.X;
@@ -312,7 +310,7 @@ namespace RobX.Commons
             }
 
             // Calculate the t that minimizes the distance.
-            float t = ((pt.X - p1.X) * dx + (pt.Y - p1.Y) * dy) /
+            var t = ((pt.X - p1.X) * dx + (pt.Y - p1.Y) * dy) /
                 (dx * dx + dy * dy);
 
             // See if this represents one of the segment's

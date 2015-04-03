@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmInterface));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(frmInterface));
             this.cmdConnect = new System.Windows.Forms.Button();
             this.lblCOMPort = new System.Windows.Forms.Label();
             this.cboCOMPorts = new System.Windows.Forms.ComboBox();

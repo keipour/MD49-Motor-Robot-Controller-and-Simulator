@@ -8,8 +8,8 @@
     <ProjectGuid>{2E943EE5-EECB-4CC0-815A-593B27CD5E5F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RobX.Commons</RootNamespace>
-    <AssemblyName>RobX Commons</AssemblyName>
+    <RootNamespace>RobX.Library</RootNamespace>
+    <AssemblyName>RobX Library</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -22,7 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>..\..\bin\Debug\RobX Commons.XML</DocumentationFile>
+    <DocumentationFile>..\..\bin\Debug\RobX Library.xml</DocumentationFile>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -44,8 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons\Obstacle.cs" />
-    <Compile Include="Communication\COM\COMClient.cs" />
-    <Compile Include="Communication\COM\COMPort.cs" />
+    <Compile Include="Communication\COM\ComClient.cs" />
+    <Compile Include="Communication\COM\ComPort.cs" />
     <Compile Include="Communication\TCP\TCPClient.cs" />
     <Compile Include="Commons\Extensions.cs" />
     <Compile Include="Commons\Methods.cs" />

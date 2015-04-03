@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using RobX.Communication;
-using RobX.Communication.TCP;
-using RobX.Communication.COM;
-using RobX.Tools;
-using RobX.Commons;
+using RobX.Library.Commons;
+using RobX.Library.Communication;
+using RobX.Library.Communication.COM;
+using RobX.Library.Communication.TCP;
+using RobX.Library.Tools;
 
 # endregion
 
@@ -20,7 +20,7 @@ namespace RobX.Interface
     {
         private Log CommunicationLog = new Log();
         private TCPServer Server = new TCPServer();
-        private COMClient Robot = new COMClient();
+        private ComClient Robot = new ComClient();
 
         /// <summary>
         /// This is the constructor for the form class of the hardware interface of the robot.
@@ -37,8 +37,8 @@ namespace RobX.Interface
             frmLog_Resize(sender, e);
             cboCOMPorts.Select();
 
-            CommunicationLog.ItemsAdded += new LogEventHandler(UpdateTextBox);
-            CommunicationLog.LogCleared += new LogEventHandler(UpdateTextBox);
+            CommunicationLog.ItemsAdded += UpdateTextBox;
+            CommunicationLog.LogCleared += UpdateTextBox;
             Server.ReceivedData += TCPReceivedData;
             Server.SentData += TCPSentData;
             Server.StatusChanged += TCPStatusChanged;
@@ -89,8 +89,8 @@ namespace RobX.Interface
         {
             if (txtLog.InvokeRequired)
             {
-                SetTextCallback d = new SetTextCallback(UpdateTextBox);
-                this.Invoke(d, new object[] { LogText });
+                var d = new SetTextCallback(UpdateTextBox);
+                Invoke(d, new object[] { LogText });
             }
             else
             {
@@ -117,8 +117,8 @@ namespace RobX.Interface
 
         private bool CheckInputErrors()
         {
-            bool ServerPortValid = true;
-            bool COMPortValid = true;
+            var ServerPortValid = true;
+            var COMPortValid = true;
 
             ushort port;
             if (ushort.TryParse(txtServerPort.Text, out port) == false || port < 2)
@@ -144,10 +144,10 @@ namespace RobX.Interface
 
         private bool Connect()
         {
-            if (CheckInputErrors() == true)
+            if (CheckInputErrors())
             {
-                if (Robot.Connect(COMPorts[cboCOMPorts.SelectedIndex].Name, (int)Commons.Robot.BaudRate,
-                    Commons.Robot.DataBits, Commons.Robot.Parity, Commons.Robot.StopBits) == false)
+                if (Robot.Connect(COMPorts[cboCOMPorts.SelectedIndex].Name, (int)Library.Commons.Robot.BaudRate,
+                    Library.Commons.Robot.DataBits, Library.Commons.Robot.Parity, Library.Commons.Robot.StopBits) == false)
                 {
                     txtMessage.AddLine("Error! No COM devices are connected to the system!");
                     return false;
@@ -162,14 +162,14 @@ namespace RobX.Interface
             return false;
         }
 
-        private List<COMPort> COMPorts;
+        private List<ComPort> COMPorts;
         private void btnRefresh_Click(object sender, EventArgs e)
         {
-            COMPorts = COMPort.GetCOMPorts();
+            COMPorts = ComPort.GetComPorts();
             cboCOMPorts.Items.Clear();
 
-            int LastCOMPort = COMPorts.Count - 1;
-            foreach (COMPort comPort in COMPorts)
+            var LastCOMPort = COMPorts.Count - 1;
+            foreach (var comPort in COMPorts)
             {
                 cboCOMPorts.Items.Add(string.Format("{0} – {1}", comPort.Name, comPort.Description));
                 if (comPort.Name == Properties.Settings.Default.COMPort)
@@ -191,10 +191,10 @@ namespace RobX.Interface
 
         private void frmLog_Resize(object sender, EventArgs e)
         {
-            int Spacing = 6;
-            txtMessage.Height = this.ClientSize.Height - pnlProperties.Height - tabController.Height;
+            var Spacing = 6;
+            txtMessage.Height = ClientSize.Height - pnlProperties.Height - tabController.Height;
             tabController.Top = txtMessage.Height + Spacing;
-            tabController.Width = this.ClientSize.Width;
+            tabController.Width = ClientSize.Width;
 
             cmdConnect.Left = pnlProperties.Width - cmdConnect.Width - Spacing;
             cmdRefresh.Left = cmdConnect.Left - cmdRefresh.Width - Spacing;
@@ -206,16 +206,16 @@ namespace RobX.Interface
             if (cboCOMPorts.Items.Count > 0)
                 Properties.Settings.Default.COMPort = COMPorts[cboCOMPorts.SelectedIndex].Name;
             Properties.Settings.Default.ServerPort = txtServerPort.Text;
-            Properties.Settings.Default.FormPosition = this.Location;
-            Properties.Settings.Default.FormSize = this.Size;
+            Properties.Settings.Default.FormPosition = Location;
+            Properties.Settings.Default.FormSize = Size;
             Properties.Settings.Default.Save();
         }
 
         private void LoadProperties()
         {
-            this.Size = Properties.Settings.Default.FormSize;
-            this.Location = Properties.Settings.Default.FormPosition;
-            txtServerPort.Text = Properties.Settings.Default.ServerPort.ToString();
+            Size = Properties.Settings.Default.FormSize;
+            Location = Properties.Settings.Default.FormPosition;
+            txtServerPort.Text = Properties.Settings.Default.ServerPort;
         }
 
         private void txtServerPort_KeyPress(object sender, KeyPressEventArgs e)
@@ -230,7 +230,7 @@ namespace RobX.Interface
             else if (e.KeyCode == Keys.Escape)
                 Application.Exit();
 
-            if (chkKeyboardControl.Checked == true || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+            if (chkKeyboardControl.Checked || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
             {
                 if (e.KeyCode == Properties.Settings.Default.ForwardKey || e.KeyCode == Properties.Settings.Default.BackwardKey ||
                     e.KeyCode == Properties.Settings.Default.RotateClockwiseKey || e.KeyCode == Properties.Settings.Default.StopKey ||

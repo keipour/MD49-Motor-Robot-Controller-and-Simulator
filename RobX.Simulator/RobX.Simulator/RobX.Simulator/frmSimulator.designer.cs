@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSimulator));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSimulator));
             this.picSimulation = new System.Windows.Forms.PictureBox();
             this.tabSimulator = new System.Windows.Forms.TabControl();
             this.tabServerLog = new System.Windows.Forms.TabPage();

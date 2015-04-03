@@ -1,6 +1,7 @@
 ﻿# region Includes
 
 using System;
+using RobX.Library.Commons;
 
 # endregion
 
@@ -130,8 +131,8 @@ namespace RobX.Simulator
                     WheelSpeed2 = Speed2 - 128;
                     break;
                 case 1:
-                    WheelSpeed1 = Commons.Methods.ConvertUnsignedByteToSigned(Speed1);
-                    WheelSpeed2 = Commons.Methods.ConvertUnsignedByteToSigned(Speed2);
+                    WheelSpeed1 = Methods.ConvertUnsignedByteToSigned(Speed1);
+                    WheelSpeed2 = Methods.ConvertUnsignedByteToSigned(Speed2);
                     break;
                 case 2:
                     if (Speed1 >= 128)                  // if forward direction
@@ -152,8 +153,8 @@ namespace RobX.Simulator
                     }
                     break;
                 case 3:
-                    int speed1 = Commons.Methods.ConvertUnsignedByteToSigned(Speed1);
-                    int speed2 = Commons.Methods.ConvertUnsignedByteToSigned(Speed2);
+                    int speed1 = Methods.ConvertUnsignedByteToSigned(Speed1);
+                    int speed2 = Methods.ConvertUnsignedByteToSigned(Speed2);
 
                     if (speed1 >= 0)                  // if forward direction
                     {
@@ -173,8 +174,8 @@ namespace RobX.Simulator
                     }
                     break;
             }
-            WheelSpeed1 *= Commons.Robot.RobotSpeedToMMpS;
-            WheelSpeed2 *= Commons.Robot.RobotSpeedToMMpS;
+            WheelSpeed1 *= Library.Commons.Robot.RobotSpeedToMmpS;
+            WheelSpeed2 *= Library.Commons.Robot.RobotSpeedToMmpS;
         }
 
         // ------------------------------------------ Constructor ------------------------------- //
@@ -185,7 +186,7 @@ namespace RobX.Simulator
         public Robot()
         {
             // Randomize initial values for encoders 1 and 2
-            Random rand = new Random();
+            var rand = new Random();
             Encoder1 = rand.Next(Int32.MinValue, Int32.MaxValue);
             Encoder2 = rand.Next(Int32.MinValue, Int32.MaxValue);
         }

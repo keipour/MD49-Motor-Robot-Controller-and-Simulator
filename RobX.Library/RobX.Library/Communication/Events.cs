@@ -4,7 +4,7 @@ using System;
 
 # endregion
 
-namespace RobX.Communication
+namespace RobX.Library.Communication
 {
     # region Event Handler Delegates
 
@@ -31,7 +31,7 @@ namespace RobX.Communication
     /// </summary>
     public class CommunicationEventArgs : EventArgs
     {
-        private byte[] mData;
+        private byte[] _mData;
 
         /// <summary>
         /// Constructor for CommunicationEventArgs event argument class.
@@ -47,15 +47,15 @@ namespace RobX.Communication
         /// </summary>
         public byte[] Data
         {
-            get { return mData; }
+            get { return _mData; }
             set
             {
                 if (value == null || value.Length == 0)
-                    mData = null;
+                    _mData = null;
                 else
                 {
-                    mData = new byte[value.Length];
-                    Array.Copy(value, mData, value.Length);
+                    _mData = new byte[value.Length];
+                    Array.Copy(value, _mData, value.Length);
                 }
             }
         }
@@ -66,12 +66,12 @@ namespace RobX.Communication
     /// </summary>
     public class CommunicationStatusEventArgs : EventArgs
     {
-        private string mStatus = "";
+        private readonly string _mStatus;
 
         /// <summary>
         /// String indicating the change of status.
         /// </summary>
-        public string Status { get { return mStatus; } }
+        public string Status { get { return _mStatus; } }
 
         /// <summary>
         /// Constructor for CommunicationStatusEventArgs event argument class.
@@ -79,7 +79,7 @@ namespace RobX.Communication
         /// <param name="status">String indicating the change of status.</param>
         public CommunicationStatusEventArgs(string status)
         {
-            mStatus = status;
+            _mStatus = status;
         }
     }
 

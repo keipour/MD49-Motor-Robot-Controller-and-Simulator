@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobX.Commons", "RobX.Commons\RobX.Commons\RobX.Commons.csproj", "{2E943EE5-EECB-4CC0-815A-593B27CD5E5F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobX.Library", "RobX.Library\RobX.Library\RobX.Library.csproj", "{2E943EE5-EECB-4CC0-815A-593B27CD5E5F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobX.Interface", "RobX.Interface\RobX.Interface\RobX.Interface.csproj", "{241BF2EE-EC3D-4865-85A0-63F554172F2B}"
 EndProject

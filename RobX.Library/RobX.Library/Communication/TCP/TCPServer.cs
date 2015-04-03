@@ -7,24 +7,31 @@ using System.Threading;
 
 # endregion
 
-namespace RobX.Communication.TCP
+namespace RobX.Library.Communication.TCP
 {
     /// <summary>
     /// A TCP Server class that runs on all IPs (v4 and v6) of current host.
     /// This class allows only one client to be connected to the server at any instance of time. 
     /// When a new client connects to the server, previous connection (if any) is closed.
     /// </summary>
+    // ReSharper disable once InconsistentNaming
     public class TCPServer
     {
         #region Private Variables
 
-        private TcpListener tcpListener = null;     // Server listener variable
-        private Thread listenThread = null;         // Server listening thread
-        private TcpClient tcpClient = null;         // The most recent client that is connected to the server
-        private TcpClient tcpClientTemp = null;     // A temporary client variable
-        private int port = -1;                      // Port of the TCP server
-        private IPAddress[] iPAddresses = null;     // IPv4 and IPv6 IP addresses of current TCP server
-        private bool startedListening = false;      // Indicates if tcpListener successfully started listening
+        private TcpListener _tcpListener;     // Server listener variable
+        private Thread _listenThread;         // Server listening thread
+        private TcpClient _tcpClient;         // The most recent client that is connected to the server
+        private TcpClient _tcpClientTemp;     // A temporary client variable
+        private bool _startedListening;       // Indicates if tcpListener successfully started listening
+
+        /// <summary>
+        /// TCP Server class initializer.
+        /// </summary>
+        public TCPServer()
+        {
+            Port = -1;
+        }
 
         # endregion
 
@@ -57,12 +64,12 @@ namespace RobX.Communication.TCP
         /// <summary>
         /// Port of the current TCP server. If TCP server is not running, this field is set to -1.
         /// </summary>
-        public int Port { get { return port; } }
+        public int Port { get; private set; }
 
         /// <summary>
         /// All IPv4 and IPv6 IP addresses of the current TCP server.
         /// </summary>
-        public IPAddress[] IPAddresses { get { return iPAddresses; } }
+        public IPAddress[] IpAddresses { get; private set; }
 
         # endregion
 
@@ -79,41 +86,41 @@ namespace RobX.Communication.TCP
             try
             {
                 // Stop if a server is currently running
-                if (this.port != -1)
+                if (Port != -1)
                     StopServer();
 
-                this.port = port;
+                Port = port;
 
                 // Define new TCP listener
-                tcpListener = new TcpListener(IPAddress.Any, port);
+                _tcpListener = new TcpListener(IPAddress.Any, port);
 
                 // Obtain IP addresses for the current host
-                iPAddresses = GetHostIPAddresses();
+                IpAddresses = GetHostIpAddresses();
 
                 // Invoke StatusChange event for each new server
-                for (int i = 0; i < iPAddresses.Length; ++i)
-                    if (iPAddresses[i].AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
+                // ReSharper disable once LoopCanBePartlyConvertedToQuery
+                foreach (var ipAddress in IpAddresses)
+                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
                         if (StatusChanged != null)
                             StatusChanged(this, new CommunicationStatusEventArgs("Started TCP server on " +
-                                iPAddresses[i].ToString() + " (port " + port.ToString() + ")."));
+                                                                                 ipAddress + " (port " + port + ")."));
 
                 // Start the TCP server on a new thread
-                listenThread = new Thread(new ThreadStart(ListenForClients));
-                listenThread.IsBackground = true;
-                listenThread.Start();
+                _listenThread = new Thread(ListenForClients) {IsBackground = true};
+                _listenThread.Start();
                 
                 // Determine if the tcpListener started successfully.
-                startedListening = false;
-                while (startedListening == false && Port != -1) ;
+                _startedListening = false;
+                while (_startedListening == false && Port != -1) { }
                 return IsRunning();
             }
             catch (Exception e)
             {
-                this.port = -1;
+                Port = -1;
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start TCP server on port " + port.ToString() + 
+                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start TCP server on port " + port + 
                         ". " + e.Message + "."));
 
                 return false;
@@ -127,12 +134,15 @@ namespace RobX.Communication.TCP
         {
             try
             {
-                tcpListener.Stop();
-                listenThread.Abort();
+                _tcpListener.Stop();
+                _listenThread.Abort();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
-            port = -1;
+            Port = -1;
 
             // Invoke StatusChange event
             if (StatusChanged != null)
@@ -145,7 +155,7 @@ namespace RobX.Communication.TCP
         /// <returns>Indicates whether the current server is running.</returns>
         public bool IsRunning()
         {
-            return (port != -1);
+            return (Port != -1);
         }
 
         # endregion
@@ -155,24 +165,24 @@ namespace RobX.Communication.TCP
         /// <summary>
         /// Sends data over a TCP connection.
         /// </summary>
-        /// <param name="Data">Array of bytes to send to client.</param>
-        /// <param name="Timeout">Timeout for send operation (in milliseconds). 
+        /// <param name="data">Array of bytes to send to client.</param>
+        /// <param name="timeout">Timeout for send operation (in milliseconds). 
         /// The operation fails if sending the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        public void SendData(byte[] Data, int Timeout = 1000)
+        public void SendData(byte[] data, int timeout = 1000)
         {
             // Check if there is data to send
-            if (Data == null || Data.Length == 0) return;
+            if (data == null || data.Length == 0) return;
 
             try
             {
-                NetworkStream clientStream = tcpClient.GetStream();
+                var clientStream = _tcpClient.GetStream();
 
                 // Set write timeout
-                clientStream.WriteTimeout = Timeout;
+                clientStream.WriteTimeout = timeout;
 
                 // Send data over network
-                clientStream.Write(Data, 0, Data.Length);
+                clientStream.Write(data, 0, data.Length);
                 clientStream.Flush();
 
                 // Invoke StatusChange event
@@ -181,7 +191,7 @@ namespace RobX.Communication.TCP
 
                 // Invoke SentData event
                 if (SentData != null)
-                    SentData(this, new CommunicationEventArgs(Data));
+                    SentData(this, new CommunicationEventArgs(data));
             }
             catch (Exception e)
             {
@@ -195,31 +205,31 @@ namespace RobX.Communication.TCP
         /// Receives data from a TCP connection.
         /// </summary>
         /// <param name="buffer">Buffer in which the received data will be returned.</param>
-        /// <param name="Timeout">Timeout for reading operation (in milliseconds). 
+        /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
         /// <returns>The number of bytes read from the TCP connection. 
         /// Return value -1 indicates that some connection/socket error has occured.</returns>
-        public int ReceiveData(ref byte[] buffer, int Timeout = 1000)
+        public int ReceiveData(ref byte[] buffer, int timeout = 1000)
         {
-            int bytesRead = 0;
+            var bytesRead = 0;
 
             try
             {
-                NetworkStream clientStream = tcpClient.GetStream();
+                var clientStream = _tcpClient.GetStream();
 
                 // Don't try to read if there is nothing to read
-                if (clientStream.DataAvailable == true)
+                if (clientStream.DataAvailable)
                 {
                     try
                     {
                         // Set read timeout
-                        clientStream.ReadTimeout = Timeout;
+                        clientStream.ReadTimeout = timeout;
 
                         // Read the received data from network stream
                         bytesRead = clientStream.Read(buffer, 0, buffer.Length);
-                        byte[] ReceivedBytes = new byte[bytesRead];
-                        Array.Copy(buffer, ReceivedBytes, bytesRead);
+                        var receivedBytes = new byte[bytesRead];
+                        Array.Copy(buffer, receivedBytes, bytesRead);
 
                         // Invoke StatusChange event
                         if (StatusChanged != null)
@@ -227,7 +237,7 @@ namespace RobX.Communication.TCP
 
                         // Invoke ReceivedData event
                         if (ReceivedData != null)
-                            ReceivedData(this, new CommunicationEventArgs(ReceivedBytes));
+                            ReceivedData(this, new CommunicationEventArgs(receivedBytes));
                     }
                     catch (Exception e) // A socket error has occured
                     {
@@ -269,10 +279,10 @@ namespace RobX.Communication.TCP
         /// Obtains all IPv4 and IPv6 addresses of the current host.
         /// </summary>
         /// <returns>Array of all IPv4 and IPv6 addresses of the current host.</returns>
-        public static IPAddress[] GetHostIPAddresses()
+        public static IPAddress[] GetHostIpAddresses()
         {
-            string host = Dns.GetHostName();
-            IPHostEntry ip = Dns.GetHostEntry(host);
+            var host = Dns.GetHostName();
+            var ip = Dns.GetHostEntry(host);
             return ip.AddressList;
         }
 
@@ -288,42 +298,44 @@ namespace RobX.Communication.TCP
             try
             {
                 // Start server
-                tcpListener.Start();
+                _tcpListener.Start();
             }
             catch (Exception e)
             {
-                int tempport = port;
-                port = -1;
+                var tempport = Port;
+                Port = -1;
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start listening on port " + tempport.ToString() + 
+                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start listening on port " + tempport + 
                         ". " + e.Message + "."));
                 return;
             }
 
-            startedListening = true;
+            _startedListening = true;
 
             while (true)
             {
                 // Blocks until a client has connected to the server
                 try
                 {
-                    tcpClientTemp = this.tcpListener.AcceptTcpClient();
+                    _tcpClientTemp = _tcpListener.AcceptTcpClient();
                 }
-                catch { }
+                catch
+                {
+                    // ignored
+                }
 
-                tcpClient = tcpClientTemp;
+                _tcpClient = _tcpClientTemp;
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
                     StatusChanged(this, new CommunicationStatusEventArgs("A client connected from " +
-                        ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Address.ToString() +
-                        " (port " + ((IPEndPoint)tcpClient.Client.RemoteEndPoint).Port.ToString() + ")."));
+                        ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address +
+                        " (port " + ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port + ")."));
 
                 // Create a thread to handle communication with connected client
-                Thread clientThread = new Thread(new ThreadStart(HandleClientComm));
-                clientThread.IsBackground = true;
+                var clientThread = new Thread(HandleClientComm) {IsBackground = true};
                 clientThread.Start();
             }
         }
@@ -333,26 +345,25 @@ namespace RobX.Communication.TCP
         /// </summary>
         private void HandleClientComm()
         {
-            byte[] buffer = new byte[4096]; // Buffer to read from client
-            int bytesRead;  // Number of bytes read from client stream
+            var buffer = new byte[4096]; // Buffer to read from client
 
             while (true)
             {
                 // Read data from network stream if available
-                bytesRead = ReceiveData(ref buffer);
+                var bytesRead = ReceiveData(ref buffer);  // Number of bytes read from client stream
 
                 // Break loop if there is a socket error or a connection is closed
                 if (bytesRead == -1) break;
 
                 // Invoke BeforeSendingData event
-                CommunicationEventArgs e = new CommunicationEventArgs(null);
+                var e = new CommunicationEventArgs(null);
                 if (BeforeSendingData != null)
                     BeforeSendingData(this, e);
 
                 // Send data if anything exists
                 SendData(e.Data);
             }
-            tcpClient.Close();
+            _tcpClient.Close();
         }
 
         #endregion

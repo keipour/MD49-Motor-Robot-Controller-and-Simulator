@@ -5,20 +5,20 @@ using System.IO.Ports;
 
 # endregion
 
-namespace RobX.Communication.COM
+namespace RobX.Library.Communication.COM
 {
     /// <summary>
     /// A class that can connect to a COM serial port and transmit/read data to/from a COM device.
     /// </summary>
-    public class COMClient
+    public class ComClient
     {
         # region Private Fields
 
-        private int dataBits = 8;
-        private Parity parity = Parity.None;
-        private StopBits stopBits = StopBits.One;
-        private int baudRate = 9600;
-        private string portName = "";
+        private int _dataBits = 8;
+        private Parity _parity = Parity.None;
+        private StopBits _stopBits = StopBits.One;
+        private int _baudRate = 9600;
+        private string _portName = "";
 
         # endregion
 
@@ -32,27 +32,27 @@ namespace RobX.Communication.COM
         /// <summary>
         /// Number of data bits for Rx/Tx connection with COM port.
         /// </summary>
-        public int DataBits { get { return dataBits; } }
+        public int DataBits { get { return _dataBits; } }
 
         /// <summary>
         /// Parity for Rx/Tx connection with COM port.
         /// </summary>
-        public Parity Parity { get { return parity; } }
+        public Parity Parity { get { return _parity; } }
 
         /// <summary>
         /// Number of stop bits for Rx/Tx connection with COM port.
         /// </summary>
-        public StopBits StopBits { get { return stopBits; } }
+        public StopBits StopBits { get { return _stopBits; } }
 
         /// <summary>
         /// Baud rate for connection with COM port.
         /// </summary>
-        public int BaudRate { get { return baudRate; } }
+        public int BaudRate { get { return _baudRate; } }
 
         /// <summary>
         /// Name of the COM port.
         /// </summary>
-        public string PortName { get { return portName; } }
+        public string PortName { get { return _portName; } }
        
         # endregion
 
@@ -85,45 +85,45 @@ namespace RobX.Communication.COM
         /// <summary>
         /// Default constructor for COMClient class.
         /// </summary>
-        public COMClient()
+        public ComClient()
         {
             // Initialize serial port
             SerialPort = new SerialPort();
-            SerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            SerialPort.DataReceived += DataReceivedHandler;
         }
 
         /// <summary>
         /// Connects to the COM port using specified parameters.
         /// </summary>
-        /// <param name="PortName">Name of the COM port (i.e. COM1, COMA, etc.)</param>
-        /// <param name="BaudRate">Baud rate for connection with COM port.</param>
-        /// <param name="DataBits">Number of data bits for Rx/Tx connection with COM port.</param>
-        /// <param name="Parity">Parity for Rx/Tx connection with COM port.</param>
-        /// <param name="StopBits">Number of stop bits for Rx/Tx connection with COM port.</param>
+        /// <param name="portName">Name of the COM port (i.e. COM1, COMA, etc.)</param>
+        /// <param name="baudRate">Baud rate for connection with COM port.</param>
+        /// <param name="dataBits">Number of data bits for Rx/Tx connection with COM port.</param>
+        /// <param name="parity">Parity for Rx/Tx connection with COM port.</param>
+        /// <param name="stopBits">Number of stop bits for Rx/Tx connection with COM port.</param>
         /// <returns>Returns true if successfully connected to COM port.</returns>
-        public bool Connect(String PortName, int BaudRate = 9600, int DataBits = 8, 
-            Parity Parity = Parity.None, StopBits StopBits = StopBits.One)
+        public bool Connect(String portName, int baudRate = 9600, int dataBits = 8, 
+            Parity parity = Parity.None, StopBits stopBits = StopBits.One)
         {
             try
             {
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connecting to " + PortName + 
-                        " with baud rate " + BaudRate.ToString() + "..."));
+                    StatusChanged(this, new CommunicationStatusEventArgs("Connecting to " + portName + 
+                        " with baud rate " + baudRate + "..."));
 
                 // Assign class fields
-                baudRate = BaudRate;
-                dataBits = DataBits;
-                parity = Parity;
-                stopBits = StopBits;
-                portName = PortName;
+                _baudRate = baudRate;
+                _dataBits = dataBits;
+                _parity = parity;
+                _stopBits = stopBits;
+                _portName = portName;
 
                 // Set input parameters
-                SerialPort.BaudRate = (int)BaudRate;
-                SerialPort.PortName = PortName;
-                SerialPort.DataBits = DataBits;
-                SerialPort.Parity = Parity;
-                SerialPort.StopBits = StopBits;
+                SerialPort.BaudRate = baudRate;
+                SerialPort.PortName = portName;
+                SerialPort.DataBits = dataBits;
+                SerialPort.Parity = parity;
+                SerialPort.StopBits = stopBits;
 
                 // Connect to port
                 SerialPort.Handshake = Handshake.RequestToSendXOnXOff;
@@ -132,8 +132,8 @@ namespace RobX.Communication.COM
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Successfully connected to " + PortName + " with baud rate " + 
-                        BaudRate.ToString() + ".")); 
+                    StatusChanged(this, new CommunicationStatusEventArgs("Successfully connected to " + portName + " with baud rate " + 
+                        baudRate + ".")); 
                 
                 return true;
             }
@@ -150,19 +150,19 @@ namespace RobX.Communication.COM
         /// <summary>
         /// Read data from the COM port.
         /// </summary>
-        /// <param name="NumOfBytes">Number of bytes to read</param>
-        /// <param name="ReadBuffer">Buffer to put read data</param>
-        /// <param name="CheckDataAvailable">Checks if data is available before trying to read data. 
+        /// <param name="numOfBytes">Number of bytes to read</param>
+        /// <param name="readBuffer">Buffer to put read data</param>
+        /// <param name="checkDataAvailable">Checks if data is available before trying to read data. 
         /// Setting this parameter to true results in non-blocking operation.</param>
-        /// <param name="Timeout">Timeout for reading operation (in milliseconds). 
+        /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
         /// <returns>Returns true if successfully read any data; false indicates socket error.</returns>
-        public bool ReceiveData(byte NumOfBytes, ref byte[] ReadBuffer, bool CheckDataAvailable = false, int Timeout = 500)
+        public bool ReceiveData(byte numOfBytes, ref byte[] readBuffer, bool checkDataAvailable = false, int timeout = 500)
         {
             try
             {
-                if (CheckDataAvailable == true)
+                if (checkDataAvailable)
                     if (SerialPort.BytesToRead == 0) 
                         return false;
             }
@@ -176,17 +176,17 @@ namespace RobX.Communication.COM
             }
 
             // Initialize Read Buffer
-            ReadBuffer = new byte[NumOfBytes];
+            readBuffer = new byte[numOfBytes];
 
             // Read all bytes from serial port
-            for (int i = 0; i < NumOfBytes; i++)
+            for (var i = 0; i < numOfBytes; i++)
             {
                 try
                 {
                     // Set read timeouts
-                    SerialPort.ReadTimeout = Timeout;
+                    SerialPort.ReadTimeout = timeout;
 
-                    SerialPort.Read(ReadBuffer, i, 1);
+                    SerialPort.Read(readBuffer, i, 1);
                     
                     // Invoke StatusChange event
                     if (StatusChanged != null)
@@ -194,7 +194,7 @@ namespace RobX.Communication.COM
 
                     // Invoke ReceivedData event
                     if (ReceivedData != null)
-                        ReceivedData(this, new CommunicationEventArgs(ReadBuffer));
+                        ReceivedData(this, new CommunicationEventArgs(readBuffer));
                 }
                 catch (Exception e)
                 {
@@ -212,26 +212,26 @@ namespace RobX.Communication.COM
         /// <summary>
         /// Send data to the COM port.
         /// </summary>
-        /// <param name="Data">Array of bytes to send.</param>
-        /// <param name="Timeout">Timeout for send operation (in milliseconds). 
+        /// <param name="data">Array of bytes to send.</param>
+        /// <param name="timeout">Timeout for send operation (in milliseconds). 
         /// The operation fails if sending the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
         /// <returns>Returns true if successfully sent data; false indicates socket error.</returns>
-        public bool SendData(byte[] Data, int Timeout = 500)
+        public bool SendData(byte[] data, int timeout = 500)
         {
             // Write all bytes to serial port
             try
             {
                 // Invoke BeforeSendingData event
-                CommunicationEventArgs e = new CommunicationEventArgs(Data);
+                var e = new CommunicationEventArgs(data);
                 if (BeforeSendingData != null)
                     BeforeSendingData(this, e);
 
                 // Set timeout for writing
-                SerialPort.WriteTimeout = Timeout;
+                SerialPort.WriteTimeout = timeout;
 
                 // Send data to COM port
-                SerialPort.Write(Data, 0, Data.Length);
+                SerialPort.Write(data, 0, data.Length);
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
@@ -239,7 +239,7 @@ namespace RobX.Communication.COM
 
                 // Invoke SentData event
                 if (SentData != null)
-                    SentData(this, new CommunicationEventArgs(Data));
+                    SentData(this, new CommunicationEventArgs(data));
 
                 return true;
             }
@@ -265,11 +265,11 @@ namespace RobX.Communication.COM
         /// <param name="e">Event argument varialbe.</param>
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
-            SerialPort sp = (SerialPort)sender;
-            int NumOfBytes = sp.BytesToRead;
+            var sp = (SerialPort)sender;
+            var numOfBytes = sp.BytesToRead;
 
-            byte[] ReadBuffer = new byte[NumOfBytes];
-            ReceiveData((byte)NumOfBytes, ref ReadBuffer);
+            var readBuffer = new byte[numOfBytes];
+            ReceiveData((byte)numOfBytes, ref readBuffer);
         }
 
         # endregion

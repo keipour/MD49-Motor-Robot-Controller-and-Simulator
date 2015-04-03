@@ -1,8 +1,8 @@
 The MIT License (MIT)
 
-###RobX Project
+# Controller and simulator for a robot with an MD49 motor driver and EMG49 motor kit (RobX Project)
 
-This project is a combination of several smaller projects that are aimed for hardware connection, control over network and simulation of a differential drive robot called RobX.
+This project is a combination of several smaller projects that are aimed for hardware connection, control over network and simulation of a differential drive robot called *RobX* built with MD49 motor driver and EMG49 motor kit.
 
 
 *This software is developed at Image Processing and Computer Vision Laboratory, Computer Engineering Department, Sharif University of Technology.*

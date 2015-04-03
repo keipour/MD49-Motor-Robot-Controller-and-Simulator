@@ -1,4 +1,4 @@
-﻿namespace RobX.Commons
+﻿namespace RobX.Library.Commons
 {
     /// <summary>
     /// This namespace contains common methods, properties and extensions for all sub-projects of the solution.
@@ -6,7 +6,7 @@
     static class NamespaceDoc { }
 }
 
-namespace RobX.Communication
+namespace RobX.Library.Communication
 {
     /// <summary>
     /// This namespace contains methods and classes used for communication with other hardwares and softwares.
@@ -14,7 +14,7 @@ namespace RobX.Communication
     static class NamespaceDoc { }
 }
 
-namespace RobX.Communication.TCP
+namespace RobX.Library.Communication.TCP
 {
     /// <summary>
     /// This namespace contains classes for TCP communication over network.
@@ -22,7 +22,7 @@ namespace RobX.Communication.TCP
     static class NamespaceDoc { }
 }
 
-namespace RobX.Communication.COM
+namespace RobX.Library.Communication.COM
 {
     /// <summary>
     /// This namespace contains classes and methods for communication with COM devices and COM ports.
@@ -30,7 +30,7 @@ namespace RobX.Communication.COM
     static class NamespaceDoc { }
 }
 
-namespace RobX.Tools
+namespace RobX.Library.Tools
 {
     /// <summary>
     /// This namespace contains classes that can be used as tools for all projects of the solution.

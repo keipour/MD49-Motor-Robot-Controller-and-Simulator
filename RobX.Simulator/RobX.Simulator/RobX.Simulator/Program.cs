@@ -15,7 +15,7 @@ namespace RobX.Simulator
         [STAThread]
         static void Main(string[] args)
         {
-            frmSimulator form = new frmSimulator();
+            var form = new frmSimulator();
             form.Show();
             // This line creates a XNA object in the form created earlier.
             form.SimulationController = new SimController(form.picSimulation.Handle, form, form.picSimulation);

@@ -3,7 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using RobX.Commons;
+using RobX.Library.Commons;
 
 # endregion
 
@@ -58,32 +58,32 @@ namespace RobX.Simulator
             double xscale, double yscale, int LineWidth = 1, int VerticalGridDistance = 500, int HorizontalGridDistance = 500)
         {
             // Pattern of the dashed lines of the grids
-            int[] Pattern = new int[] { 3, 5 };
+            var Pattern = new int[] { 3, 5 };
 
             // Calculate distance between vertical grid lines
-            int VerticalLines = ScreenWidth / VerticalGridDistance;
+            var VerticalLines = ScreenWidth / VerticalGridDistance;
 
             // Draw vertical grid lines
-            for (int i = -VerticalLines; i <= VerticalLines; ++i)
+            for (var i = -VerticalLines; i <= VerticalLines; ++i)
             {
-                int dist = i * VerticalGridDistance;
-                double distm = (double)dist / 1000; // Convert millimeters to meters
+                var dist = i * VerticalGridDistance;
+                var distm = (double)dist / 1000; // Convert millimeters to meters
 
-                int linex = (int)(xscale * ConvertX(dist, XCenter));
+                var linex = (int)(xscale * ConvertX(dist, XCenter));
                 Frame.DrawVerticalLine(linex, 0, (int)(ScreenHeight * yscale), gridColor, LineWidth, Pattern);
                 Frame.DrawString((distm).ToString("0.##") + " m", fontColor, GraphicsEngine.GridFont, linex, 0);
             }
 
             // Calculate distance between horizontal grid lines
-            int HorizontalLines = ScreenHeight / HorizontalGridDistance;
+            var HorizontalLines = ScreenHeight / HorizontalGridDistance;
 
             // Draw horizontal grid lines
-            for (int i = -HorizontalLines; i <= HorizontalLines; ++i)
+            for (var i = -HorizontalLines; i <= HorizontalLines; ++i)
             {
-                int dist = i * HorizontalGridDistance;
-                double distm = (double)dist / 1000; // Convert millimeters to meters
+                var dist = i * HorizontalGridDistance;
+                var distm = (double)dist / 1000; // Convert millimeters to meters
 
-                int liney = (int)(yscale * ConvertY(dist, YCenter));
+                var liney = (int)(yscale * ConvertY(dist, YCenter));
                 Frame.DrawHorizontalLine(0, (int)(ScreenWidth * xscale), liney, gridColor, LineWidth, Pattern);
                 Frame.DrawString((distm).ToString("0.##") + " m", fontColor, GraphicsEngine.GridFont, 0, liney);
             }
@@ -103,12 +103,12 @@ namespace RobX.Simulator
             double xscale = 1.0F, double yscale = 1.0F)
         {
             // Rectangle that the robot should fit in
-            Rectangle DestRect = new Rectangle((int)(xscale * (ConvertX((int)Env.Robot.X, XCenter) - Commons.Robot.Radius)),
-                (int)(yscale * (ConvertY((int)Env.Robot.Y, YCenter) - Commons.Robot.Radius)),
-                (int)(xscale * 2 * Commons.Robot.Radius), (int)(yscale * 2 * Commons.Robot.Radius));
+            var DestRect = new Rectangle((int)(xscale * (ConvertX((int)Env.Robot.X, XCenter) - Library.Commons.Robot.Radius)),
+                (int)(yscale * (ConvertY((int)Env.Robot.Y, YCenter) - Library.Commons.Robot.Radius)),
+                (int)(xscale * 2 * Library.Commons.Robot.Radius), (int)(yscale * 2 * Library.Commons.Robot.Radius));
 
             // Calculate integer angle of the robot
-            int AngleIndex = ((int)(ConvertAngle(Env.Robot.Angle)) % 360 + 360) % 360;
+            var AngleIndex = ((int)(ConvertAngle(Env.Robot.Angle)) % 360 + 360) % 360;
             
             // Draw the robot
             Frame.Draw(Robot.Image[AngleIndex], DestRect, Color.White);
@@ -131,8 +131,8 @@ namespace RobX.Simulator
             if (Env.Robot.Trace.Count < 2) return;
 
             // Calculate scaled positions of the trace points
-            Vector2[] points = new Vector2[Env.Robot.Trace.Count];
-            for (int i = 0; i < points.Length; ++i)
+            var points = new Vector2[Env.Robot.Trace.Count];
+            for (var i = 0; i < points.Length; ++i)
             {
                 points[i].X = (float)(xscale * ConvertX((int)Env.Robot.Trace[i].X, XCenter));
                 points[i].Y = (float)(yscale * ConvertY((int)Env.Robot.Trace[i].Y, YCenter));
@@ -154,13 +154,13 @@ namespace RobX.Simulator
         private void DrawObstacles(SpriteBatch Frame, Environment Env, int XCenter, int YCenter,
             double xscale = 1.0F, double yscale = 1.0F)
         {
-            for (int i = 0; i < Env.Obstacles.Count; ++i)
+            for (var i = 0; i < Env.Obstacles.Count; ++i)
             {
                 // Calculate scaled properties of the obstacle
-                Obstacle obs = Env.Obstacles[i];
+                var obs = Env.Obstacles[i];
                 Vector2[] points = null;
-                Rectangle Rect = new Rectangle();
-                Color color = (Microsoft.Xna.Framework.Color)obs.Color;
+                var Rect = new Rectangle();
+                var color = (Color)obs.Color;
 
                 if (obs.Type == Obstacle.ObstacleType.RectangleFilled ||
                     obs.Type == Obstacle.ObstacleType.RectangleBorder)
@@ -170,13 +170,13 @@ namespace RobX.Simulator
                         (int)(xscale * obs.Rectangle.Width),
                         (int)(yscale * obs.Rectangle.Height));
 
-                    if (obs.IsIntersected(Env.Robot.X, Env.Robot.Y, Commons.Robot.Radius))
+                    if (obs.IsIntersected(Env.Robot.X, Env.Robot.Y, Library.Commons.Robot.Radius))
                         color = obs.CollisionColor;
                 }
                 else
                 {
                     points = new Vector2[obs.Points.Length];
-                    for (int p = 0; p < points.Length; ++i)
+                    for (var p = 0; p < points.Length; ++i)
                     {
                         points[p].X = (float)(xscale * ConvertX((int)obs.Points[p].X, XCenter));
                         points[p].Y = (float)(yscale * ConvertY((int)obs.Points[p].Y, YCenter));
@@ -207,28 +207,28 @@ namespace RobX.Simulator
             TimeSpan TotalTime, double xscale = 1.0F, double yscale = 1.0F)
         {
             // Calculate screen dimensions
-            int ScreenWidth = (int)(Env.Ground.Width * xscale);
-            int ScreenHeight = (int)(Env.Ground.Height * yscale);
+            var ScreenWidth = (int)(Env.Ground.Width * xscale);
+            var ScreenHeight = (int)(Env.Ground.Height * yscale);
 
             // ------------ Print simulation time in seconds ----------------
-            int DurationInMilliSecs = (int)(TotalTime.TotalMilliseconds);
+            var DurationInMilliSecs = (int)(TotalTime.TotalMilliseconds);
 
-            string str = "Simulation time: " + (DurationInMilliSecs / 1000F).ToString("0.000") + " s";
-            Rectangle textrect = Frame.DrawString(str, color, GraphicsEngine.StatisticsFont,
+            var str = "Simulation time: " + (DurationInMilliSecs / 1000F).ToString("0.000") + " s";
+            var textrect = Frame.DrawString(str, color, GraphicsEngine.StatisticsFont,
                 ScreenWidth, ScreenHeight, GraphicsEngine.HorizontalTextAlign.Right, GraphicsEngine.VerticalTextAlign.Bottom);
 
             // ------------ Print frame rate in fps -------------------
-            str = "Frame rate: " + SimController.DrawFPS.ToString() + " fps";
+            str = "Frame rate: " + SimController.DrawFPS + " fps";
             textrect = Frame.DrawString(str, color, GraphicsEngine.StatisticsFont, ScreenWidth, textrect.Top,
                 GraphicsEngine.HorizontalTextAlign.Right, GraphicsEngine.VerticalTextAlign.Bottom);
 
             // ------------ Print update rate in Hz -------------------
-            str = "Update rate: " + SimController.UpdateRate.ToString() + " Hz";
+            str = "Update rate: " + SimController.UpdateRate + " Hz";
             textrect = Frame.DrawString(str, color, GraphicsEngine.StatisticsFont, ScreenWidth, textrect.Top,
                 GraphicsEngine.HorizontalTextAlign.Right, GraphicsEngine.VerticalTextAlign.Bottom);
 
             // ------------ Print robot angle in degrees -------------------
-            double Angl = ((Env.Robot.Angle + 360) % 360);
+            var Angl = ((Env.Robot.Angle + 360) % 360);
             if (Angl > 180) Angl -= 360;
 
             str = "Robot angle: " + Angl.ToString("0.0") + " degs";
@@ -242,7 +242,7 @@ namespace RobX.Simulator
                 GraphicsEngine.HorizontalTextAlign.Right, GraphicsEngine.VerticalTextAlign.Bottom);
 
             // ------------ Print robot encoder counts -------------------
-            str = "Encoders: (" + Robot.Encoder1.ToString() + ", " + Robot.Encoder2.ToString() + ")";
+            str = "Encoders: (" + Robot.Encoder1 + ", " + Robot.Encoder2 + ")";
             textrect = Frame.DrawString(str, color, GraphicsEngine.StatisticsFont, ScreenWidth, textrect.Top,
                 GraphicsEngine.HorizontalTextAlign.Right, GraphicsEngine.VerticalTextAlign.Bottom);
 
@@ -291,16 +291,16 @@ namespace RobX.Simulator
                 DrawGround(SubFrame, Properties.Settings.Default.GroundColor, Environment.Ground.Width, Environment.Ground.Height, xscale, yscale);
 
                 // Draw obstacles
-                if (Properties.Settings.Default.DrawObstacles == true)
+                if (Properties.Settings.Default.DrawObstacles)
                     DrawObstacles(SubFrame, Environment, xoffset, yoffset, xscale, yscale);
 
                 // Draw grids
-                if (Properties.Settings.Default.DrawGrids == true)
+                if (Properties.Settings.Default.DrawGrids)
                     DrawGrids(SubFrame, Properties.Settings.Default.GridLineColor, Properties.Settings.Default.GridFontColor,
                         Environment.Ground.Width, Environment.Ground.Height, xoffset, yoffset, xscale, yscale);
 
                 // Draw robot traces
-                if (Properties.Settings.Default.DrawRobotTrace == true)
+                if (Properties.Settings.Default.DrawRobotTrace)
                     DrawRobotTrace(SubFrame, Environment, xoffset, yoffset, Properties.Settings.Default.RobotTraceColor, xscale, yscale);
 
                 // Draw robot
@@ -360,14 +360,14 @@ namespace RobX.Simulator
                 TotalTime += TimeSpan.FromTicks((long)(ElapsedTime.Ticks * Simulator.SimulationSpeed));
 
                 // Calculate conversion scales from real-world to screen dimensions
-                double xscale = (double)ScreenWidth / Environment.Ground.Width;
-                double yscale = (double)ScreenHeight / Environment.Ground.Height;
+                var xscale = (double)ScreenWidth / Environment.Ground.Width;
+                var yscale = (double)ScreenHeight / Environment.Ground.Height;
 
                 // Render subframe
                 RenderSubframe(ref Frame, ScreenWidth, ScreenHeight, ref Environment, Robot, RenderType, xscale, yscale);
 
                 // Draw statistics (simulation time, etc.)
-                if (Properties.Settings.Default.DrawStatistics == true)
+                if (Properties.Settings.Default.DrawStatistics)
                     DrawStatistics(Frame, Environment, Robot, Properties.Settings.Default.StatisticsFontColor, TotalTime, xscale, yscale);
             }
             catch { }

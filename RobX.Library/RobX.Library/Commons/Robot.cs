@@ -1,4 +1,4 @@
-﻿namespace RobX.Commons
+﻿namespace RobX.Library.Commons
 {
     /// <summary>
     /// This class keeps all common properties of RobX robot.
@@ -29,7 +29,7 @@
         /// <summary>
         /// Motor timeout time in milliseconds for MD49 motor driver used in RobX robot.
         /// </summary>
-        public const int MotorTimeoutInMS = 2000;
+        public const int MotorTimeoutInMs = 2000;
 
         /// <summary>
         /// <para>Converts robot speed to millimeters per second. Calculated empirically.</para>
@@ -37,7 +37,7 @@
         /// This assumption works fine for most applications. To get more accurate results, the robot speed vs 
         /// real-world speed relation should be measured (which is anticipated to be non-linear).</para>
         /// </summary>
-        public const double RobotSpeedToMMpS = 6.25F;
+        public const double RobotSpeedToMmpS = 6.25F;
 
         /// <summary>
         /// Converts encoder count to distance in millimeters for EMG49 motor set used in RobX robot.
@@ -66,7 +66,7 @@
         /// <summary>
         /// Baud rate for connection with COM port of the MD49 motor used in RobX robot.
         /// </summary>
-        public const BaudRates BaudRate = BaudRates.BaudRate_9600;
+        public const BaudRates BaudRate = BaudRates.BaudRate9600;
 
         # endregion
 
@@ -80,12 +80,12 @@
             /// <summary>
             /// Baud rate of 9600 symbols per second.
             /// </summary>
-            BaudRate_9600 = 9600,
+            BaudRate9600 = 9600,
 
             /// <summary>
             /// Baud rate of 38400 symbols per second.
             /// </summary>
-            BaudRate_38400 = 38400
+            BaudRate38400 = 38400
         }
 
         /// <summary>
@@ -96,24 +96,24 @@
             /// <summary>
             /// (Default) The speeds of wheels are in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
             /// </summary>
-            Mode_0 = 0,
+            Mode0 = 0,
 
             /// <summary>
             /// The speeds of wheels are in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
             /// </summary>
-            Mode_1 = 1,
+            Mode1 = 1,
 
             /// <summary>
             /// Uses SPEED 1 for both motors, and SPEED 2 for turn value. 
             /// Data is in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
             /// </summary>
-            Mode_2 = 2,
+            Mode2 = 2,
 
             /// <summary>
             /// Uses SPEED 1 for both motors, and SPEED 2 for turn value. 
             /// Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
             /// </summary>
-            Mode_3 = 3
+            Mode3 = 3
         }
 
         /// <summary>

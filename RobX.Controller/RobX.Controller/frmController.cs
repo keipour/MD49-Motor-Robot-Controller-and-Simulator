@@ -3,9 +3,9 @@
 using System;
 using System.Windows.Forms;
 using System.Threading;
-using RobX.Tools;
-using RobX.Commons;
-using RobX.Communication;
+using RobX.Library.Commons;
+using RobX.Library.Communication;
+using RobX.Library.Tools;
 
 # endregion
 
@@ -18,7 +18,7 @@ namespace RobX.Controller
     {
         private Log CommunicationLog = new Log();
         private Log MessageLog = new Log();
-        private Controller Controller = new Controller(Commons.Robot.RobotType.Simulation);
+        private Controller Controller = new Controller(Library.Commons.Robot.RobotType.Simulation);
         private Thread ExecutionThread = null; 
 
         /// <summary>
@@ -39,10 +39,10 @@ namespace RobX.Controller
             txtIPAddress.Select();
 
             // Add events
-            CommunicationLog.ItemsAdded += new LogEventHandler(txtLogUpdate);
-            CommunicationLog.LogCleared += new LogEventHandler(txtLogUpdate);
-            MessageLog.ItemsAdded += new LogEventHandler(txtMessageUpdate);
-            MessageLog.LogCleared += new LogEventHandler(txtMessageUpdate);
+            CommunicationLog.ItemsAdded += txtLogUpdate;
+            CommunicationLog.LogCleared += txtLogUpdate;
+            MessageLog.ItemsAdded += txtMessageUpdate;
+            MessageLog.LogCleared += txtMessageUpdate;
             Controller.ReceivedData += RobotReceivedData;
             Controller.SentData += RobotSentData;
             Controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
@@ -63,7 +63,7 @@ namespace RobX.Controller
             else if (e.KeyCode == Keys.Escape)
                 Application.Exit();
 
-            if (chkKeyboardControl.Checked == true || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+            if (chkKeyboardControl.Checked || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
             {
                 if (e.KeyCode == Properties.Settings.Default.ForwardKey || e.KeyCode == Properties.Settings.Default.BackwardKey ||
                     e.KeyCode == Properties.Settings.Default.RotateClockwiseKey || e.KeyCode == Properties.Settings.Default.StopKey ||
@@ -129,8 +129,8 @@ namespace RobX.Controller
             {
                 if (txtLog.InvokeRequired)
                 {
-                    SetTextCallback d = new SetTextCallback(txtLogUpdate);
-                    this.Invoke(d, new object[] { LogText });
+                    var d = new SetTextCallback(txtLogUpdate);
+                    Invoke(d, new object[] { LogText });
                 }
                 else
                 {
@@ -156,8 +156,8 @@ namespace RobX.Controller
             {
                 if (txtMessage.InvokeRequired)
                 {
-                    SetTextCallback d = new SetTextCallback(txtMessageUpdate);
-                    this.Invoke(d, new object[] { LogText });
+                    var d = new SetTextCallback(txtMessageUpdate);
+                    Invoke(d, new object[] { LogText });
                 }
                 else
                 {
@@ -218,9 +218,9 @@ namespace RobX.Controller
                 ExecutionThread.Abort();
             }
 
-            ExecutionThread = new Thread(new ThreadStart(StartExecution));
+            ExecutionThread = new Thread(StartExecution);
             ExecutionThread.IsBackground = true;
-            ushort SimSpeed = (ushort)(Math.Round(Properties.Settings.Default.SimulationSpeed * 10));
+            var SimSpeed = (ushort)(Math.Round(Properties.Settings.Default.SimulationSpeed * 10));
             if (SimSpeed != 10)
                 Controller.SetSimulationSpeed(SimSpeed);
             ExecutionThread.Start();
@@ -262,8 +262,8 @@ namespace RobX.Controller
 
         private bool CheckInputErrors()
         {
-            bool ipValid = true;
-            bool portValid = true;
+            var ipValid = true;
+            var portValid = true;
 
             System.Net.IPAddress ip;
             if (System.Net.IPAddress.TryParse(txtIPAddress.Text, out ip) == false)
@@ -285,15 +285,15 @@ namespace RobX.Controller
         private bool Connect()
         {
             SaveProperties();
-            if (CheckInputErrors() == true)
+            if (CheckInputErrors())
                 return Controller.Connect(txtIPAddress.Text, Int32.Parse(txtPort.Text));
             return false;
         }
 
         private void LoadProperties()
         {
-            this.Size = Properties.Settings.Default.FormSize;
-            this.Location = Properties.Settings.Default.FormPosition;
+            Size = Properties.Settings.Default.FormSize;
+            Location = Properties.Settings.Default.FormPosition;
             txtSimSpeed.Text = Properties.Settings.Default.SimulationSpeed.ToString("0.0");
 
             if (Properties.Settings.Default.RobotType == 1)
@@ -323,17 +323,17 @@ namespace RobX.Controller
             }
             Properties.Settings.Default.SimulationSpeed = double.Parse(txtSimSpeed.Text);
             Properties.Settings.Default.RobotType = cboRobotType.SelectedIndex;
-            Properties.Settings.Default.FormPosition = this.Location;
-            Properties.Settings.Default.FormSize = this.Size;
+            Properties.Settings.Default.FormPosition = Location;
+            Properties.Settings.Default.FormSize = Size;
             Properties.Settings.Default.Save();
         }
 
         private void frmLog_Resize(object sender, EventArgs e)
         {
-            int Spacing = 6;
-            txtMessage.Height = this.ClientSize.Height - pnlController.Height - tabController.Height;
+            var Spacing = 6;
+            txtMessage.Height = ClientSize.Height - pnlController.Height - tabController.Height;
             tabController.Top = txtMessage.Height + Spacing;
-            tabController.Width = this.ClientSize.Width;
+            tabController.Width = ClientSize.Width;
 
             cmdStart.Left = pnlController.Width - cmdStart.Width - Spacing;
             cmdConnect.Left = cmdStart.Left;

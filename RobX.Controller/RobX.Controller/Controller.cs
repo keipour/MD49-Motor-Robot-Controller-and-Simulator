@@ -3,8 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using RobX.Communication;
-using RobX.Communication.TCP;
+using RobX.Controller.Properties;
+using RobX.Library.Communication;
 
 # endregion
 
@@ -25,7 +25,7 @@ namespace RobX.Controller
         /// <summary>
         /// Type of robot: Real robot / Simulation
         /// </summary>
-        public Commons.Robot.RobotType RobotType;
+        public Library.Commons.Robot.RobotType RobotType;
 
         public bool IsConnected = false;
 
@@ -79,7 +79,7 @@ namespace RobX.Controller
         /// Constructor for the Controller class
         /// </summary>
         /// <param name="robotType"></param>
-        public Controller(Commons.Robot.RobotType robotType)
+        public Controller(Library.Commons.Robot.RobotType robotType)
         {
             RobotType = robotType;
             Robot = new Robot(robotType);
@@ -236,7 +236,7 @@ namespace RobX.Controller
         public void PrepareForExecution()
         {
             Robot.DisableTimeout();
-            Robot.SetMode(Commons.Robot.SpeedModes.Mode_0);
+            Robot.SetMode(Library.Commons.Robot.SpeedModes.Mode0);
         }
 
         /// <summary>
@@ -249,32 +249,32 @@ namespace RobX.Controller
         {
             if (Milliseconds < 0) throw new Exception("Error! Time can't be negative!");
 
-            if (ShowMessage == true && RobotStatusChanged != null)
+            if (ShowMessage && RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Setting the speed of the left wheel to " + Wheel1_Speed.ToString() +
+                    "Setting the speed of the left wheel to " + Wheel1_Speed +
                     " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s) and the right wheel to " + 
-                    Wheel2_Speed.ToString() + " (" + (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + 
+                    Wheel2_Speed + " (" + (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + 
                     " mm/s) for " + Milliseconds.ToString("0.00") + " milliseconds."));
 
             Robot.SetSpeeds((byte)(Wheel1_Speed + 128), (byte)(Wheel2_Speed + 128));
 
             if (Milliseconds > 0)
-                Thread.Sleep(TimeSpan.FromMilliseconds(Milliseconds / Properties.Settings.Default.SimulationSpeed));
+                Thread.Sleep(TimeSpan.FromMilliseconds(Milliseconds / Settings.Default.SimulationSpeed));
         }
 
         public void SetSpeedDegrees(double Degrees, sbyte Wheel1_Speed, sbyte Wheel2_Speed, bool ShowMessage = true)
         {
-            if (ShowMessage == true && RobotStatusChanged != null)
+            if (ShowMessage && RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot " + ((Wheel1_Speed < Wheel2_Speed)?"counter-":"") + "clockwise " + 
                     Degrees.ToString("0.0") + " degrees with the speed of the left wheel set to " + 
-                    Wheel1_Speed.ToString() + " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + 
-                    " mm/s) and the right wheel set to " +  Wheel2_Speed.ToString() + " (" + 
+                    Wheel1_Speed + " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + 
+                    " mm/s) and the right wheel set to " +  Wheel2_Speed + " (" + 
                     (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s)."));
 
-            double deltaV = (Wheel1_Speed - Wheel2_Speed) * Robot.RobotSpeedToMMpS / 1000F;
-            double Radians = Degrees * Math.PI / 180F;
-            double milliseconds = Math.Abs(2 * Robot.Radius * Radians / deltaV);
+            var deltaV = (Wheel1_Speed - Wheel2_Speed) * Robot.RobotSpeedToMMpS / 1000F;
+            var Radians = Degrees * Math.PI / 180F;
+            var milliseconds = Math.Abs(2 * Robot.Radius * Radians / deltaV);
 
             Robot.SetSpeeds((byte)(Wheel1_Speed + 128), (byte)(Wheel2_Speed + 128));
             SetSpeedMilliseconds(milliseconds, Wheel1_Speed, Wheel2_Speed, false);
@@ -286,9 +286,9 @@ namespace RobX.Controller
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
-                    "Setting the speed of the left wheel to " + Wheel1_Speed.ToString() +
+                    "Setting the speed of the left wheel to " + Wheel1_Speed +
                     " (" + (Wheel1_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s) and the right wheel to " +
-                    Wheel2_Speed.ToString() + " (" + (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Wheel2_Speed + " (" + (Wheel2_Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) for " + Distance.ToString("0.0") + " millimeters."));
 
             throw new NotImplementedException("Error! This function is not implemented yet!");
@@ -298,7 +298,7 @@ namespace RobX.Controller
         {
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopping robot."));
-            Robot.SetMode(Commons.Robot.SpeedModes.Mode_0);
+            Robot.SetMode(Library.Commons.Robot.SpeedModes.Mode0);
             SetSpeedMilliseconds(0, 0, 0, false);
         }
 
@@ -309,7 +309,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " + 
-                    Speed.ToString() + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) for " + Milliseconds.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(Milliseconds, Speed, Speed, false);
@@ -322,7 +322,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    Speed.ToString() + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) for " + Milliseconds.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(Milliseconds, (sbyte)(-Speed), (sbyte)(-Speed), false);
@@ -340,10 +340,10 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " +
-                    Speed.ToString() + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) for " + Distance.ToString("0.0") + " millimeters."));
 
-            double timeout = Distance / (Robot.RobotSpeedToMMpS * Math.Abs(Speed)) * 1000F;
+            var timeout = Distance / (Robot.RobotSpeedToMMpS * Math.Abs(Speed)) * 1000F;
             SetSpeedMilliseconds(timeout, Speed, Speed, false);
         }
 
@@ -354,10 +354,10 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    Speed.ToString() + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) for " + Distance.ToString("0.0") + " millimeters."));
 
-            double timeout = Distance / (Robot.RobotSpeedToMMpS * Math.Abs(Speed)) * 1000F;
+            var timeout = Distance / (Robot.RobotSpeedToMMpS * Math.Abs(Speed)) * 1000F;
             SetSpeedMilliseconds(timeout, (sbyte)(-Speed), (sbyte)(-Speed), false);
         }
 
@@ -366,7 +366,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot counter-clockwise around center of robot " + 
-                    Degrees.ToString("0.0") + " degrees with the speed set to " + Speed.ToString() +
+                    Degrees.ToString("0.0") + " degrees with the speed set to " + Speed +
                     " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s)."));
 
             SetSpeedDegrees(Degrees, (sbyte)(-Speed), Speed, false);
@@ -377,7 +377,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot " +
-                    Degrees.ToString("0.0") + " degrees with the speed set to " + Speed.ToString() +
+                    Degrees.ToString("0.0") + " degrees with the speed set to " + Speed +
                     " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") + " mm/s)."));
 
             SetSpeedDegrees(Degrees, Speed, (sbyte)(-Speed), false);
@@ -390,7 +390,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot counter-clockwise around center of robot with the speed set to " + 
-                    Speed.ToString() + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) + for " + Milliseconds.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(Milliseconds, (sbyte)(-Speed), Speed, false);
@@ -403,7 +403,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot with the speed set to " +
-                    Speed.ToString() + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
+                    Speed + " (" + (Speed * Robot.RobotSpeedToMMpS).ToString("0.0") +
                     " mm/s) + for " + Milliseconds.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(Milliseconds, Speed, (sbyte)(-Speed), false);
@@ -447,14 +447,14 @@ namespace RobX.Controller
 
         public TimeSpan CalculateDelay()
         {
-            DateTime Now = DateTime.Now;
+            var Now = DateTime.Now;
             Robot.GetVersion();
             return DateTime.Now - Now;
         }
 
         public void SetSimulationSpeed(ushort Speed)
         {
-            Properties.Settings.Default.SimulationSpeed = Speed / 10F;
+            Settings.Default.SimulationSpeed = Speed / 10F;
             Robot.SetSimulationSpeed(Speed);
         }
     }

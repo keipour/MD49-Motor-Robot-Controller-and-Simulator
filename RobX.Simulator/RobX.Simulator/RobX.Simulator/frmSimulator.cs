@@ -2,10 +2,10 @@
 
 using System;
 using System.Windows.Forms;
-using RobX.Communication;
-using RobX.Communication.TCP;
-using RobX.Tools;
-using RobX.Commons;
+using RobX.Library.Commons;
+using RobX.Library.Communication;
+using RobX.Library.Communication.TCP;
+using RobX.Library.Tools;
 
 # endregion
 
@@ -41,8 +41,8 @@ namespace RobX.Simulator
             LoadSettings();
             frmSimulator_Resize(sender, e);
 
-            ServerLog.ItemsAdded += new LogEventHandler(UpdateTextBox);
-            ServerLog.LogCleared += new LogEventHandler(UpdateTextBox);
+            ServerLog.ItemsAdded += UpdateTextBox;
+            ServerLog.LogCleared += UpdateTextBox;
 
             // Start Server
             StartServer();
@@ -53,7 +53,7 @@ namespace RobX.Simulator
 
         private bool CheckInputErrors()
         {
-            bool ServerPortValid = true;
+            var ServerPortValid = true;
 
             ushort port;
             if (ushort.TryParse(txtServerPort.Text, out port) == false || port < 2)
@@ -86,21 +86,21 @@ namespace RobX.Simulator
 
         private void frmSimulator_Resize(object sender, EventArgs e)
         {
-            int width = this.ClientSize.Width;
-            int height = tabSimulator.Top;
+            var width = ClientSize.Width;
+            var height = tabSimulator.Top;
 
-            if (Properties.Settings.Default.KeepAspectRatio == true)
+            if (Properties.Settings.Default.KeepAspectRatio)
             {
                 picSimulation.Left = 0;
                 picSimulation.Top = 0;
-                picSimulation.Width = this.ClientSize.Width;
+                picSimulation.Width = ClientSize.Width;
                 picSimulation.Height = tabSimulator.Top;
             }
             else
             {
                 picSimulation.Dock = DockStyle.None;
-                double screenratio = (double)height / width;
-                double groundratio = (double)Simulator.Environment.Ground.Height / Simulator.Environment.Ground.Width;
+                var screenratio = (double)height / width;
+                var groundratio = (double)Simulator.Environment.Ground.Height / Simulator.Environment.Ground.Width;
                 if (groundratio > screenratio)
                 {
                     picSimulation.Width = (int)(height / groundratio);
@@ -112,7 +112,7 @@ namespace RobX.Simulator
                     picSimulation.Height = (int)(width * groundratio);
                 }
 
-                picSimulation.Left = (this.ClientSize.Width - picSimulation.Width) / 2;
+                picSimulation.Left = (ClientSize.Width - picSimulation.Width) / 2;
                 picSimulation.Top = (tabSimulator.Top - picSimulation.Height) / 2;
             }
             tabSimulator_Resize(sender, e);
@@ -120,8 +120,8 @@ namespace RobX.Simulator
 
         private void tabSimulator_Resize(object sender, EventArgs e)
         {
-            int txtHelpMinSize = 272;
-            int txtHelp1Width = tabHelp.ClientSize.Width / 2;
+            var txtHelpMinSize = 272;
+            var txtHelp1Width = tabHelp.ClientSize.Width / 2;
             if (txtHelp1Width < txtHelpMinSize)
                 txtHelp1Width = txtHelpMinSize;
             txtHelp2.Width = tabHelp.ClientSize.Width - txtHelp1Width;
@@ -158,8 +158,8 @@ namespace RobX.Simulator
         {
             if (txtLog.InvokeRequired)
             {
-                SetTextCallback d = new SetTextCallback(UpdateTextBox);
-                this.Invoke(d, new object[] { ServerLogText });
+                var d = new SetTextCallback(UpdateTextBox);
+                Invoke(d, new object[] { ServerLogText });
             }
             else
             {
@@ -186,7 +186,7 @@ namespace RobX.Simulator
 
         private void HandleHotKeys(KeyEventArgs e)
         {
-            bool txtServerPortActive = txtServerPort.Focused;
+            var txtServerPortActive = txtServerPort.Focused;
 
             if (txtServerPortActive == false)
             {
@@ -222,7 +222,7 @@ namespace RobX.Simulator
             else if (e.KeyCode == Properties.Settings.Default.ToggleKeyboardControl)
                 chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
 
-            if (chkKeyboardControl.Checked == true || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
+            if (chkKeyboardControl.Checked || e.KeyCode == Properties.Settings.Default.GlobalStopKey)
             {
                 if (e.KeyCode == Properties.Settings.Default.ForwardKey || e.KeyCode == Properties.Settings.Default.BackwardKey ||
                     e.KeyCode == Properties.Settings.Default.RotateClockwiseKey || e.KeyCode == Properties.Settings.Default.StopKey ||
@@ -280,16 +280,16 @@ namespace RobX.Simulator
         private void SaveSettings()
         {
             Properties.Settings.Default.ServerPort = txtServerPort.Text;
-            Properties.Settings.Default.FormPosition = this.Location;
-            Properties.Settings.Default.FormSize = this.Size;
+            Properties.Settings.Default.FormPosition = Location;
+            Properties.Settings.Default.FormSize = Size;
             Properties.Settings.Default.Save();
         }
 
         private void LoadSettings()
         {
             UserDefinitions.DefineSimulation(ref Simulator);
-            this.Size = Properties.Settings.Default.FormSize;
-            this.Location = Properties.Settings.Default.FormPosition;
+            Size = Properties.Settings.Default.FormSize;
+            Location = Properties.Settings.Default.FormPosition;
             txtServerPort.Text = Properties.Settings.Default.ServerPort;
         }
 

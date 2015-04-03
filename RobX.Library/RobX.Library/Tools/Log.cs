@@ -2,10 +2,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 # endregion
 
-namespace RobX.Tools
+namespace RobX.Library.Tools
 {
     /// <summary>
     /// Class to maintain logs.
@@ -14,8 +15,8 @@ namespace RobX.Tools
     {
         # region Private Fields
 
-        string newText = "";
-        List<LogItem> newItems = new List<LogItem>();
+        string _newText = "";
+        readonly List<LogItem> _newItems = new List<LogItem>();
 
         # endregion
 
@@ -55,10 +56,10 @@ namespace RobX.Tools
         private void CallItemsAddedEvent()
         {
             if (ItemsAdded != null)
-                ItemsAdded(this, new LogEventArgs(newText, newItems));
+                ItemsAdded(this, new LogEventArgs(_newText, _newItems));
             
-            newText = "";
-            newItems.Clear();
+            _newText = "";
+            _newItems.Clear();
         }
 
         # endregion
@@ -68,20 +69,20 @@ namespace RobX.Tools
         /// <summary>
         /// Adds an item to the end of current log.
         /// </summary>
-        /// <param name="ItemText">String of the item that should be added to the log.</param>
-        /// <param name="AddTime">If true, adds current time to the beginning of the new line.</param>
-        public void AddItem(string ItemText = "", bool AddTime = false)
+        /// <param name="itemText">String of the item that should be added to the log.</param>
+        /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
+        public void AddItem(string itemText = "", bool addTime = false)
         {
-            if (AddTime == true)
+            if (addTime)
             {
                 Text += "[" + DateTime.Now.ToString("HH:mm:ss.fff") + "] ";
-                newText += "[" + DateTime.Now.ToString("HH:mm:ss.fff") + "] ";
+                _newText += "[" + DateTime.Now.ToString("HH:mm:ss.fff") + "] ";
             }
 
-            Text += ItemText + System.Environment.NewLine;
-            newText += ItemText + Environment.NewLine;
+            Text += itemText + Environment.NewLine;
+            _newText += itemText + Environment.NewLine;
 
-            newItems.Add(new LogItem(ItemText, AddTime));
+            _newItems.Add(new LogItem(itemText, addTime));
             CallItemsAddedEvent();
         }
 
@@ -93,8 +94,8 @@ namespace RobX.Tools
             Text = "";
             CallItemsAddedEvent();
 
-            newText = "";
-            newItems.Clear();
+            _newText = "";
+            _newItems.Clear();
 
             if (LogCleared != null)
                 LogCleared(this, new LogEventArgs(null, null));
@@ -103,13 +104,11 @@ namespace RobX.Tools
         /// <summary>
         /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log.
         /// </summary>
-        /// <param name="Bytes">The array that should be added to the log.</param>
-        public void AddBytes(byte[] Bytes)
+        /// <param name="bytes">The array that should be added to the log.</param>
+        public void AddBytes(byte[] bytes)
         {
-            string byteText = "";
-            for (int i = 0; i < Bytes.Length; ++i)
-                byteText += "0x" + Bytes[i].ToString("X2") + "(" + Bytes[i].ToString() + ") ";
-            AddItem(byteText, false);
+            var byteText = bytes.Aggregate("", (current, t) => current + ("0x" + t.ToString("X2") + "(" + t + ") "));
+            AddItem(byteText);
         }
 
         # endregion

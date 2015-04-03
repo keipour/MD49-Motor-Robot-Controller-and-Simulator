@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-using RobX.Commons;
+using RobX.Library.Commons;
 
 # endregion
 
@@ -103,17 +103,17 @@ namespace RobX.Simulator
         public byte[] GetSentBytes()
         {
             byte[] result = null;
-            lock (Simulator.SendByteLock)
+            lock (SendByteLock)
             {
                 // Return null if there is nothing to send
                 if (SendBytes.Count != 0)
                 {
                     // Get number of bytes that should be sent
-                    int Count = SendBytes.Count;
+                    var Count = SendBytes.Count;
 
                     // Copy bytes from sending list to return variable and remove them from the sending list
                     result = new byte[Count];
-                    for (int i = 0; i < Count; ++i)
+                    for (var i = 0; i < Count; ++i)
                     {
                         result[i] = SendBytes.First.Value;
                         SendBytes.RemoveFirst();
@@ -130,9 +130,9 @@ namespace RobX.Simulator
         public void AddCommands(byte[] Code)
         {
             // Use lock to avoid multithreading issues
-            lock (Simulator.CommandsLock)
+            lock (CommandsLock)
             {
-                for (int i = 0; i < Code.Length; ++i)
+                for (var i = 0; i < Code.Length; ++i)
                     Commands.AddLast(new Command(Code[i], DateTime.Now));
             }
         }

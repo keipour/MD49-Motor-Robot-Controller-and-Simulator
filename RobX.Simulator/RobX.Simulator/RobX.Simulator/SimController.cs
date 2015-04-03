@@ -13,7 +13,7 @@ namespace RobX.Simulator
     /// <summary>
     /// This is the main type for your game
     /// </summary>
-    public class SimController : Microsoft.Xna.Framework.Game
+    public class SimController : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch Frame;
@@ -43,15 +43,15 @@ namespace RobX.Simulator
             this.SimulatorPictureBox = SimulatorPictureBox;
 
             // prepare graphics event
-            graphics.PreparingDeviceSettings += new EventHandler<PreparingDeviceSettingsEventArgs>(graphics_PreparingDeviceSettings);
+            graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
 
-            RedundantForm = (Form)Control.FromHandle(this.Window.Handle);
+            RedundantForm = (Form)Control.FromHandle(Window.Handle);
             RedundantForm.VisibleChanged += RedundantForm_VisiblilityChanged;
 
             //Tell the mouse it will be getting it's input through the pictureBox
             Mouse.WindowHandle = DrawingSurface;
 
-            this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / Properties.Settings.Default.UpdateRate);
+            TargetElapsedTime = TimeSpan.FromSeconds(1.0f / Properties.Settings.Default.UpdateRate);
 
             graphics.IsFullScreen = false;
             graphics.PreferredBackBufferWidth = SimulatorPictureBox.ClientSize.Width;
@@ -60,7 +60,7 @@ namespace RobX.Simulator
 
         private void RedundantForm_VisiblilityChanged(object sender, EventArgs e)
         {
-            if (RedundantForm.Visible == true)
+            if (RedundantForm.Visible)
                 RedundantForm.Visible = false;
         }
 
@@ -78,7 +78,7 @@ namespace RobX.Simulator
         /// </summary>
         protected override void Initialize()
         {
-            GraphicsEngine.Initialize(this.GraphicsDevice, Content.Load<SpriteFont>("Grid"),
+            GraphicsEngine.Initialize(GraphicsDevice, Content.Load<SpriteFont>("Grid"),
                 Content.Load<SpriteFont>("Statistics"), Content.Load<SpriteFont>("SimulationSpeed"));
             base.Initialize();
         }
@@ -94,8 +94,8 @@ namespace RobX.Simulator
 
             Simulator.Robot.Image = new Texture2D[360];
 
-            for (int i = 0; i < Simulator.Robot.Image.Length; ++i)
-                Simulator.Robot.Image[i] = Content.Load<Texture2D>("RobotImages\\Robot" + i.ToString());
+            for (var i = 0; i < Simulator.Robot.Image.Length; ++i)
+                Simulator.Robot.Image[i] = Content.Load<Texture2D>("RobotImages\\Robot" + i);
         }
 
         protected override void UnloadContent() { }
@@ -109,7 +109,7 @@ namespace RobX.Simulator
         {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == Microsoft.Xna.Framework.Input.ButtonState.Pressed)
-                this.Exit();
+                Exit();
 
             update_elapsed_time += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
             update_total_count++;
@@ -159,7 +159,7 @@ namespace RobX.Simulator
             GraphicsDevice.Clear(Color.CornflowerBlue);
             Frame.Begin();
 
-            TimeSpan ElapsedTime = TimeSpan.Zero;
+            var ElapsedTime = TimeSpan.Zero;
             if (Simulator.IsRunning)
                 ElapsedTime = gameTime.ElapsedGameTime;
 
