@@ -115,12 +115,9 @@ namespace RobX.Simulator
 
         private bool CheckInputErrors()
         {
-            ushort port;
-
-            if (ushort.TryParse(txtServerPort.Text, out port) && port >= 2) return true;
+            if (Methods.IsValidPort(txtServerPort.Text)) return true;
             
             _serverLog.AddItem("Error! Invalid server port number!");
-
             return false;
         }
 

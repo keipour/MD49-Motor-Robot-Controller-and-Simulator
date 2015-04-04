@@ -15,8 +15,7 @@ namespace RobX.Library.Commons
     /// </summary>
     public static class Extensions
     {
-        # region TextBox Extensions
-
+        # region TextBox Add Line Extensions
 
         private delegate void SetTextCallback(TextBox textBox, string line);
         private static void AddLinePrivate(TextBox textBox, string line)
@@ -52,6 +51,10 @@ namespace RobX.Library.Commons
         {
             AddLinePrivate(textBox, line);
         }
+
+        # endregion
+
+        # region TextBox KeyPress Validation Extensions
 
         /// <summary>
         /// Validates the input key pressed by user so that the text is always valid as part of a TCP port number.
@@ -101,6 +104,10 @@ namespace RobX.Library.Commons
             if ((e.KeyChar == '.') && (textBox.SelectionLength == textBox.TextLength)) return;
             e.Handled = true;
         }
+
+        # endregion
+
+        # region TextBox Save Extension
 
         /// <summary>
         /// Saves the text of a textbox into file.

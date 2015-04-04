@@ -146,20 +146,14 @@ namespace RobX.Controller
 
         private bool CheckInputErrors()
         {
-            var ipValid = true;
+            var ipValid = Methods.IsValidIpAddress(txtIPAddress.Text);
 
-            IPAddress ip;
-            if (IPAddress.TryParse(txtIPAddress.Text, out ip) == false)
-            {
+            if (ipValid == false)
                 txtMessage.AddLine("Invalid IP address format!");
-                ipValid = false;
-            }
 
-            ushort port;
-            if (ushort.TryParse(txtPort.Text, out port) && port >= 2) return ipValid;
+            if (Methods.IsValidPort(txtPort.Text)) return ipValid;
 
-            txtMessage.AddLine("Invalid port number!");
-
+            txtMessage.AddLine("Invalid TCP port number!");
             return false;
         }
 

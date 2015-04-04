@@ -151,18 +151,14 @@ namespace RobX.Interface
 
         private bool CheckInputErrors()
         {
-            var serverPortValid = true;
+            var serverPortValid = Methods.IsValidPort(txtServerPort.Text);
 
-            ushort port;
-            if (ushort.TryParse(txtServerPort.Text, out port) == false || port < 2)
-            {
+            if (serverPortValid == false)
                 txtMessage.AddLine("Error! Invalid server port number!");
-                serverPortValid = false;
-            }
 
             if (cboCOMPorts.Items.Count != 0) return serverPortValid;
-            txtMessage.AddLine("Error! No COM devices are connected to the system!");
 
+            txtMessage.AddLine("Error! No COM devices are connected to the system!");
             return false;
         }
 

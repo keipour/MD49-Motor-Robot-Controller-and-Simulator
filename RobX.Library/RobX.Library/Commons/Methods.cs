@@ -1,4 +1,10 @@
-﻿namespace RobX.Library.Commons
+﻿# region Includes
+
+using System.Net;
+
+# endregion
+
+namespace RobX.Library.Commons
 {
     /// <summary>
     /// This class contains public static methods used in the project.
@@ -29,6 +35,30 @@
         public static byte ConvertSignedByteToUnsigned(int number)
         {
             return (byte)(((number % 256) + 256) % 256);
+        }
+
+        # endregion
+
+        # region String Validation Methods
+
+        /// <summary>
+        /// This method checks if the input string is a valid TCP port number.
+        /// </summary>
+        /// <returns>Returns true if the input string is a valid TCP port number; otherwise returns false.</returns>
+        public static bool IsValidPort(string str)
+        {
+            ushort port;
+            return ushort.TryParse(str, out port) && port >= 2;
+        }
+
+        /// <summary>
+        /// This method checks if the input string is a valid IP address.
+        /// </summary>
+        /// <returns>Returns true if the input string is a valid IP address; otherwise returns false.</returns>
+        public static bool IsValidIpAddress(string str)
+        {
+            IPAddress ip;
+            return IPAddress.TryParse(str, out ip);
         }
 
         # endregion
