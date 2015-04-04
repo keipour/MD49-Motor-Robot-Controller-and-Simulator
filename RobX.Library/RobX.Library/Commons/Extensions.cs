@@ -15,10 +15,10 @@ namespace RobX.Library.Commons
     /// </summary>
     public static class Extensions
     {
-        # region TextBox Add Line Extensions
+        # region TextBox Add Line Extension
 
-        private delegate void SetTextCallback(TextBox textBox, string line);
-        private static void AddLinePrivate(TextBox textBox, string line)
+        private delegate void SetTextCallback(TextBoxBase textBox, string line);
+        private static void AddLinePrivate(TextBoxBase textBox, string line)
         {
             try
             {
@@ -47,9 +47,47 @@ namespace RobX.Library.Commons
         /// </summary>
         /// <param name="textBox">The textbox instance to which the line should be added.</param>
         /// <param name="line">The string that should be added as a line to the end of the TextBox text.</param>
-        public static void AddLine(this TextBox textBox, string line)
+        public static void AddLine(this TextBoxBase textBox, string line)
         {
             AddLinePrivate(textBox, line);
+        }
+
+        # endregion
+
+        # region TextBox Update Text Extension
+
+        private static void UpdateTextPrivate(TextBoxBase textBox, string text)
+        {
+            try
+            {
+                if (textBox.InvokeRequired)
+                {
+                    var d = new SetTextCallback(AddLinePrivate);
+                    textBox.Invoke(d, textBox, text);
+                }
+                else
+                {
+                    if (textBox.Text == text) return;
+
+                    textBox.Text = text;
+                    textBox.Select(textBox.Text.Length, 0);
+                    textBox.ScrollToCaret();
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        /// <summary>
+        /// Updates text of a TextBox control.
+        /// </summary>
+        /// <param name="textBox">The textbox instance which should be updated.</param>
+        /// <param name="text">The text that should be put in the TextBox.</param>
+        public static void UpdateText(this TextBoxBase textBox, string text)
+        {
+            UpdateTextPrivate(textBox, text);
         }
 
         # endregion

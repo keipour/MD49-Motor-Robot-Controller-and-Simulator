@@ -120,33 +120,6 @@ namespace RobX.Interface
 
         # endregion
 
-        # region Log Events
-
-        private delegate void SetTextCallback(string str);
-        private void UpdateTextBox(string logText)
-        {
-            if (txtLog.InvokeRequired)
-            {
-                var d = new SetTextCallback(UpdateTextBox);
-                Invoke(d, logText);
-            }
-            else
-            {
-                if (txtLog.Text == logText) return;
-
-                txtLog.Text = logText;
-                txtLog.Select(txtLog.Text.Length, 0);
-                txtLog.ScrollToCaret();
-            }
-        }
-
-        private void UpdateTextBox(object sender, LogEventArgs e)
-        {
-            UpdateTextBox(_communicationLog.Text);
-        }
-
-        # endregion
-
         # region Private Functions
 
         private bool CheckInputErrors()
@@ -169,7 +142,7 @@ namespace RobX.Interface
             if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int)Robot.BaudRate,
                 Robot.DataBits, Robot.Parity, Robot.StopBits) == false)
             {
-                txtMessage.AddLine("Error! No COM devices are connected to the system!");
+                txtMessage.AddLine("Error! Selected COM port is busy right now!");
                 return;
             }
 
@@ -262,6 +235,11 @@ namespace RobX.Interface
         private void SaveLogTextBox(object sender, KeyEventArgs e)
         {
             (sender as TextBox).SaveTextBox_CtrlS(e);
+        }
+
+        private void UpdateTextBox(object sender, LogEventArgs e)
+        {
+            txtLog.UpdateText(_communicationLog.Text);
         }
 
         # endregion

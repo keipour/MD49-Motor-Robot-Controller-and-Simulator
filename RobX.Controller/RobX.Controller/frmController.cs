@@ -229,74 +229,6 @@ namespace RobX.Controller
 
         # endregion
 
-        # region Log Events
-
-        private delegate void SetTextCallback(string str);
-
-        // ReSharper disable once InconsistentNaming
-        private void txtLogUpdate(string logText)
-        {
-            try
-            {
-                if (txtLog.InvokeRequired)
-                {
-                    var d = new SetTextCallback(txtLogUpdate);
-                    Invoke(d, logText);
-                }
-                else
-                {
-                    if (txtLog.Text == logText) return;
-
-                    txtLog.Text = logText;
-                    txtLog.Select(txtLog.Text.Length, 0);
-                    txtLog.ScrollToCaret();
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        // ReSharper disable once InconsistentNaming
-        private void txtLogUpdate(object sender, LogEventArgs e)
-        {
-            txtLogUpdate(_communicationLog.Text);
-        }
-
-        // ReSharper disable once InconsistentNaming
-        private void txtMessageUpdate(string logText)
-        {
-            try
-            {
-                if (txtMessage.InvokeRequired)
-                {
-                    var d = new SetTextCallback(txtMessageUpdate);
-                    Invoke(d, logText);
-                }
-                else
-                {
-                    if (txtMessage.Text == logText) return;
-
-                    txtMessage.Text = logText;
-                    txtMessage.Select(txtMessage.Text.Length, 0);
-                    txtMessage.ScrollToCaret();
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        // ReSharper disable once InconsistentNaming
-        private void txtMessageUpdate(object sender, LogEventArgs e)
-        {
-            txtMessageUpdate(_messageLog.Text);
-        }
-
-        # endregion
-
         # region Form Component Events
 
         private void cmdStart_Click(object sender, EventArgs e)
@@ -374,6 +306,18 @@ namespace RobX.Controller
         private void SaveLogTextBox(object sender, KeyEventArgs e)
         {
             (sender as TextBox).SaveTextBox_CtrlS(e);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void txtLogUpdate(object sender, LogEventArgs e)
+        {
+            txtLog.UpdateText(_communicationLog.Text);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void txtMessageUpdate(object sender, LogEventArgs e)
+        {
+            txtMessage.UpdateText(_messageLog.Text);
         }
 
         # endregion

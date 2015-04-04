@@ -283,33 +283,6 @@ namespace RobX.Simulator
 
         # endregion
 
-        # region Log Events
-
-        private delegate void SetTextCallback(string str);
-        private void UpdateTextBox(string serverLogText)
-        {
-            if (txtLog.InvokeRequired)
-            {
-                var d = new SetTextCallback(UpdateTextBox);
-                Invoke(d, serverLogText);
-            }
-            else
-            {
-                if (txtLog.Text == serverLogText) return;
-
-                txtLog.Text = serverLogText;
-                txtLog.Select(txtLog.Text.Length, 0);
-                txtLog.ScrollToCaret();
-            }
-        }
-
-        private void UpdateTextBox(object sender, LogEventArgs e)
-        {
-            UpdateTextBox(_serverLog.Text);
-        }
-
-        # endregion
-
         # region Form Component Events
 
         private void tabSimulator_Resize(object sender, EventArgs e)
@@ -342,6 +315,11 @@ namespace RobX.Simulator
         private void SaveLogTextBox(object sender, KeyEventArgs e)
         {
             (sender as TextBox).SaveTextBox_CtrlS(e);
+        }
+
+        private void UpdateTextBox(object sender, LogEventArgs e)
+        {
+            txtLog.UpdateText(_serverLog.Text);
         }
 
         # endregion
