@@ -8,14 +8,14 @@ using RobX.Library.Commons;
 namespace RobX.Simulator
 {
     /// <summary>
-    /// Defines all simulation settings set by the user
+    /// This class defines all simulation settings set by the user.
     /// </summary>
     public static class UserDefinitions
     {
         /// <summary>
-        /// Defines all simulation settings set by the user
+        /// Defines all simulation settings set by the user.
         /// </summary>
-        /// <param name="sim">Simulator variable</param>
+        /// <param name="sim">Simulator variable.</param>
         public static void DefineSimulation(ref Simulator sim)
         {
             // Prof. Jamzad's Image Processing and Computer Vision Lab
@@ -41,7 +41,7 @@ namespace RobX.Simulator
             sim.AddObstacle(new Obstacle(sim.Environment.Ground.Width - 1640, sim.Environment.Ground.Height - 1830 - 1300, 1640, 1300));
             sim.AddObstacle(new Obstacle(sim.Environment.Ground.Width - 1700, 2310, 1700, 1300));
             sim.AddObstacle(new Obstacle(sim.Environment.Ground.Width - 650, 1530, 650, 600));
-            sim.AddObstacle(new Obstacle(0, 0, sim.Environment.Ground.Width, sim.Environment.Ground.Height, false, 10));
+            sim.AddObstacle(new Obstacle(0, 0, sim.Environment.Ground.Width, sim.Environment.Ground.Height, false, 100));
             sim.AddObstacle(new Obstacle(sim.Environment.Ground.Width - 100, 210, 100, 1040, Color.Brown));
 
             // Set robot position

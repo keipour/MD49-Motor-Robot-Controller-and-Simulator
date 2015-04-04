@@ -13,32 +13,44 @@ namespace RobX.Simulator
     /// </summary>
     public class Robot
     {
-        // -------------------------------------- Public Variables ------------------------------ //
+        # region Private Fields
 
+        private byte _previousmode;
+        private byte _mode;
+        private byte _speed1 = 128;
+        private byte _speed2 = 128;
+
+        # endregion
+
+        # region Public Fields 
+
+        /// <summary>
+        /// Array of robot images in all 360 directions.
+        /// </summary>
         public Texture2D[] Image;
 
         /// <summary>
-        /// The version of the motor controller's software
+        /// The version of the motor controller's software.
         /// </summary>
         public readonly byte Version = 1;
 
         /// <summary>
-        /// The voltage of robot batteries
+        /// The voltage of robot batteries.
         /// </summary>
         public readonly byte Volts = 24;
 
         /// <summary>
-        /// The current driven by motor 1 (1 = 100 mA)
+        /// The current driven by motor 1 (1 = 100 mA).
         /// </summary>
         public readonly byte Current1 = 10;
 
         /// <summary>
-        /// The current driven by motor 2 (1 = 100 mA)
+        /// The current driven by motor 2 (1 = 100 mA).
         /// </summary>
         public readonly byte Current2 = 10;
 
         /// <summary>
-        /// An error occured in motor (assumed 0 which means no error occured)
+        /// An error occured in motor (assumed 0 which means no error occured).
         /// </summary>
         public readonly byte Error = 0;
 
@@ -51,17 +63,17 @@ namespace RobX.Simulator
         /// </summary>
         public byte Mode
         {
-            get { return mode; }
+            get { return _mode; }
             set
             {
-                previousmode = mode;
-                mode = value;
+                _previousmode = _mode;
+                _mode = value;
             }
         }
 
         /// <summary>
         /// Turn on/off speed regulation: If the required speed is not being achieved, increase power to the motors 
-        /// until it reaches the desired rate (or the motors reach the maximum output)
+        /// until it reaches the desired rate (or the motors reach the maximum output).
         /// </summary>
         public bool Regulator = false;
 
@@ -71,12 +83,12 @@ namespace RobX.Simulator
         public bool Timeout = true;
 
         /// <summary>
-        /// A 32-bit signed integer counter for motor 1 encoder
+        /// A 32-bit signed integer counter for motor 1 encoder.
         /// </summary>
         public int Encoder1;
 
         /// <summary>
-        /// A 32-bit signed integer counter for motor 2 encoder
+        /// A 32-bit signed integer counter for motor 2 encoder.
         /// </summary>
         public int Encoder2;
 
@@ -86,11 +98,11 @@ namespace RobX.Simulator
         /// </summary>
         public byte Speed1
         {
-            get { return speed1; }
+            get { return _speed1; }
             set
             {
-                previousmode = mode;
-                speed1 = value;
+                _previousmode = _mode;
+                _speed1 = value;
             }
         }
 
@@ -100,11 +112,11 @@ namespace RobX.Simulator
         /// </summary>
         public byte Speed2
         {
-            get { return speed2; }
+            get { return _speed2; }
             set
             {
-                previousmode = mode;
-                speed2 = value;
+                _previousmode = _mode;
+                _speed2 = value;
             }
         }
 
@@ -113,44 +125,46 @@ namespace RobX.Simulator
         /// </summary>
         public byte Acceleration = 5;
 
-        // -------------------------------------- Public Functions ------------------------------ //
+        # endregion
+
+        # region Public Functions (WheelSpeeds)
 
         /// <summary>
-        /// Calculates normalized individual wheel speeds (in millimeters per second)
+        /// Calculates normalized individual wheel speeds (in millimeters per second).
         /// </summary>
-        /// <param name="WheelSpeed1">Speed of wheel 1</param>
-        /// <param name="WheelSpeed2">Speed of wheel 2</param>
-        public void WheelSpeeds(out double WheelSpeed1, out double WheelSpeed2)
+        /// <param name="wheelSpeed1">Speed of wheel 1.</param>
+        /// <param name="wheelSpeed2">Speed of wheel 2.</param>
+        public void WheelSpeeds(out double wheelSpeed1, out double wheelSpeed2)
         {
-            WheelSpeed1 = 0;
-            WheelSpeed2 = 0;
+            wheelSpeed1 = 0;
+            wheelSpeed2 = 0;
 
-            switch (previousmode)
+            switch (_previousmode)
             {
                 case 0:
-                    WheelSpeed1 = Speed1 - 128;
-                    WheelSpeed2 = Speed2 - 128;
+                    wheelSpeed1 = Speed1 - 128;
+                    wheelSpeed2 = Speed2 - 128;
                     break;
                 case 1:
-                    WheelSpeed1 = Methods.ConvertUnsignedByteToSigned(Speed1);
-                    WheelSpeed2 = Methods.ConvertUnsignedByteToSigned(Speed2);
+                    wheelSpeed1 = Methods.ConvertUnsignedByteToSigned(Speed1);
+                    wheelSpeed2 = Methods.ConvertUnsignedByteToSigned(Speed2);
                     break;
                 case 2:
                     if (Speed1 >= 128)                  // if forward direction
                     {
-                        WheelSpeed1 = Speed1 + Speed2 - 256;
-                        if (WheelSpeed1 > 127) WheelSpeed1 = 127;
+                        wheelSpeed1 = Speed1 + Speed2 - 256;
+                        if (wheelSpeed1 > 127) wheelSpeed1 = 127;
 
-                        WheelSpeed2 = Speed1 - Speed2;
-                        if (WheelSpeed2 > 127) WheelSpeed2 = 127;
+                        wheelSpeed2 = Speed1 - Speed2;
+                        if (wheelSpeed2 > 127) wheelSpeed2 = 127;
                     }
                     else                              // if backward direction
                     {
-                        WheelSpeed1 = Speed1 - Speed2;
-                        if (WheelSpeed1 < -128) WheelSpeed1 = -128;
+                        wheelSpeed1 = Speed1 - Speed2;
+                        if (wheelSpeed1 < -128) wheelSpeed1 = -128;
 
-                        WheelSpeed2 = Speed1 + Speed2 - 256;
-                        if (WheelSpeed2 < -128) WheelSpeed2 = -128;
+                        wheelSpeed2 = Speed1 + Speed2 - 256;
+                        if (wheelSpeed2 < -128) wheelSpeed2 = -128;
                     }
                     break;
                 case 3:
@@ -159,44 +173,41 @@ namespace RobX.Simulator
 
                     if (speed1 >= 0)                  // if forward direction
                     {
-                        WheelSpeed1 = speed1 + speed2;
-                        if (WheelSpeed1 > 127) WheelSpeed1 = 127;
+                        wheelSpeed1 = speed1 + speed2;
+                        if (wheelSpeed1 > 127) wheelSpeed1 = 127;
 
-                        WheelSpeed2 = speed1 - speed2;
-                        if (WheelSpeed2 > 127) WheelSpeed2 = 127;
+                        wheelSpeed2 = speed1 - speed2;
+                        if (wheelSpeed2 > 127) wheelSpeed2 = 127;
                     }
                     else                              // if backward direction
                     {
-                        WheelSpeed1 = speed1 - speed2;
-                        if (WheelSpeed1 < -128) WheelSpeed1 = -128;
+                        wheelSpeed1 = speed1 - speed2;
+                        if (wheelSpeed1 < -128) wheelSpeed1 = -128;
 
-                        WheelSpeed2 = speed1 + speed2;
-                        if (WheelSpeed2 < -128) WheelSpeed2 = -128;
+                        wheelSpeed2 = speed1 + speed2;
+                        if (wheelSpeed2 < -128) wheelSpeed2 = -128;
                     }
                     break;
             }
-            WheelSpeed1 *= Library.Commons.Robot.RobotSpeedToMmpS;
-            WheelSpeed2 *= Library.Commons.Robot.RobotSpeedToMmpS;
+            wheelSpeed1 *= Library.Commons.Robot.RobotSpeedToMmpS;
+            wheelSpeed2 *= Library.Commons.Robot.RobotSpeedToMmpS;
         }
 
-        // ------------------------------------------ Constructor ------------------------------- //
+        # endregion
+
+        # region Constructor
 
         /// <summary>
-        /// Constructor for the Robot class
+        /// Constructor for the Robot class.
         /// </summary>
         public Robot()
         {
-            // Randomize initial values for encoders 1 and 2
+            // Randomize initial values for encoders 1 and 2.
             var rand = new Random();
             Encoder1 = rand.Next(Int32.MinValue, Int32.MaxValue);
             Encoder2 = rand.Next(Int32.MinValue, Int32.MaxValue);
         }
 
-        // ------------------------------------------ Constructor ------------------------------- //
-
-        private byte previousmode;
-        private byte mode;
-        private byte speed1 = 128;
-        private byte speed2 = 128;
+        # endregion
     }
 }

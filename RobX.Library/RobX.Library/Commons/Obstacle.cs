@@ -191,7 +191,7 @@ namespace RobX.Library.Commons
         /// <param name="height">Height of the rectangle in millimeters.</param>
         /// <param name="color">Color of the rectangle or rectangle border.</param>
         /// <param name="fill">If true, fill the rectangle; otherwise the obstacle is only a border.</param>
-        /// <param name="borderwidth">Width of the rectangle border (works only when fill parameter is false).</param>
+        /// <param name="borderwidth">Width of the rectangle border in millimeters (works only when fill parameter is false).</param>
         public Obstacle(int x, int y, int width, int height, Color color, bool fill = true, int borderwidth = 4)
         {
             if (fill == false)
@@ -208,7 +208,7 @@ namespace RobX.Library.Commons
         /// <param name="width">Width of the rectangle in millimeters.</param>
         /// <param name="height">Height of the rectangle in millimeters.</param>
         /// <param name="fill">If true, fill the rectangle; otherwise the obstacle is only a border.</param>
-        /// <param name="borderwidth">Width of the rectangle border (works only when fill parameter is false).</param>
+        /// <param name="borderwidth">Width of the rectangle border in millimeters (works only when fill parameter is false).</param>
         public Obstacle(int x, int y, int width, int height, bool fill = true, int borderwidth = 4)
         {
             if (fill == false)
@@ -220,7 +220,7 @@ namespace RobX.Library.Commons
         /// <summary>
         /// Construct obstcle as a polygon border with the specified color.
         /// </summary>
-        /// <param name="points">Array of vertex points of the polygon (positions in millimeters).</param>
+        /// <param name="points">Array of vertex points of the polygon in millimeters (positions in millimeters).</param>
         /// <param name="color">Color of the polygon border.</param>
         /// <param name="borderwidth">Width of the polygon border.</param>
         public Obstacle(Vector2[] points, Color color, int borderwidth = 4)
@@ -231,7 +231,7 @@ namespace RobX.Library.Commons
         /// <summary>
         /// Construct obstcle as a polygon border with the default color.
         /// </summary>
-        /// <param name="points">Array of vertex points of the polygon (positions in millimeters)</param>
+        /// <param name="points">Array of vertex points of the polygon in millimeters (positions in millimeters)</param>
         /// <param name="borderwidth">Width of the polygon border.</param>
         public Obstacle(Vector2[] points, int borderwidth = 4)
         {

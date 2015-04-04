@@ -13,69 +13,95 @@ using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
 namespace RobX.Simulator
 {
     /// <summary>
-    /// This is the main type for your game
+    /// This class manages all the simulation aspects (update, draw, etc.).
     /// </summary>
     public class SimController : Game
     {
-        GraphicsDeviceManager graphics;
-        SpriteBatch Frame;
+        # region Private Fields
 
-        Simulator Simulator;
+        readonly GraphicsDeviceManager _graphics;
+        SpriteBatch _frame;
 
-        Form RedundantForm;
-        IntPtr DrawingSurface;
-        Form SimulatorForm;
-        PictureBox SimulatorPictureBox;
+        readonly Simulator _simulator;
 
-        int draw_total_frames;
-        float draw_elapsed_time;
-        int update_total_count;
-        float update_elapsed_time;
-        public static int DrawFPS;
+        readonly Form _redundantForm;
+        readonly IntPtr _drawingSurface;
+        readonly PictureBox _simulatorPictureBox;
+
+        int _drawTotalFrames;
+        float _drawElapsedTime;
+        int _updateTotalCount;
+        float _updateElapsedTime;
+
+        # endregion
+
+        # region Public Fields
+
+        /// <summary>
+        /// Number of drawn frames per second.
+        /// </summary>
+        public static int DrawFps;
+
+        /// <summary>
+        /// The update rate (times per second). 
+        /// </summary>
         public static int UpdateRate;
 
-        public SimController(IntPtr DrawingSurface, frmSimulator SimulatorForm, PictureBox SimulatorPictureBox)
-        {
-            Simulator = SimulatorForm.Simulator;
+        # endregion
 
-            graphics = new GraphicsDeviceManager(this);
+        # region Constructor
+
+        /// <summary>
+        /// Constructor for the SimController class.
+        /// </summary>
+        /// <param name="drawingSurface">Pointer to the drawing suface.</param>
+        /// <param name="simulatorPictureBox">PictureBox control that is used for drawing of the simulation frames.</param>
+        /// <param name="simulator">Simulator class instance.</param>
+        public SimController(IntPtr drawingSurface, PictureBox simulatorPictureBox, Simulator simulator)
+        {
+            _simulator = simulator;
+
+            _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            this.DrawingSurface = DrawingSurface;
-            this.SimulatorForm = SimulatorForm;
-            this.SimulatorPictureBox = SimulatorPictureBox;
+            _drawingSurface = drawingSurface;
+            _simulatorPictureBox = simulatorPictureBox;
 
             // prepare graphics event
-            graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
+            _graphics.PreparingDeviceSettings += graphics_PreparingDeviceSettings;
 
-            RedundantForm = (Form)Control.FromHandle(Window.Handle);
-            RedundantForm.VisibleChanged += RedundantForm_VisiblilityChanged;
+            _redundantForm = (Form)Control.FromHandle(Window.Handle);
+            _redundantForm.VisibleChanged += RedundantForm_VisiblilityChanged;
 
             //Tell the mouse it will be getting it's input through the pictureBox
-            Mouse.WindowHandle = DrawingSurface;
+            Mouse.WindowHandle = drawingSurface;
 
             TargetElapsedTime = TimeSpan.FromSeconds(1.0f / Settings.Default.UpdateRate);
 
-            graphics.IsFullScreen = false;
-            graphics.PreferredBackBufferWidth = SimulatorPictureBox.ClientSize.Width;
-            graphics.PreferredBackBufferHeight = SimulatorPictureBox.ClientSize.Height;
+            _graphics.IsFullScreen = false;
+            _graphics.PreferredBackBufferWidth = simulatorPictureBox.ClientSize.Width;
+            _graphics.PreferredBackBufferHeight = simulatorPictureBox.ClientSize.Height;
         }
+
+        # endregion
+
+        # region Private and Protected XNA-related Methods
 
         private void RedundantForm_VisiblilityChanged(object sender, EventArgs e)
         {
-            if (RedundantForm.Visible)
-                RedundantForm.Visible = false;
+            if (_redundantForm.Visible)
+                _redundantForm.Visible = false;
         }
 
         private void graphics_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
         {
             // Finally attach draw ability to the picture box in winforms.
-            e.GraphicsDeviceInformation.PresentationParameters.DeviceWindowHandle = DrawingSurface;
+            e.GraphicsDeviceInformation.PresentationParameters.DeviceWindowHandle = _drawingSurface;
         }
 
         /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// Allows the simulation to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
+        /// related content. Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize()
@@ -86,91 +112,103 @@ namespace RobX.Simulator
         }
 
         /// <summary>
-        /// LoadContent will be called once per game and is the place to load
+        /// LoadContent will be called once per simulation and is the place to load
         /// all of your content.
         /// </summary>
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
-            Frame = new SpriteBatch(GraphicsDevice);
+            _frame = new SpriteBatch(GraphicsDevice);
 
-            Simulator.Robot.Image = new Texture2D[360];
+            _simulator.Robot.Image = new Texture2D[360];
 
-            for (var i = 0; i < Simulator.Robot.Image.Length; ++i)
-                Simulator.Robot.Image[i] = Content.Load<Texture2D>("RobotImages\\Robot" + i);
+            for (var i = 0; i < _simulator.Robot.Image.Length; ++i)
+                _simulator.Robot.Image[i] = Content.Load<Texture2D>("RobotImages\\Robot" + i);
         }
 
+        /// <summary>
+        /// In this method all the unloading for after the simulation is perormed.
+        /// </summary>
         protected override void UnloadContent() { }
 
+        # endregion
+
+        # region Private and Protected Simulation-related Methods
+
         /// <summary>
-        /// Allows the game to run logic such as updating the world,
+        /// Allows the simulation to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
         /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Update(GameTime gameTime)
+        /// <param name="simTime">Provides a snapshot of timing values (update time and simulation time).</param>
+        protected override void Update(GameTime simTime)
         {
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 Exit();
 
-            update_elapsed_time += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            update_total_count++;
+            _updateElapsedTime += (float)simTime.ElapsedGameTime.TotalMilliseconds;
+            _updateTotalCount++;
 
             // 1 Second has passed
-            if (update_elapsed_time >= 1000.0f)
+            if (_updateElapsedTime >= 1000.0f)
             {
-                UpdateRate = update_total_count;
-                update_total_count = 0;
-                update_elapsed_time = 0;
+                UpdateRate = _updateTotalCount;
+                _updateTotalCount = 0;
+                _updateElapsedTime = 0;
             }
 
-            Simulator.StepSimulation();
+            _simulator.StepSimulation();
 
-            base.Update(gameTime);
+            base.Update(simTime);
         }
 
         /// <summary>
-        /// This is called when the game should draw itself.
+        /// Draws simulation frame on the screen.
         /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
+        /// <param name="simTime">Provides a snapshot of timing values (frame time and simulation time).</param>
+        protected override void Draw(GameTime simTime)
         {
-            draw_elapsed_time += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
-            draw_total_frames++;
+            _drawElapsedTime += (float)simTime.ElapsedGameTime.TotalMilliseconds;
+            _drawTotalFrames++;
             // 1 Second has passed
-            if (draw_elapsed_time >= 1000.0f)
+            if (_drawElapsedTime >= 1000.0f)
             {
-                DrawFPS = draw_total_frames;
-                draw_total_frames = 0;
-                draw_elapsed_time = 0;
+                DrawFps = _drawTotalFrames;
+                _drawTotalFrames = 0;
+                _drawElapsedTime = 0;
             }
 
             // Check if screen dimensions are changed (simulation form is resized)
             try
             {
-                if (graphics.PreferredBackBufferWidth != SimulatorPictureBox.ClientSize.Width ||
-                graphics.PreferredBackBufferHeight != SimulatorPictureBox.ClientSize.Height)
+                if (_graphics.PreferredBackBufferWidth != _simulatorPictureBox.ClientSize.Width ||
+                _graphics.PreferredBackBufferHeight != _simulatorPictureBox.ClientSize.Height)
                 {
-                    graphics.PreferredBackBufferWidth = SimulatorPictureBox.ClientSize.Width;
-                    graphics.PreferredBackBufferHeight = SimulatorPictureBox.ClientSize.Height;
-                    graphics.ApplyChanges();
+                    _graphics.PreferredBackBufferWidth = _simulatorPictureBox.ClientSize.Width;
+                    _graphics.PreferredBackBufferHeight = _simulatorPictureBox.ClientSize.Height;
+                    _graphics.ApplyChanges();
                 }
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
 
             GraphicsDevice.Clear(Color.CornflowerBlue);
-            Frame.Begin();
+            _frame.Begin();
 
-            var ElapsedTime = TimeSpan.Zero;
-            if (Simulator.IsRunning)
-                ElapsedTime = gameTime.ElapsedGameTime;
+            var elapsedTime = TimeSpan.Zero;
+            if (_simulator.IsRunning)
+                elapsedTime = simTime.ElapsedGameTime;
 
-            Simulator.Drawer.Render(ref Frame, SimulatorPictureBox.ClientSize.Width, SimulatorPictureBox.ClientSize.Height,
-                ref Simulator.Environment, Simulator.Robot, ElapsedTime, Simulator.Render.Type);
+            _simulator.Drawer.Render(ref _frame, _simulatorPictureBox.ClientSize.Width, _simulatorPictureBox.ClientSize.Height,
+                ref _simulator.Environment, _simulator.Robot, elapsedTime, _simulator.Render.Type);
             
-            Frame.End();
+            _frame.End();
             
-            base.Draw(gameTime);
+            base.Draw(simTime);
         }
+
+        # endregion
     }
 }

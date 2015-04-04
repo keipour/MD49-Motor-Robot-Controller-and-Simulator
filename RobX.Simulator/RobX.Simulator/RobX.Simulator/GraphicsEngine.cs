@@ -8,153 +8,292 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace RobX.Simulator
 {
+    /// <summary>
+    /// A class that provides basic drawing functionality using XNA framework. 
+    /// </summary>
     public static class GraphicsEngine
     {
-        private static Texture2D pixel;
+        # region Private Fields
+
+        private static Texture2D _pixel;
+
+        # endregion
+
+        # region Public Fields
+
+        /// <summary>
+        /// Font used for drawing grid annotation text on the screen.
+        /// </summary>
         public static SpriteFont GridFont;
+
+        /// <summary>
+        /// Font used for drawing statistics text on the screen.
+        /// </summary>
         public static SpriteFont StatisticsFont;
+
+        /// <summary>
+        /// Font used for drawing simulation speed text on the screen.
+        /// </summary>
         public static SpriteFont SimulationSpeedFont;
 
+        # endregion
+
+        # region Public Static Methods
+
+        /// <summary>
+        /// Initializes the current graphics engine for the first time of use.
+        /// </summary>
+        /// <param name="graphicsDevice">The graphics device used to draw.</param>
+        /// <param name="gridFont">Font for drawing the grid annotation text on the screen.</param>
+        /// <param name="statisticsFont">Font for drawing statistics text on the screen.</param>
+        /// <param name="simulationSpeedFont">Font for drawing simulation speed text on the screen.</param>
         public static void Initialize(GraphicsDevice graphicsDevice, SpriteFont gridFont,
             SpriteFont statisticsFont, SpriteFont simulationSpeedFont)
         {
-            pixel = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
-            pixel.SetData(new[] { Color.White });
+            _pixel = new Texture2D(graphicsDevice, 1, 1, false, SurfaceFormat.Color);
+            _pixel.SetData(new[] { Color.White });
             GridFont = gridFont;
             StatisticsFont = statisticsFont;
             SimulationSpeedFont = simulationSpeedFont;
         }
 
-        public static void FillRect(this SpriteBatch Sprite, Rectangle Rect, Color Color)
+        /// <summary>
+        /// Draw a filled rectangle on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="rect">Dimensions of the rectangle to draw on the screen in pixels.</param>
+        /// <param name="color">Color of the rectangle.</param>
+        public static void FillRect(this SpriteBatch sprite, Rectangle rect, Color color)
         {
-            Sprite.Draw(pixel, Rect, Color);
+            sprite.Draw(_pixel, rect, color);
         }
 
-        public static void DrawRect(this SpriteBatch Sprite, Rectangle Rect, Color Color, int BorderWidth = 20)
+        /// <summary>
+        /// Draw a rectangle border on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="rect">Dimensions of the rectangle to draw on the screen in pixels.</param>
+        /// <param name="color">Color of the rectangle.</param>
+        /// <param name="horizontalBorderWidth">Width of the horizontal border of the rectangle in pixels.</param>
+        /// <param name="verticalBorderWidth">Width of the vertical border of the rectangle in pixels.</param>
+        public static void DrawRect(this SpriteBatch sprite, Rectangle rect, Color color, int horizontalBorderWidth = 20, int verticalBorderWidth = 20)
         {
             // Draw top line
-            Sprite.FillRect(new Rectangle(Rect.X, Rect.Y, Rect.Width, BorderWidth), Color);
+            sprite.FillRect(new Rectangle(rect.X, rect.Y, rect.Width, horizontalBorderWidth), color);
 
             // Draw left line
-            Sprite.FillRect(new Rectangle(Rect.X, Rect.Y, BorderWidth, Rect.Height), Color);
+            sprite.FillRect(new Rectangle(rect.X, rect.Y, verticalBorderWidth, rect.Height), color);
 
             // Draw right line
-            Sprite.FillRect(new Rectangle((Rect.X + Rect.Width - BorderWidth), Rect.Y, BorderWidth, Rect.Height), Color);
+            sprite.FillRect(new Rectangle((rect.X + rect.Width - verticalBorderWidth), rect.Y, verticalBorderWidth, rect.Height), color);
 
             // Draw bottom line
-            Sprite.FillRect(new Rectangle(Rect.X, Rect.Y + Rect.Height - BorderWidth, Rect.Width, BorderWidth), Color);
+            sprite.FillRect(new Rectangle(rect.X, rect.Y + rect.Height - horizontalBorderWidth, rect.Width, horizontalBorderWidth), color);
         }
 
-        public static void DrawHorizontalLine(this SpriteBatch Sprite, int StartX, int EndX, int Y, Color Color, int LineWidth = 10, int[] Pattern = null)
+        /// <summary>
+        /// Draw a horizontal line on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="startX">X coordinate of the starting (left) point of the line.</param>
+        /// <param name="endX">X coordinate of the ending (right) point of the line.</param>
+        /// <param name="y">Y coordinate of the line.</param>
+        /// <param name="color">Color of the line.</param>
+        /// <param name="lineWidth">Width of the line in pixels.</param>
+        /// <param name="pattern">Pattern used to draw the line. If pattern is null, draws a solid line. Otherwise uses the pattern 
+        /// array to draw a dashed line.</param>
+        public static void DrawHorizontalLine(this SpriteBatch sprite, int startX, int endX, int y, Color color, int lineWidth = 10, int[] pattern = null)
         {
-            if (Pattern == null)
+            if (pattern == null)
             {
-                Sprite.FillRect(new Rectangle(StartX, Y - LineWidth / 2, EndX - StartX, LineWidth), Color);
+                sprite.FillRect(new Rectangle(startX, y - lineWidth / 2, endX - startX, lineWidth), color);
                 return;
             }
 
-            var X = StartX;
-            for (; X <= EndX - Pattern[0]; X += Pattern[0] + Pattern[1])
-                Sprite.DrawHorizontalLine(X, X + Pattern[0], Y, Color, LineWidth);
+            var x = startX;
+            for (; x <= endX - pattern[0]; x += pattern[0] + pattern[1])
+                sprite.DrawHorizontalLine(x, x + pattern[0], y, color, lineWidth);
 
-            if (X <= EndX)
-                Sprite.DrawHorizontalLine(X, EndX, Y, Color, LineWidth);
+            if (x <= endX)
+                // ReSharper disable once TailRecursiveCall
+                sprite.DrawHorizontalLine(x, endX, y, color, lineWidth);
         }
 
-        public static void DrawVerticalLine(this SpriteBatch Sprite, int X, int StartY, int EndY, Color Color, int LineWidth = 10, int[] Pattern = null)
+        /// <summary>
+        /// Draw a vertical line on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="x">X coordinate of the line.</param>
+        /// <param name="startY">Y coordinate of the starting (top) point of the line.</param>
+        /// <param name="endY">Y coordinate of the ending (bottom) point of the line.</param>
+        /// <param name="color">Color of the line.</param>
+        /// <param name="lineWidth">Width of the line in pixels.</param>
+        /// <param name="pattern">Pattern used to draw the line. If pattern is null, draws a solid line. Otherwise uses the pattern 
+        /// array to draw a dashed line.</param>
+        public static void DrawVerticalLine(this SpriteBatch sprite, int x, int startY, int endY, Color color, int lineWidth = 10, int[] pattern = null)
         {
-            if (Pattern == null)
+            if (pattern == null)
             {
-                Sprite.FillRect(new Rectangle(X - LineWidth / 2, StartY, LineWidth, EndY - StartY), Color);
+                sprite.FillRect(new Rectangle(x - lineWidth / 2, startY, lineWidth, endY - startY), color);
                 return;
             }
 
-            var Y = StartY;
-            for (; Y <= EndY - Pattern[0]; Y += Pattern[0] + Pattern[1])
-                Sprite.DrawVerticalLine(X, Y, Y + Pattern[0], Color, LineWidth);
+            var y = startY;
+            for (; y <= endY - pattern[0]; y += pattern[0] + pattern[1])
+                sprite.DrawVerticalLine(x, y, y + pattern[0], color, lineWidth);
 
-            if (Y <= EndY)
-                Sprite.DrawVerticalLine(X, Y, EndY, Color, LineWidth);
+            if (y <= endY)
+                // ReSharper disable once TailRecursiveCall
+                sprite.DrawVerticalLine(x, y, endY, color, lineWidth);
         }
 
-
-
-        public static Rectangle DrawString(this SpriteBatch Sprite, string str, Color color,
-            SpriteFont Font, int X = 0, int Y = 0,
-            HorizontalTextAlign AlignHorizontal = HorizontalTextAlign.Center,
-            VerticalTextAlign AlignVertical = VerticalTextAlign.Center)
+        /// <summary>
+        /// Draw (write) a string of text on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="str">String of text to write on the screen.</param>
+        /// <param name="color">Color of the text.</param>
+        /// <param name="font">Font of the text.</param>
+        /// <param name="x">X coordinate of the text.</param>
+        /// <param name="y">Y Coordinate of the text.</param>
+        /// <param name="alignHorizontal">Horizontal alignment of the text with respect to (X, Y).</param>
+        /// <param name="alignVertical">Vertical alignment of the text with respect to (X, Y).</param>
+        /// <returns>Returns the position and dimensions of the rectangle surrounding the written text.</returns>
+        public static Rectangle DrawString(this SpriteBatch sprite, string str, Color color,
+            SpriteFont font, int x = 0, int y = 0,
+            HorizontalTextAlign alignHorizontal = HorizontalTextAlign.Center,
+            VerticalTextAlign alignVertical = VerticalTextAlign.Center)
         {
             // Measure size of the drawn string
-            var strsize = Font.MeasureString(str);
+            var strsize = font.MeasureString(str);
 
             // Calculate actual x and y positions of upper-left corner of text
-            var x = X;
-            var y = Y;
+            var strX = x;
+            var strY = y;
 
-            if (AlignHorizontal == HorizontalTextAlign.Center)
-                x -= (int)strsize.X / 2;
-            else if (AlignHorizontal == HorizontalTextAlign.Right)
-                x -= (int)strsize.X;
+            switch (alignHorizontal)
+            {
+                case HorizontalTextAlign.Center:
+                    strX -= (int)strsize.X / 2;
+                    break;
+                case HorizontalTextAlign.Right:
+                    strX -= (int)strsize.X;
+                    break;
+            }
 
-            if (AlignVertical == VerticalTextAlign.Center)
-                y -= (int)strsize.Y / 2;
-            else if (AlignVertical == VerticalTextAlign.Bottom)
-                y -= (int)strsize.Y;
+            switch (alignVertical)
+            {
+                case VerticalTextAlign.Center:
+                    strY -= (int)strsize.Y / 2;
+                    break;
+                case VerticalTextAlign.Bottom:
+                    strY -= (int)strsize.Y;
+                    break;
+            }
 
-            if (X == 0) x = 3;
-            if (Y == 0) y = 3;
+            if (x == 0) strX = 3;
+            if (y == 0) strY = 3;
 
             // Draw text on the frame
-            Sprite.DrawString(Font, str, new Vector2(x, y), color);
+            sprite.DrawString(font, str, new Vector2(strX, strY), color);
 
-            return new Rectangle(x, y, (int)strsize.X, (int)strsize.Y);
+            return new Rectangle(strX, strY, (int)strsize.X, (int)strsize.Y);
         }
 
-        public static void DrawLineSegment(this SpriteBatch Sprite, Vector2 point1, Vector2 point2, Color color, int lineWidth)
+        /// <summary>
+        /// Draw a line segment on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="point1">Starting point of the line.</param>
+        /// <param name="point2">Ending point of the line.</param>
+        /// <param name="color">Color of the line.</param>
+        /// <param name="lineWidth">Width of the line in pixels.</param>
+        public static void DrawLineSegment(this SpriteBatch sprite, Vector2 point1, Vector2 point2, Color color, int lineWidth)
         {
             var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
             var length = Vector2.Distance(point1, point2);
 
-            Sprite.Draw(pixel, point1, null, color, angle, Vector2.Zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
-        }
-
-        public static void DrawPath(this SpriteBatch Sprite, Vector2[] points, Color color, int lineWidth = 1)
-        {
-            var Count = points.Length;
-            if (Count >= 2)
-                for (var i = 0; i < Count - 1; i++)
-                    DrawLineSegment(Sprite, points[i], points[i + 1], color, lineWidth);
-        }
-
-        public static void DrawPolygon(this SpriteBatch Sprite, Vector2[] points, Color color, int lineWidth = 1)
-        {
-            var Count = points.Length;
-            if (Count >= 2)
-            {
-                DrawPath(Sprite, points, color, lineWidth);
-                DrawLineSegment(Sprite, points[Count - 1], points[0], color, lineWidth);
-            }
+            sprite.Draw(_pixel, point1, null, color, angle, Vector2.Zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
         }
 
         /// <summary>
-        /// Horizontal alignments for a text string
+        /// Draw a path on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="points">Ordered collection of points defining the path.</param>
+        /// <param name="color">Color of the path.</param>
+        /// <param name="lineWidth">Width of the lines (in pixels) connecting the consecutive points in the path.</param>
+        public static void DrawPath(this SpriteBatch sprite, Vector2[] points, Color color, int lineWidth = 1)
+        {
+            var count = points.Length;
+            if (count < 2) return;
+            
+            for (var i = 0; i < count - 1; i++)
+                DrawLineSegment(sprite, points[i], points[i + 1], color, lineWidth);
+        }
+
+        /// <summary>
+        /// Draw a polygon on the screen.
+        /// </summary>
+        /// <param name="sprite">SpriteBatch used for drawing.</param>
+        /// <param name="points">Ordered collection of points defining the polygon.</param>
+        /// <param name="color">Color of the polygon border.</param>
+        /// <param name="lineWidth">Width of the lines (in pixels) connecting the consecutive points of the polygon.</param>
+        public static void DrawPolygon(this SpriteBatch sprite, Vector2[] points, Color color, int lineWidth = 1)
+        {
+            var count = points.Length;
+            if (count < 2) return;
+
+            DrawPath(sprite, points, color, lineWidth);
+            DrawLineSegment(sprite, points[count - 1], points[0], color, lineWidth);
+        }
+
+        # endregion
+
+        # region Enums
+
+        /// <summary>
+        /// Horizontal alignments for a text string.
         /// </summary>
         public enum HorizontalTextAlign
         {
+            /// <summary>
+            /// Align text to the left.
+            /// </summary>
             Left = 0,
+
+            /// <summary>
+            /// Align text to the right.
+            /// </summary>
             Right = 1,
+
+            /// <summary>
+            /// Align text to the center.
+            /// </summary>
             Center = 2
         }
 
         /// <summary>
-        /// Vertical alignments for a text string
+        /// Vertical alignments for a text string.
         /// </summary>
         public enum VerticalTextAlign
         {
+            /// <summary>
+            /// Align text to the top.
+            /// </summary>
             Top = 0,
+
+            /// <summary>
+            /// Align text to the bottom.
+            /// </summary>
             Bottom = 1,
+
+            /// <summary>
+            /// Align text to the center.
+            /// </summary>
             Center = 2
         }
-    }
 
+        # endregion
+    }
 }

@@ -275,7 +275,7 @@ namespace RobX.Simulator
         private TextBox txtHelp1;
         private TextBox txtHelp2;
         private TextBox txtAbout;
-        public PictureBox picSimulation;
+        internal PictureBox picSimulation;
         private TabPage tabSettings;
         private Panel pnlSettings;
         private CheckBox chkKeyboardControl;

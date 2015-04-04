@@ -13,12 +13,12 @@ namespace RobX.Simulator
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        static void Main()
         {
             var form = new frmSimulator();
             form.Show();
             // This line creates a XNA object in the form created earlier.
-            form.SimulationController = new SimController(form.picSimulation.Handle, form, form.picSimulation);
+            form.SimulationController = new SimController(form.picSimulation.Handle, form.picSimulation, form.Simulator);
             form.SimulationController.Run();
         }
     }

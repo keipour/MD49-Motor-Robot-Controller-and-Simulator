@@ -12,20 +12,38 @@ using RobX.Simulator.Properties;
 
 namespace RobX.Simulator
 {
+    /// <summary>
+    /// Window of the simulator application.
+    /// </summary>
+    // ReSharper disable once InconsistentNaming
     public partial class frmSimulator : Form
     {
-        // ---------------------------- Private Variables ---------------------------- //
+        # region Private Variables 
 
+        private readonly TCPServer _robotServer =  new TCPServer();
+        private readonly Log _serverLog = new Log();
+
+        # endregion
+
+        # region Public Variables 
+
+        /// <summary>
+        /// Contains all the simulation functions and objects.
+        /// </summary>
         public Simulator Simulator = new Simulator();
-        private TCPServer RobotServer =  new TCPServer();
-        private Log ServerLog = new Log();
 
-        // ---------------------------- Public Variables ----------------------------- //
-
+        /// <summary>
+        /// Manages all the simulation steps (timing, ets.).
+        /// </summary>
         public SimController SimulationController;
 
-        // ------------------------------ Form Events -------------------------------- //
+        # endregion
 
+        # region Form Constructor and Events 
+
+        /// <summary>
+        /// Constructor for the Simulator window.
+        /// </summary>
         public frmSimulator()
         {
             InitializeComponent();
@@ -42,42 +60,14 @@ namespace RobX.Simulator
             LoadSettings();
             frmSimulator_Resize(sender, e);
 
-            ServerLog.ItemsAdded += UpdateTextBox;
-            ServerLog.LogCleared += UpdateTextBox;
+            _serverLog.ItemsAdded += UpdateTextBox;
+            _serverLog.LogCleared += UpdateTextBox;
 
             // Start Server
             StartServer();
 
             // Start simulation
             StartSimulation();
-        }
-
-        private bool CheckInputErrors()
-        {
-            var ServerPortValid = true;
-
-            ushort port;
-            if (ushort.TryParse(txtServerPort.Text, out port) == false || port < 2)
-            {
-                ServerLog.AddItem("Error! Invalid server port number!");
-                ServerPortValid = false;
-            }
-
-            return ServerPortValid;
-        }
-
-        private void StartServer()
-        {
-            if (CheckInputErrors() == false) return;
-
-            if (RobotServer.IsRunning() == false)
-            {
-                RobotServer.ReceivedData += TCPReceivedData;
-                RobotServer.SentData += TCPSentData;
-                RobotServer.StatusChanged += TCPStatusChanged;
-                RobotServer.BeforeSendingData += TCPBeforeSendingData;
-            }
-            RobotServer.StartServer(ushort.Parse(Settings.Default.ServerPort));
         }
 
         private void frmSimulator_KeyDown(object sender, KeyEventArgs e)
@@ -119,70 +109,38 @@ namespace RobX.Simulator
             tabSimulator_Resize(sender, e);
         }
 
-        private void tabSimulator_Resize(object sender, EventArgs e)
+        # endregion
+
+        # region Private Methods
+
+        private bool CheckInputErrors()
         {
-            var txtHelpMinSize = 272;
-            var txtHelp1Width = tabHelp.ClientSize.Width / 2;
-            if (txtHelp1Width < txtHelpMinSize)
-                txtHelp1Width = txtHelpMinSize;
-            txtHelp2.Width = tabHelp.ClientSize.Width - txtHelp1Width;
-            pnlSettings.Left = (tabSettings.ClientSize.Width - pnlSettings.Width) / 2;
+            ushort port;
+
+            if (ushort.TryParse(txtServerPort.Text, out port) && port >= 2) return true;
+            
+            _serverLog.AddItem("Error! Invalid server port number!");
+
+            return false;
         }
 
-        // ---------------------------------------- TCP Server Events ---------------------------------- //
-
-        private void TCPReceivedData(object sender, CommunicationEventArgs e)
+        private void StartServer()
         {
-            Simulator.AddCommands(e.Data);
-            ServerLog.AddBytes(e.Data);
-        }
+            if (CheckInputErrors() == false) return;
 
-        private void TCPSentData(object sender, CommunicationEventArgs e)
-        {
-            ServerLog.AddBytes(e.Data);
-        }
-
-        private void TCPStatusChanged(object sender, CommunicationStatusEventArgs e)
-        {
-            ServerLog.AddItem(e.Status, true);
-        }
-
-        private void TCPBeforeSendingData(object sender, CommunicationEventArgs e)
-        {
-            e.Data = Simulator.GetSentBytes();
-        }
-
-        // ----------------------------------------------- Log Events ---------------------------------- //
-
-        private delegate void SetTextCallback(string str);
-        private void UpdateTextBox(string ServerLogText)
-        {
-            if (txtLog.InvokeRequired)
+            if (_robotServer.IsRunning() == false)
             {
-                var d = new SetTextCallback(UpdateTextBox);
-                Invoke(d, ServerLogText);
+                _robotServer.ReceivedData += TcpReceivedData;
+                _robotServer.SentData += TcpSentData;
+                _robotServer.StatusChanged += TcpStatusChanged;
+                _robotServer.BeforeSendingData += TcpBeforeSendingData;
             }
-            else
-            {
-                if (txtLog.Text != ServerLogText)
-                {
-                    txtLog.Text = ServerLogText;
-                    txtLog.Select(txtLog.Text.Length, 0);
-                    txtLog.ScrollToCaret();
-                }
-            }
+            _robotServer.StartServer(ushort.Parse(Settings.Default.ServerPort));
         }
-
-        private void UpdateTextBox(object sender, LogEventArgs e)
-        {
-            UpdateTextBox(ServerLog.Text);
-        }
-
-        // ---------------------------------------- Private Functions ---------------------------------- //
 
         private void StartSimulation()
         {
-            Simulator.RunSimulation(picSimulation, 10, Simulator.RenderOptions.RenderType.StaticAxis_ZeroCornered);
+            Simulator.RunSimulation(picSimulation, 10, Simulator.RenderOptions.RenderType.StaticAxisZeroCornered);
         }
 
         private void HandleHotKeys(KeyEventArgs e)
@@ -191,91 +149,98 @@ namespace RobX.Simulator
 
             if (txtServerPortActive == false)
             {
-                if (e.KeyCode == Keys.D1 || e.KeyCode == Keys.NumPad1)
-                    Simulator.Render.Type = Simulator.RenderOptions.RenderType.StaticAxis_ZeroCentered;
-                else if (e.KeyCode == Keys.D2 || e.KeyCode == Keys.NumPad2)
-                    Simulator.Render.Type = Simulator.RenderOptions.RenderType.StaticAxis_ZeroCornered;
-                else if (e.KeyCode == Keys.F1)
-                    tabSimulator.SelectedTab = tabHelp;
-                else if (e.KeyCode == Keys.G)
-                    Settings.Default.DrawGrids = !Settings.Default.DrawGrids;
-                else if (e.KeyCode == Keys.S)
-                    Settings.Default.DrawStatistics = !Settings.Default.DrawStatistics;
-                else if (e.KeyCode == Keys.O)
-                    Settings.Default.DrawObstacles = !Settings.Default.DrawObstacles;
-                else if (e.KeyCode == Keys.T)
-                    Settings.Default.DrawRobotTrace = !Settings.Default.DrawRobotTrace;
-                else if (e.KeyCode == Keys.A)
+                switch (e.KeyCode)
                 {
-                    Settings.Default.KeepAspectRatio = !Settings.Default.KeepAspectRatio;
-                    frmSimulator_Resize(this, new EventArgs());
+                    case Keys.D1:
+                    case Keys.NumPad1:
+                        Simulator.Render.Type = Simulator.RenderOptions.RenderType.StaticAxisZeroCentered;
+                        break;
+                    case Keys.D2:
+                    case Keys.NumPad2:
+                        Simulator.Render.Type = Simulator.RenderOptions.RenderType.StaticAxisZeroCornered;
+                        break;
+                    case Keys.F1:
+                        tabSimulator.SelectedTab = tabHelp;
+                        break;
+                    case Keys.G:
+                        Settings.Default.DrawGrids = !Settings.Default.DrawGrids;
+                        break;
+                    case Keys.S:
+                        Settings.Default.DrawStatistics = !Settings.Default.DrawStatistics;
+                        break;
+                    case Keys.O:
+                        Settings.Default.DrawObstacles = !Settings.Default.DrawObstacles;
+                        break;
+                    case Keys.T:
+                        Settings.Default.DrawRobotTrace = !Settings.Default.DrawRobotTrace;
+                        break;
+                    case Keys.A:
+                        Settings.Default.KeepAspectRatio = !Settings.Default.KeepAspectRatio;
+                        frmSimulator_Resize(this, new EventArgs());
+                        break;
                 }
             }
-            
-            if (e.KeyCode == Keys.F5)
-                StartSimulation();
-            else if (e.KeyCode == Keys.F6)
-                Simulator.ContinueSimulation();
-            else if (e.KeyCode == Keys.F7)
-                Simulator.StopSimulation();
-            else if (e.KeyCode == Keys.Escape)
-                Application.Exit();
-            else if (e.KeyCode == Settings.Default.ToggleKeyboardControl)
-                chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
 
-            if (chkKeyboardControl.Checked || e.KeyCode == Settings.Default.GlobalStopKey)
+            switch (e.KeyCode)
             {
-                if (e.KeyCode == Settings.Default.ForwardKey || e.KeyCode == Settings.Default.BackwardKey ||
-                    e.KeyCode == Settings.Default.RotateClockwiseKey || e.KeyCode == Settings.Default.StopKey ||
-                    e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
-                {
-                    // Set robot mode to 0
-                    Simulator.AddCommands(new byte[] { 0x00, 0x34, 0x00 });
-
-                    // Enable timeout
-                    Simulator.AddCommands(new byte[] { 0x00, 0x39 });
-                }
-
-                if (e.KeyCode == Settings.Default.ForwardKey)
-                {
-                    Simulator.AddCommands(new byte[] { 0x00, 0x31, 148 });
-                    Simulator.AddCommands(new byte[] { 0x00, 0x32, 148 });
-                }
-                else if (e.KeyCode == Settings.Default.BackwardKey)
-                {
-                    Simulator.AddCommands(new byte[] { 0x00, 0x31, 108 });
-                    Simulator.AddCommands(new byte[] { 0x00, 0x32, 108 });
-                }
-                else if (e.KeyCode == Settings.Default.RotateClockwiseKey)
-                {
-                    Simulator.AddCommands(new byte[] { 0x00, 0x31, 148 });
-                    Simulator.AddCommands(new byte[] { 0x00, 0x32, 108 });
-                }
-                else if (e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
-                {
-                    Simulator.AddCommands(new byte[] { 0x00, 0x31, 108 });
-                    Simulator.AddCommands(new byte[] { 0x00, 0x32, 148 });
-                }
-                else if (e.KeyCode == Settings.Default.StopKey || e.KeyCode == Settings.Default.GlobalStopKey)
-                {
-                    Simulator.AddCommands(new byte[] { 0x00, 0x31, 128 });
-                    Simulator.AddCommands(new byte[] { 0x00, 0x32, 128 });
-                }
-
-                e.SuppressKeyPress = true;
+                case Keys.F5:
+                    StartSimulation();
+                    break;
+                case Keys.F6:
+                    Simulator.ContinueSimulation();
+                    break;
+                case Keys.F7:
+                    Simulator.StopSimulation();
+                    break;
+                case Keys.Escape:
+                    Application.Exit();
+                    break;
+                default:
+                    if (e.KeyCode == Settings.Default.ToggleKeyboardControl)
+                        chkKeyboardControl.Checked = !chkKeyboardControl.Checked;
+                    break;
             }
-        }
 
-        private void pnlSettings_Paint(object sender, PaintEventArgs e)
-        {
-            tabSimulator_Resize(sender, e);
-        }
+            if (!chkKeyboardControl.Checked && e.KeyCode != Settings.Default.GlobalStopKey) return;
 
-        private void cmdStartServer_Click(object sender, EventArgs e)
-        {
-            SaveSettings();
-            StartServer();
-            tabSimulator.SelectedIndex = 0;
+            if (e.KeyCode == Settings.Default.ForwardKey || e.KeyCode == Settings.Default.BackwardKey ||
+                e.KeyCode == Settings.Default.RotateClockwiseKey || e.KeyCode == Settings.Default.StopKey ||
+                e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
+            {
+                // Set robot mode to 0
+                Simulator.AddCommands(new byte[] { 0x00, 0x34, 0x00 });
+
+                // Enable timeout
+                Simulator.AddCommands(new byte[] { 0x00, 0x39 });
+            }
+
+            if (e.KeyCode == Settings.Default.ForwardKey)
+            {
+                Simulator.AddCommands(new byte[] { 0x00, 0x31, 148 });
+                Simulator.AddCommands(new byte[] { 0x00, 0x32, 148 });
+            }
+            else if (e.KeyCode == Settings.Default.BackwardKey)
+            {
+                Simulator.AddCommands(new byte[] { 0x00, 0x31, 108 });
+                Simulator.AddCommands(new byte[] { 0x00, 0x32, 108 });
+            }
+            else if (e.KeyCode == Settings.Default.RotateClockwiseKey)
+            {
+                Simulator.AddCommands(new byte[] { 0x00, 0x31, 148 });
+                Simulator.AddCommands(new byte[] { 0x00, 0x32, 108 });
+            }
+            else if (e.KeyCode == Settings.Default.RotateCounterClockwiseKey)
+            {
+                Simulator.AddCommands(new byte[] { 0x00, 0x31, 108 });
+                Simulator.AddCommands(new byte[] { 0x00, 0x32, 148 });
+            }
+            else if (e.KeyCode == Settings.Default.StopKey || e.KeyCode == Settings.Default.GlobalStopKey)
+            {
+                Simulator.AddCommands(new byte[] { 0x00, 0x31, 128 });
+                Simulator.AddCommands(new byte[] { 0x00, 0x32, 128 });
+            }
+
+            e.SuppressKeyPress = true;
         }
 
         private void SaveSettings()
@@ -294,6 +259,84 @@ namespace RobX.Simulator
             txtServerPort.Text = Settings.Default.ServerPort;
         }
 
+        # endregion
+
+        # region Communication Events
+
+        private void TcpReceivedData(object sender, CommunicationEventArgs e)
+        {
+            Simulator.AddCommands(e.Data);
+            _serverLog.AddBytes(e.Data);
+        }
+
+        private void TcpSentData(object sender, CommunicationEventArgs e)
+        {
+            _serverLog.AddBytes(e.Data);
+        }
+
+        private void TcpStatusChanged(object sender, CommunicationStatusEventArgs e)
+        {
+            _serverLog.AddItem(e.Status, true);
+        }
+
+        private void TcpBeforeSendingData(object sender, CommunicationEventArgs e)
+        {
+            e.Data = Simulator.GetSentBytes();
+        }
+
+        # endregion
+
+        # region Log Events
+
+        private delegate void SetTextCallback(string str);
+        private void UpdateTextBox(string serverLogText)
+        {
+            if (txtLog.InvokeRequired)
+            {
+                var d = new SetTextCallback(UpdateTextBox);
+                Invoke(d, serverLogText);
+            }
+            else
+            {
+                if (txtLog.Text == serverLogText) return;
+
+                txtLog.Text = serverLogText;
+                txtLog.Select(txtLog.Text.Length, 0);
+                txtLog.ScrollToCaret();
+            }
+        }
+
+        private void UpdateTextBox(object sender, LogEventArgs e)
+        {
+            UpdateTextBox(_serverLog.Text);
+        }
+
+        # endregion
+
+        # region Form Component Events
+
+        private void tabSimulator_Resize(object sender, EventArgs e)
+        {
+            const int txtHelpMinSize = 272;
+            var txtHelp1Width = tabHelp.ClientSize.Width / 2;
+            if (txtHelp1Width < txtHelpMinSize)
+                txtHelp1Width = txtHelpMinSize;
+            txtHelp2.Width = tabHelp.ClientSize.Width - txtHelp1Width;
+            pnlSettings.Left = (tabSettings.ClientSize.Width - pnlSettings.Width) / 2;
+        }
+
+        private void pnlSettings_Paint(object sender, PaintEventArgs e)
+        {
+            tabSimulator_Resize(sender, e);
+        }
+
+        private void cmdStartServer_Click(object sender, EventArgs e)
+        {
+            SaveSettings();
+            StartServer();
+            tabSimulator.SelectedIndex = 0;
+        }
+
         private void txtServerPort_KeyPress(object sender, KeyPressEventArgs e)
         {
             (sender as TextBox).ValidateInput_TCPPort(e);
@@ -303,5 +346,7 @@ namespace RobX.Simulator
         {
             (sender as TextBox).SaveTextBox_CtrlS(e);
         }
+
+        # endregion
     }
 }

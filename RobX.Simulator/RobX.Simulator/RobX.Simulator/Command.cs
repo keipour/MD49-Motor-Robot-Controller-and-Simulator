@@ -1,4 +1,8 @@
-﻿using System;
+﻿# region Includes
+
+using System;
+
+# endregion
 
 namespace RobX.Simulator
 {
