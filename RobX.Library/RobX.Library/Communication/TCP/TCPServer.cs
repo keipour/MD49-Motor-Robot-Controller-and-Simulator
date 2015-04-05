@@ -85,6 +85,18 @@ namespace RobX.Library.Communication.TCP
         {
             try
             {
+                // Don't proceed if the server is running on the same port
+                if (port == Port)
+                {
+                    // ReSharper disable once LoopCanBePartlyConvertedToQuery
+                    foreach (var ipAddress in IpAddresses)
+                        if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
+                            if (StatusChanged != null)
+                                StatusChanged(this, new CommunicationStatusEventArgs("Warning! TCP server is already running on " +
+                                                                                     ipAddress + " (port " + port + ")."));
+                    return true;
+                }
+
                 // Stop if a server is currently running
                 if (Port != -1)
                     StopServer();
@@ -142,11 +154,16 @@ namespace RobX.Library.Communication.TCP
                 // ignored
             }
 
+            var port = Port;
             Port = -1;
 
             // Invoke StatusChange event
-            if (StatusChanged != null)
-                StatusChanged(this, new CommunicationStatusEventArgs("Stopped TCP Server!"));
+            // ReSharper disable once LoopCanBePartlyConvertedToQuery
+            foreach (var ipAddress in IpAddresses)
+                if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
+                    if (StatusChanged != null)
+                        StatusChanged(this, new CommunicationStatusEventArgs("Stopped TCP server on " +
+                                                                             ipAddress + " (port " + port + ")."));
         }
 
         /// <summary>

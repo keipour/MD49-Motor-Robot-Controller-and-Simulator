@@ -256,13 +256,16 @@ namespace RobX.Library.Tools
 
                 if (text.Contains("error"))
                     return LogItemTypes.Error;
-                
+
+                if (text.Contains("warning"))
+                    return LogItemTypes.Warning;
+
                 if (text.Contains("receive"))
                     return LogItemTypes.Receive;
                 
                 if (text.Contains("send") || text.Contains("sent"))
                     return LogItemTypes.Send;
-                
+
                 return LogItemTypes.Default;
             }
 
@@ -277,6 +280,8 @@ namespace RobX.Library.Tools
                 {
                     case LogItemTypes.Error:
                         return Properties.Settings.Default.ErrorLogItemColor;
+                    case LogItemTypes.Warning:
+                        return Properties.Settings.Default.WarningLogItemColor;
                     case LogItemTypes.Receive:
                         return Properties.Settings.Default.ReceiveLogItemColor;
                     case LogItemTypes.Send:
@@ -313,7 +318,12 @@ namespace RobX.Library.Tools
                 /// <summary>
                 /// Color of items indicating sending data.
                 /// </summary>
-                Send
+                Send, 
+
+                /// <summary>
+                /// Color of warning items.
+                /// </summary>
+                Warning
             }
 
             #endregion

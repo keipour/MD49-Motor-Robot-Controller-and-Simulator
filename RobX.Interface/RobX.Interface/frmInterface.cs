@@ -23,7 +23,6 @@ namespace RobX.Interface
         # region Private Fields
 
         private readonly Log _communicationLog = new Log();
-        private readonly Log _messageLog = new Log();
         private readonly TCPServer _server = new TCPServer();
         private readonly ComClient _robot = new ComClient();
         private List<ComPort> _comPorts;
@@ -49,8 +48,6 @@ namespace RobX.Interface
 
             _communicationLog.ItemsAdded += lstLogAddItems;
             _communicationLog.LogCleared += lstLogClear;
-            _messageLog.ItemsAdded += lstMessageAddItems;
-            _messageLog.LogCleared += lstMessageClear;
             _server.ReceivedData += TcpReceivedData;
             _server.SentData += TcpSentData;
             _server.StatusChanged += TcpStatusChanged;
@@ -76,17 +73,14 @@ namespace RobX.Interface
         private void frmLog_Resize(object sender, EventArgs e)
         {
             const int spacing = 6;
-            lstMessage.Height = ClientSize.Height - pnlProperties.Height - tabController.Height;
-            tabController.Top = lstMessage.Height + spacing;
-            tabController.Width = ClientSize.Width;
+            tabController.Height = pnlProperties.Top;
 
             cmdConnect.Left = pnlProperties.Width - cmdConnect.Width - spacing;
             cmdRefresh.Left = cmdConnect.Left - cmdRefresh.Width - spacing;
             cboCOMPorts.Width = cmdRefresh.Left - cboCOMPorts.Left - spacing;
+            cmdStartServer.Left = cmdConnect.Left;
 
             const int timeColWidth = 80;
-            colMessageTime.Width = timeColWidth;
-            colMessageText.Width = lstMessage.ClientSize.Width - colMessageTime.Width - 5;
             colLogTime.Width = timeColWidth;
             colLogText.Width = lstLog.ClientSize.Width - colLogTime.Width - 5;
         }
@@ -131,33 +125,40 @@ namespace RobX.Interface
 
         # region Private Functions
 
-        private bool CheckInputErrors()
+        private bool CheckInputErrors(bool checkServerPort = true, bool checkComPort = true)
         {
             var serverPortValid = Methods.IsValidPort(txtServerPort.Text);
+            if (checkServerPort)
+                if (serverPortValid == false)
+                    _communicationLog.AddItem("Input Error! Invalid TCP port number!", true);
 
-            if (serverPortValid == false)
-                _messageLog.AddItem("Invalid TCP port number!", Log.LogItem.LogItemTypes.Error);
+            if (!checkComPort || cboCOMPorts.Items.Count != 0)
+                return (serverPortValid || !checkServerPort);
 
-            if (cboCOMPorts.Items.Count != 0) return serverPortValid;
-            _messageLog.AddItem("Error! No COM devices are connected to the system!", Log.LogItem.LogItemTypes.Error);
+            _communicationLog.AddItem("Error! No COM devices are connected to the system!", true);
             return false;
         }
 
-        private void Connect()
+        private bool Connect()
         {
-            if (!CheckInputErrors()) return;
+            if (!CheckInputErrors(false)) return false;
 
             if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int)Robot.BaudRate,
                 Robot.DataBits, Robot.Parity, Robot.StopBits) == false)
             {
-                _messageLog.AddItem("Error! Selected COM port is busy right now!", Log.LogItem.LogItemTypes.Error);
-                return;
+                _communicationLog.AddItem("Error! Selected COM port is busy right now!", true);
+                return false;
             }
 
-            if (_server.StartServer(Int32.Parse(txtServerPort.Text))) return;
+            return StartServer();
+        }
 
-            _messageLog.AddItem("Error! Could not start TCP Server on port " + txtServerPort.Text + "!", 
-                Log.LogItem.LogItemTypes.Error);
+        private bool StartServer()
+        {
+            if (!CheckInputErrors(true, false)) return false;
+            if (_server.StartServer(Int32.Parse(txtServerPort.Text))) return true;
+            _communicationLog.AddItem("Error! Could not start TCP Server on port " + txtServerPort.Text + "!", true);
+            return false;
         }
 
         private void SaveProperties()
@@ -215,7 +216,10 @@ namespace RobX.Interface
         private void cmdConnect_Click(object sender, EventArgs e)
         {
             SaveProperties();
-            Connect();
+            if (!Connect()) return;
+
+            cmdConnect.Text = @"Re&connect";
+            cmdStartServer.Visible = true;
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -242,19 +246,6 @@ namespace RobX.Interface
         }
 
         // ReSharper disable once InconsistentNaming
-        private void lstMessageAddItems(object sender, LogEventArgs e)
-        {
-            foreach (var item in e.Items)
-                lstMessage.AddLogItem(item);
-        }
-
-        // ReSharper disable once InconsistentNaming
-        private void lstMessageClear(object sender, LogEventArgs e)
-        {
-            lstMessage.ClearItems();
-        }
-
-        // ReSharper disable once InconsistentNaming
         private void lstLogAddItems(object sender, LogEventArgs e)
         {
             foreach (var item in e.Items)
@@ -270,6 +261,12 @@ namespace RobX.Interface
         private void SaveLog(object sender, KeyEventArgs e)
         {
             (sender as ListView).SaveListView_CtrlS(e);
+        }
+
+        private void cmdStartServer_Click(object sender, EventArgs e)
+        {
+            SaveProperties();
+            StartServer();
         }
 
         # endregion

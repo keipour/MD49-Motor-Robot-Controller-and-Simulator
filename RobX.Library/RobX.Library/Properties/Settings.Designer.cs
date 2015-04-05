@@ -58,5 +58,14 @@ namespace RobX.Library.Properties {
                 return ((global::System.Drawing.Color)(this["SendLogItemColor"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkOrange")]
+        public global::System.Drawing.Color WarningLogItemColor {
+            get {
+                return ((global::System.Drawing.Color)(this["WarningLogItemColor"]));
+            }
+        }
     }
 }

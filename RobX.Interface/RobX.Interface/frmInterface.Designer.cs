@@ -37,6 +37,7 @@ namespace RobX.Interface
             this.cboCOMPorts = new System.Windows.Forms.ComboBox();
             this.cmdRefresh = new System.Windows.Forms.Button();
             this.pnlProperties = new System.Windows.Forms.Panel();
+            this.cmdStartServer = new System.Windows.Forms.Button();
             this.chkKeyboardControl = new System.Windows.Forms.CheckBox();
             this.lblServerPort = new System.Windows.Forms.Label();
             this.txtServerPort = new System.Windows.Forms.TextBox();
@@ -49,9 +50,6 @@ namespace RobX.Interface
             this.txtHelp = new System.Windows.Forms.TextBox();
             this.tabAbout = new System.Windows.Forms.TabPage();
             this.txtAbout = new System.Windows.Forms.TextBox();
-            this.lstMessage = new System.Windows.Forms.ListView();
-            this.colMessageTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.colMessageText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.pnlProperties.SuspendLayout();
             this.tabController.SuspendLayout();
             this.tabLog.SuspendLayout();
@@ -61,9 +59,9 @@ namespace RobX.Interface
             // 
             // cmdConnect
             // 
-            this.cmdConnect.Location = new System.Drawing.Point(370, 10);
+            this.cmdConnect.Location = new System.Drawing.Point(364, 10);
             this.cmdConnect.Name = "cmdConnect";
-            this.cmdConnect.Size = new System.Drawing.Size(75, 23);
+            this.cmdConnect.Size = new System.Drawing.Size(90, 23);
             this.cmdConnect.TabIndex = 6;
             this.cmdConnect.Text = "&Connect";
             this.cmdConnect.UseVisualStyleBackColor = true;
@@ -76,7 +74,7 @@ namespace RobX.Interface
             this.lblCOMPort.Name = "lblCOMPort";
             this.lblCOMPort.Size = new System.Drawing.Size(56, 13);
             this.lblCOMPort.TabIndex = 0;
-            this.lblCOMPort.Text = "&COM Port:";
+            this.lblCOMPort.Text = "COM &Port:";
             // 
             // cboCOMPorts
             // 
@@ -84,14 +82,14 @@ namespace RobX.Interface
             this.cboCOMPorts.FormattingEnabled = true;
             this.cboCOMPorts.Location = new System.Drawing.Point(77, 11);
             this.cboCOMPorts.Name = "cboCOMPorts";
-            this.cboCOMPorts.Size = new System.Drawing.Size(258, 21);
+            this.cboCOMPorts.Size = new System.Drawing.Size(255, 21);
             this.cboCOMPorts.TabIndex = 1;
             // 
             // cmdRefresh
             // 
             this.cmdRefresh.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cmdRefresh.Image = ((System.Drawing.Image)(resources.GetObject("cmdRefresh.Image")));
-            this.cmdRefresh.Location = new System.Drawing.Point(341, 10);
+            this.cmdRefresh.Location = new System.Drawing.Point(338, 10);
             this.cmdRefresh.Name = "cmdRefresh";
             this.cmdRefresh.Size = new System.Drawing.Size(21, 23);
             this.cmdRefresh.TabIndex = 2;
@@ -101,6 +99,7 @@ namespace RobX.Interface
             // 
             // pnlProperties
             // 
+            this.pnlProperties.Controls.Add(this.cmdStartServer);
             this.pnlProperties.Controls.Add(this.chkKeyboardControl);
             this.pnlProperties.Controls.Add(this.lblServerPort);
             this.pnlProperties.Controls.Add(this.txtServerPort);
@@ -113,6 +112,17 @@ namespace RobX.Interface
             this.pnlProperties.Name = "pnlProperties";
             this.pnlProperties.Size = new System.Drawing.Size(464, 75);
             this.pnlProperties.TabIndex = 11;
+            // 
+            // cmdStartServer
+            // 
+            this.cmdStartServer.Location = new System.Drawing.Point(364, 41);
+            this.cmdStartServer.Name = "cmdStartServer";
+            this.cmdStartServer.Size = new System.Drawing.Size(90, 23);
+            this.cmdStartServer.TabIndex = 12;
+            this.cmdStartServer.Text = "&Restart Server";
+            this.cmdStartServer.UseVisualStyleBackColor = true;
+            this.cmdStartServer.Visible = false;
+            this.cmdStartServer.Click += new System.EventHandler(this.cmdStartServer_Click);
             // 
             // chkKeyboardControl
             // 
@@ -149,10 +159,11 @@ namespace RobX.Interface
             this.tabController.Controls.Add(this.tabLog);
             this.tabController.Controls.Add(this.tabHelp);
             this.tabController.Controls.Add(this.tabAbout);
-            this.tabController.Location = new System.Drawing.Point(0, 156);
+            this.tabController.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tabController.Location = new System.Drawing.Point(0, 0);
             this.tabController.Name = "tabController";
             this.tabController.SelectedIndex = 0;
-            this.tabController.Size = new System.Drawing.Size(454, 223);
+            this.tabController.Size = new System.Drawing.Size(464, 442);
             this.tabController.TabIndex = 8;
             // 
             // tabLog
@@ -162,7 +173,7 @@ namespace RobX.Interface
             this.tabLog.Location = new System.Drawing.Point(4, 22);
             this.tabLog.Name = "tabLog";
             this.tabLog.Padding = new System.Windows.Forms.Padding(3);
-            this.tabLog.Size = new System.Drawing.Size(446, 197);
+            this.tabLog.Size = new System.Drawing.Size(456, 416);
             this.tabLog.TabIndex = 0;
             this.tabLog.Text = "Log";
             // 
@@ -178,7 +189,7 @@ namespace RobX.Interface
             this.lstLog.Location = new System.Drawing.Point(3, 3);
             this.lstLog.MultiSelect = false;
             this.lstLog.Name = "lstLog";
-            this.lstLog.Size = new System.Drawing.Size(440, 191);
+            this.lstLog.Size = new System.Drawing.Size(450, 410);
             this.lstLog.TabIndex = 9;
             this.lstLog.UseCompatibleStateImageBehavior = false;
             this.lstLog.View = System.Windows.Forms.View.Details;
@@ -244,31 +255,6 @@ namespace RobX.Interface
             this.txtAbout.TabStop = false;
             this.txtAbout.Text = resources.GetString("txtAbout.Text");
             // 
-            // lstMessage
-            // 
-            this.lstMessage.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colMessageTime,
-            this.colMessageText});
-            this.lstMessage.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lstMessage.FullRowSelect = true;
-            this.lstMessage.GridLines = true;
-            this.lstMessage.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.lstMessage.Location = new System.Drawing.Point(0, 0);
-            this.lstMessage.Name = "lstMessage";
-            this.lstMessage.Size = new System.Drawing.Size(464, 150);
-            this.lstMessage.TabIndex = 7;
-            this.lstMessage.UseCompatibleStateImageBehavior = false;
-            this.lstMessage.View = System.Windows.Forms.View.Details;
-            this.lstMessage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLog);
-            // 
-            // colMessageTime
-            // 
-            this.colMessageTime.Text = "Time";
-            // 
-            // colMessageText
-            // 
-            this.colMessageText.Text = "Message Text";
-            // 
             // frmInterface
             // 
             this.AcceptButton = this.cmdConnect;
@@ -276,7 +262,6 @@ namespace RobX.Interface
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(464, 523);
-            this.Controls.Add(this.lstMessage);
             this.Controls.Add(this.tabController);
             this.Controls.Add(this.pnlProperties);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -319,9 +304,7 @@ namespace RobX.Interface
         private ListView lstLog;
         private ColumnHeader colLogTime;
         private ColumnHeader colLogText;
-        private ListView lstMessage;
-        private ColumnHeader colMessageTime;
-        private ColumnHeader colMessageText;
+        private Button cmdStartServer;
 
     }
 }
