@@ -60,8 +60,8 @@ namespace RobX.Simulator
             LoadSettings();
             frmSimulator_Resize(sender, e);
 
-            _serverLog.ItemsAdded += UpdateTextBox;
-            _serverLog.LogCleared += UpdateTextBox;
+            _serverLog.ItemsAdded += lstLogAddItems;
+            _serverLog.LogCleared += lstLogClear;
 
             // Start Server
             StartServer();
@@ -117,7 +117,7 @@ namespace RobX.Simulator
         {
             if (Methods.IsValidPort(txtServerPort.Text)) return true;
             
-            _serverLog.AddItem("Error! Invalid server port number!");
+            _serverLog.AddItem("Error! Invalid server port number!", Log.LogItem.LogItemTypes.Error);
             return false;
         }
 
@@ -263,12 +263,12 @@ namespace RobX.Simulator
         private void TcpReceivedData(object sender, CommunicationEventArgs e)
         {
             Simulator.AddCommands(e.Data);
-            _serverLog.AddBytes(e.Data);
+            _serverLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
         }
 
         private void TcpSentData(object sender, CommunicationEventArgs e)
         {
-            _serverLog.AddBytes(e.Data);
+            _serverLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
         }
 
         private void TcpStatusChanged(object sender, CommunicationStatusEventArgs e)
@@ -293,6 +293,10 @@ namespace RobX.Simulator
                 txtHelp1Width = txtHelpMinSize;
             txtHelp2.Width = tabHelp.ClientSize.Width - txtHelp1Width;
             pnlSettings.Left = (tabSettings.ClientSize.Width - pnlSettings.Width) / 2;
+
+            const int timeColWidth = 80;
+            colLogTime.Width = timeColWidth;
+            colLogText.Width = lstLog.ClientSize.Width - colLogTime.Width - 5;
         }
 
         private void pnlSettings_Paint(object sender, PaintEventArgs e)
@@ -312,14 +316,22 @@ namespace RobX.Simulator
             (sender as TextBox).ValidateInput_TCPPort(e);
         }
 
-        private void SaveLogTextBox(object sender, KeyEventArgs e)
+        private void SaveLog(object sender, KeyEventArgs e)
         {
-            (sender as TextBox).SaveTextBox_CtrlS(e);
+            (sender as ListView).SaveListView_CtrlS(e);
         }
 
-        private void UpdateTextBox(object sender, LogEventArgs e)
+        // ReSharper disable once InconsistentNaming
+        private void lstLogAddItems(object sender, LogEventArgs e)
         {
-            txtLog.UpdateText(_serverLog.Text);
+            foreach (var item in e.Items)
+                lstLog.AddLogItem(item);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void lstLogClear(object sender, LogEventArgs e)
+        {
+            lstLog.ClearItems();
         }
 
         # endregion

@@ -23,6 +23,7 @@ namespace RobX.Interface
         # region Private Fields
 
         private readonly Log _communicationLog = new Log();
+        private readonly Log _messageLog = new Log();
         private readonly TCPServer _server = new TCPServer();
         private readonly ComClient _robot = new ComClient();
         private List<ComPort> _comPorts;
@@ -46,8 +47,10 @@ namespace RobX.Interface
             frmLog_Resize(sender, e);
             cboCOMPorts.Select();
 
-            _communicationLog.ItemsAdded += UpdateTextBox;
-            _communicationLog.LogCleared += UpdateTextBox;
+            _communicationLog.ItemsAdded += lstLogAddItems;
+            _communicationLog.LogCleared += lstLogClear;
+            _messageLog.ItemsAdded += lstMessageAddItems;
+            _messageLog.LogCleared += lstMessageClear;
             _server.ReceivedData += TcpReceivedData;
             _server.SentData += TcpSentData;
             _server.StatusChanged += TcpStatusChanged;
@@ -73,13 +76,19 @@ namespace RobX.Interface
         private void frmLog_Resize(object sender, EventArgs e)
         {
             const int spacing = 6;
-            txtMessage.Height = ClientSize.Height - pnlProperties.Height - tabController.Height;
-            tabController.Top = txtMessage.Height + spacing;
+            lstMessage.Height = ClientSize.Height - pnlProperties.Height - tabController.Height;
+            tabController.Top = lstMessage.Height + spacing;
             tabController.Width = ClientSize.Width;
 
             cmdConnect.Left = pnlProperties.Width - cmdConnect.Width - spacing;
             cmdRefresh.Left = cmdConnect.Left - cmdRefresh.Width - spacing;
             cboCOMPorts.Width = cmdRefresh.Left - cboCOMPorts.Left - spacing;
+
+            const int timeColWidth = 80;
+            colMessageTime.Width = timeColWidth;
+            colMessageText.Width = lstMessage.ClientSize.Width - colMessageTime.Width - 5;
+            colLogTime.Width = timeColWidth;
+            colLogText.Width = lstLog.ClientSize.Width - colLogTime.Width - 5;
         }
 
         # endregion
@@ -88,13 +97,13 @@ namespace RobX.Interface
 
         private void TcpReceivedData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
             _robot.SendData(e.Data);
         }
 
         private void TcpSentData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
         }
 
         private void TcpStatusChanged(object sender, CommunicationStatusEventArgs e)
@@ -104,13 +113,13 @@ namespace RobX.Interface
 
         private void RobotReceivedData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
             _server.SendData(e.Data);
         }
 
         private void RobotSentData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
         }
 
         private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
@@ -127,11 +136,10 @@ namespace RobX.Interface
             var serverPortValid = Methods.IsValidPort(txtServerPort.Text);
 
             if (serverPortValid == false)
-                txtMessage.AddLine("Error! Invalid server port number!");
+                _messageLog.AddItem("Invalid TCP port number!", Log.LogItem.LogItemTypes.Error);
 
             if (cboCOMPorts.Items.Count != 0) return serverPortValid;
-
-            txtMessage.AddLine("Error! No COM devices are connected to the system!");
+            _messageLog.AddItem("Error! No COM devices are connected to the system!", Log.LogItem.LogItemTypes.Error);
             return false;
         }
 
@@ -142,13 +150,14 @@ namespace RobX.Interface
             if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int)Robot.BaudRate,
                 Robot.DataBits, Robot.Parity, Robot.StopBits) == false)
             {
-                txtMessage.AddLine("Error! Selected COM port is busy right now!");
+                _messageLog.AddItem("Error! Selected COM port is busy right now!", Log.LogItem.LogItemTypes.Error);
                 return;
             }
 
             if (_server.StartServer(Int32.Parse(txtServerPort.Text))) return;
 
-            txtMessage.AddLine("Error! Could not start TCP Server on port " + txtServerPort.Text + "!");
+            _messageLog.AddItem("Error! Could not start TCP Server on port " + txtServerPort.Text + "!", 
+                Log.LogItem.LogItemTypes.Error);
         }
 
         private void SaveProperties()
@@ -232,14 +241,35 @@ namespace RobX.Interface
             (sender as TextBox).ValidateInput_TCPPort(e);
         }
 
-        private void SaveLogTextBox(object sender, KeyEventArgs e)
+        // ReSharper disable once InconsistentNaming
+        private void lstMessageAddItems(object sender, LogEventArgs e)
         {
-            (sender as TextBox).SaveTextBox_CtrlS(e);
+            foreach (var item in e.Items)
+                lstMessage.AddLogItem(item);
         }
 
-        private void UpdateTextBox(object sender, LogEventArgs e)
+        // ReSharper disable once InconsistentNaming
+        private void lstMessageClear(object sender, LogEventArgs e)
         {
-            txtLog.UpdateText(_communicationLog.Text);
+            lstMessage.ClearItems();
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void lstLogAddItems(object sender, LogEventArgs e)
+        {
+            foreach (var item in e.Items)
+                lstLog.AddLogItem(item);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void lstLogClear(object sender, LogEventArgs e)
+        {
+            lstLog.ClearItems();
+        }
+
+        private void SaveLog(object sender, KeyEventArgs e)
+        {
+            (sender as ListView).SaveListView_CtrlS(e);
         }
 
         # endregion

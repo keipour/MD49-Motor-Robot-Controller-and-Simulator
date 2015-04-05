@@ -31,11 +31,13 @@ namespace RobX.Simulator
         /// </summary>
         private void InitializeComponent()
         {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSimulator));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmSimulator));
             this.picSimulation = new System.Windows.Forms.PictureBox();
             this.tabSimulator = new System.Windows.Forms.TabControl();
             this.tabServerLog = new System.Windows.Forms.TabPage();
-            this.txtLog = new System.Windows.Forms.TextBox();
+            this.lstLog = new System.Windows.Forms.ListView();
+            this.colLogTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colLogText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabSettings = new System.Windows.Forms.TabPage();
             this.pnlSettings = new System.Windows.Forms.Panel();
             this.cmdStartServer = new System.Windows.Forms.Button();
@@ -81,7 +83,7 @@ namespace RobX.Simulator
             // 
             // tabServerLog
             // 
-            this.tabServerLog.Controls.Add(this.txtLog);
+            this.tabServerLog.Controls.Add(this.lstLog);
             this.tabServerLog.Location = new System.Drawing.Point(4, 22);
             this.tabServerLog.Name = "tabServerLog";
             this.tabServerLog.Padding = new System.Windows.Forms.Padding(3);
@@ -90,19 +92,31 @@ namespace RobX.Simulator
             this.tabServerLog.Text = "Server Log";
             this.tabServerLog.UseVisualStyleBackColor = true;
             // 
-            // txtLog
+            // lstLog
             // 
-            this.txtLog.BackColor = System.Drawing.SystemColors.Window;
-            this.txtLog.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtLog.Location = new System.Drawing.Point(3, 3);
-            this.txtLog.Multiline = true;
-            this.txtLog.Name = "txtLog";
-            this.txtLog.ReadOnly = true;
-            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(469, 127);
-            this.txtLog.TabIndex = 1;
-            this.txtLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLogTextBox);
+            this.lstLog.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colLogTime,
+            this.colLogText});
+            this.lstLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstLog.FullRowSelect = true;
+            this.lstLog.GridLines = true;
+            this.lstLog.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lstLog.Location = new System.Drawing.Point(3, 3);
+            this.lstLog.MultiSelect = false;
+            this.lstLog.Name = "lstLog";
+            this.lstLog.Size = new System.Drawing.Size(469, 127);
+            this.lstLog.TabIndex = 13;
+            this.lstLog.UseCompatibleStateImageBehavior = false;
+            this.lstLog.View = System.Windows.Forms.View.Details;
+            this.lstLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLog);
+            // 
+            // colLogTime
+            // 
+            this.colLogTime.Text = "Time";
+            // 
+            // colLogText
+            // 
+            this.colLogText.Text = "Log Text";
             // 
             // tabSettings
             // 
@@ -253,7 +267,6 @@ namespace RobX.Simulator
             ((System.ComponentModel.ISupportInitialize)(this.picSimulation)).EndInit();
             this.tabSimulator.ResumeLayout(false);
             this.tabServerLog.ResumeLayout(false);
-            this.tabServerLog.PerformLayout();
             this.tabSettings.ResumeLayout(false);
             this.pnlSettings.ResumeLayout(false);
             this.pnlSettings.PerformLayout();
@@ -271,7 +284,6 @@ namespace RobX.Simulator
         private TabPage tabServerLog;
         private TabPage tabHelp;
         private TabPage tabAbout;
-        private TextBox txtLog;
         private TextBox txtHelp1;
         private TextBox txtHelp2;
         private TextBox txtAbout;
@@ -282,6 +294,9 @@ namespace RobX.Simulator
         private Label lblServerPort;
         private TextBox txtServerPort;
         private Button cmdStartServer;
+        private ListView lstLog;
+        private ColumnHeader colLogTime;
+        private ColumnHeader colLogText;
 
     }
 }

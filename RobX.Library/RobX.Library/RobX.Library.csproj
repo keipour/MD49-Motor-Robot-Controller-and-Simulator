@@ -51,12 +51,24 @@
     <Compile Include="Commons\Extensions.cs" />
     <Compile Include="Commons\Methods.cs" />
     <Compile Include="Documentation.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Tools\Events.cs" />
     <Compile Include="Tools\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Communication\Events.cs" />
     <Compile Include="Commons\Robot.cs" />
     <Compile Include="Communication\TCP\TCPServer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

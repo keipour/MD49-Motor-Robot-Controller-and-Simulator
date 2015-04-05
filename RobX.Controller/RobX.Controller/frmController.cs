@@ -1,7 +1,6 @@
 ﻿# region Includes
 
 using System;
-using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 using RobX.Controller.Properties;
@@ -46,10 +45,10 @@ namespace RobX.Controller
             txtIPAddress.Select();
 
             // Add events
-            _communicationLog.ItemsAdded += txtLogUpdate;
-            _communicationLog.LogCleared += txtLogUpdate;
-            _messageLog.ItemsAdded += txtMessageUpdate;
-            _messageLog.LogCleared += txtMessageUpdate;
+            _communicationLog.ItemsAdded += lstLogAddItems;
+            _communicationLog.LogCleared += lstLogClear;
+            _messageLog.ItemsAdded += lstMessageAddItems;
+            _messageLog.LogCleared += lstMessageClear;
             _controller.ReceivedData += RobotReceivedData;
             _controller.SentData += RobotSentData;
             _controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
@@ -69,13 +68,19 @@ namespace RobX.Controller
         private void frmLog_Resize(object sender, EventArgs e)
         {
             const int spacing = 6;
-            txtMessage.Height = ClientSize.Height - pnlController.Height - tabController.Height;
-            tabController.Top = txtMessage.Height + spacing;
+            lstMessage.Height = ClientSize.Height - pnlController.Height - tabController.Height;
+            tabController.Top = lstMessage.Height + spacing;
             tabController.Width = ClientSize.Width;
 
             cmdStart.Left = pnlController.Width - cmdStart.Width - spacing;
             cmdConnect.Left = cmdStart.Left;
             cboRobotType.Width = cmdConnect.Left - cboRobotType.Left - spacing;
+
+            const int timeColWidth = 80;
+            colMessageTime.Width = timeColWidth;
+            colMessageText.Width = lstMessage.ClientSize.Width - colMessageTime.Width - 5;
+            colLogTime.Width = timeColWidth;
+            colLogText.Width = lstLog.ClientSize.Width - colLogTime.Width - 5;
         }
 
         # endregion
@@ -149,11 +154,11 @@ namespace RobX.Controller
             var ipValid = Methods.IsValidIpAddress(txtIPAddress.Text);
 
             if (ipValid == false)
-                txtMessage.AddLine("Invalid IP address format!");
+                _messageLog.AddItem("Invalid IP address format!", Log.LogItem.LogItemTypes.Error);
 
             if (Methods.IsValidPort(txtPort.Text)) return ipValid;
 
-            txtMessage.AddLine("Invalid TCP port number!");
+            _messageLog.AddItem("Invalid TCP port number!", Log.LogItem.LogItemTypes.Error);
             return false;
         }
 
@@ -208,12 +213,12 @@ namespace RobX.Controller
 
         private void RobotReceivedData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
         }
 
         private void RobotSentData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
         }
 
         private void RobotCommunicationStatusChanged(object sender, CommunicationStatusEventArgs e)
@@ -224,7 +229,6 @@ namespace RobX.Controller
         private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
             _messageLog.AddItem(e.Status, true);
-            _messageLog.AddItem();
         }
 
         # endregion
@@ -303,21 +307,35 @@ namespace RobX.Controller
             (sender as TextBox).ValidateInput_IPAddress(e);
         }
 
-        private void SaveLogTextBox(object sender, KeyEventArgs e)
+        // ReSharper disable once InconsistentNaming
+        private void lstMessageAddItems(object sender, LogEventArgs e)
         {
-            (sender as TextBox).SaveTextBox_CtrlS(e);
+            foreach (var item in e.Items)
+                lstMessage.AddLogItem(item);
         }
 
         // ReSharper disable once InconsistentNaming
-        private void txtLogUpdate(object sender, LogEventArgs e)
+        private void lstMessageClear(object sender, LogEventArgs e)
         {
-            txtLog.UpdateText(_communicationLog.Text);
+            lstMessage.ClearItems();
         }
 
         // ReSharper disable once InconsistentNaming
-        private void txtMessageUpdate(object sender, LogEventArgs e)
+        private void lstLogAddItems(object sender, LogEventArgs e)
         {
-            txtMessage.UpdateText(_messageLog.Text);
+            foreach (var item in e.Items)
+                lstLog.AddLogItem(item);
+        }
+
+        // ReSharper disable once InconsistentNaming
+        private void lstLogClear(object sender, LogEventArgs e)
+        {
+            lstLog.ClearItems();
+        }
+
+        private void SaveLog(object sender, KeyEventArgs e)
+        {
+            (sender as ListView).SaveListView_CtrlS(e);
         }
 
         # endregion

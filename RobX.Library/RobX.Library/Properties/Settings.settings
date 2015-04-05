@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RobX.Library.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DefaultLogItemColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">Black</Value>
+    </Setting>
+    <Setting Name="ErrorLogItemColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">Red</Value>
+    </Setting>
+    <Setting Name="ReceiveLogItemColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">LightSeaGreen</Value>
+    </Setting>
+    <Setting Name="SendLogItemColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">DodgerBlue</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

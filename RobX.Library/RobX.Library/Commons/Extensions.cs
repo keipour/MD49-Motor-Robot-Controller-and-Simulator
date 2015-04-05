@@ -145,7 +145,7 @@ namespace RobX.Library.Commons
 
         # endregion
 
-        # region TextBox Save Extension
+        # region TextBox and ListView Save Extensions
 
         /// <summary>
         /// Saves the text of a textbox into file.
@@ -167,6 +167,96 @@ namespace RobX.Library.Commons
                 File.WriteAllText(sfdSaveLog.FileName, textBox.Text);
             
             sfdSaveLog.Dispose();
+        }
+
+        /// <summary>
+        /// Saves the text of a ListView into file.
+        /// </summary>
+        /// <param name="listView">The ListView instance which text should be saved.</param>
+        /// <param name="e">Argument containing keys pressed by the user.</param>
+        public static void SaveListView_CtrlS(this ListView listView, KeyEventArgs e)
+        {
+            if (!e.Control || e.KeyCode != Keys.S) return;
+
+            var sfdSaveLog = new SaveFileDialog
+            {
+                Filter = @"Text Files (*.txt)|*.txt|All Files (*.*)|*.*",
+                DefaultExt = "txt",
+                SupportMultiDottedExtensions = true
+            };
+
+            if (sfdSaveLog.ShowDialog() == DialogResult.OK)
+            {
+                var text = "";
+                foreach (ListViewItem item in listView.Items)
+                {
+                    for (var i = 0; i < item.SubItems.Count; ++i)
+                    {
+                        if (i > 0) text += "\t";
+                        text += item.SubItems[i].Text;
+                    }
+                    text += Environment.NewLine;
+                }
+
+                File.WriteAllText(sfdSaveLog.FileName, text);
+            }
+
+            sfdSaveLog.Dispose();
+        }
+
+        # endregion
+
+        # region ListView Extensions
+
+        private delegate void SetListCallback(ListView listView, ListViewItem item);
+
+        internal static void ListAddItemPrivate(ListView listView, ListViewItem item)
+        {
+            try
+            {
+                if (listView.InvokeRequired)
+                {
+                    var d = new SetListCallback(ListAddItemPrivate);
+                    listView.Invoke(d, listView, item);
+                }
+                else
+                {
+                    listView.Items.Add(item);
+                    listView.TopItem = listView.Items[listView.Items.Count - 1];
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        private delegate void SetListLogClearCallback(ListView listView);
+        private static void ClearItemsPrivate(ListView listView)
+        {
+            try
+            {
+                if (listView.InvokeRequired)
+                {
+                    var d = new SetListLogClearCallback(ClearItemsPrivate);
+                    listView.Invoke(d, listView);
+                }
+                else
+                    listView.Items.Clear();
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        /// <summary>
+        /// Clears all items in the ListView control.
+        /// </summary>
+        /// <param name="listView">The ListView instance which should be cleared.</param>
+        public static void ClearItems(this ListView listView)
+        {
+            ClearItemsPrivate(listView);
         }
 
         # endregion

@@ -31,9 +31,8 @@ namespace RobX.Controller
         /// </summary>
         private void InitializeComponent()
         {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(frmController));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmController));
             this.cmdStart = new System.Windows.Forms.Button();
-            this.txtMessage = new System.Windows.Forms.TextBox();
             this.cmdConnect = new System.Windows.Forms.Button();
             this.txtPort = new System.Windows.Forms.TextBox();
             this.lblIPAddress = new System.Windows.Forms.Label();
@@ -46,11 +45,16 @@ namespace RobX.Controller
             this.txtIPAddress = new System.Windows.Forms.TextBox();
             this.tabController = new System.Windows.Forms.TabControl();
             this.tabLog = new System.Windows.Forms.TabPage();
-            this.txtLog = new System.Windows.Forms.TextBox();
+            this.lstLog = new System.Windows.Forms.ListView();
+            this.colLogTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colLogText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabHelp = new System.Windows.Forms.TabPage();
             this.txtHelp = new System.Windows.Forms.TextBox();
             this.tabAbout = new System.Windows.Forms.TabPage();
             this.txtAbout = new System.Windows.Forms.TextBox();
+            this.lstMessage = new System.Windows.Forms.ListView();
+            this.colMessageTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colMessageText = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.pnlController.SuspendLayout();
             this.tabController.SuspendLayout();
             this.tabLog.SuspendLayout();
@@ -67,19 +71,6 @@ namespace RobX.Controller
             this.cmdStart.Text = "&Start";
             this.cmdStart.UseVisualStyleBackColor = true;
             this.cmdStart.Click += new System.EventHandler(this.cmdStart_Click);
-            // 
-            // txtMessage
-            // 
-            this.txtMessage.BackColor = System.Drawing.SystemColors.Window;
-            this.txtMessage.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtMessage.Location = new System.Drawing.Point(0, 0);
-            this.txtMessage.Multiline = true;
-            this.txtMessage.Name = "txtMessage";
-            this.txtMessage.ReadOnly = true;
-            this.txtMessage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtMessage.Size = new System.Drawing.Size(464, 223);
-            this.txtMessage.TabIndex = 10;
-            this.txtMessage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLogTextBox);
             // 
             // cmdConnect
             // 
@@ -207,7 +198,7 @@ namespace RobX.Controller
             // tabLog
             // 
             this.tabLog.BackColor = System.Drawing.SystemColors.Control;
-            this.tabLog.Controls.Add(this.txtLog);
+            this.tabLog.Controls.Add(this.lstLog);
             this.tabLog.Location = new System.Drawing.Point(4, 22);
             this.tabLog.Name = "tabLog";
             this.tabLog.Padding = new System.Windows.Forms.Padding(3);
@@ -215,18 +206,31 @@ namespace RobX.Controller
             this.tabLog.TabIndex = 0;
             this.tabLog.Text = "Communication Log";
             // 
-            // txtLog
+            // lstLog
             // 
-            this.txtLog.BackColor = System.Drawing.SystemColors.Window;
-            this.txtLog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtLog.Location = new System.Drawing.Point(3, 3);
-            this.txtLog.Multiline = true;
-            this.txtLog.Name = "txtLog";
-            this.txtLog.ReadOnly = true;
-            this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(450, 191);
-            this.txtLog.TabIndex = 12;
-            this.txtLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLogTextBox);
+            this.lstLog.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colLogTime,
+            this.colLogText});
+            this.lstLog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstLog.FullRowSelect = true;
+            this.lstLog.GridLines = true;
+            this.lstLog.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lstLog.Location = new System.Drawing.Point(3, 3);
+            this.lstLog.MultiSelect = false;
+            this.lstLog.Name = "lstLog";
+            this.lstLog.Size = new System.Drawing.Size(450, 191);
+            this.lstLog.TabIndex = 12;
+            this.lstLog.UseCompatibleStateImageBehavior = false;
+            this.lstLog.View = System.Windows.Forms.View.Details;
+            this.lstLog.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLog);
+            // 
+            // colLogTime
+            // 
+            this.colLogTime.Text = "Time";
+            // 
+            // colLogText
+            // 
+            this.colLogText.Text = "Log Text";
             // 
             // tabHelp
             // 
@@ -279,6 +283,31 @@ namespace RobX.Controller
             this.txtAbout.TabIndex = 7;
             this.txtAbout.Text = resources.GetString("txtAbout.Text");
             // 
+            // lstMessage
+            // 
+            this.lstMessage.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colMessageTime,
+            this.colMessageText});
+            this.lstMessage.Dock = System.Windows.Forms.DockStyle.Top;
+            this.lstMessage.FullRowSelect = true;
+            this.lstMessage.GridLines = true;
+            this.lstMessage.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lstMessage.Location = new System.Drawing.Point(0, 0);
+            this.lstMessage.Name = "lstMessage";
+            this.lstMessage.Size = new System.Drawing.Size(464, 223);
+            this.lstMessage.TabIndex = 10;
+            this.lstMessage.UseCompatibleStateImageBehavior = false;
+            this.lstMessage.View = System.Windows.Forms.View.Details;
+            this.lstMessage.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SaveLog);
+            // 
+            // colMessageTime
+            // 
+            this.colMessageTime.Text = "Time";
+            // 
+            // colMessageText
+            // 
+            this.colMessageText.Text = "Message Text";
+            // 
             // frmController
             // 
             this.AcceptButton = this.cmdConnect;
@@ -286,7 +315,7 @@ namespace RobX.Controller
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(464, 523);
-            this.Controls.Add(this.txtMessage);
+            this.Controls.Add(this.lstMessage);
             this.Controls.Add(this.tabController);
             this.Controls.Add(this.pnlController);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -302,20 +331,17 @@ namespace RobX.Controller
             this.pnlController.PerformLayout();
             this.tabController.ResumeLayout(false);
             this.tabLog.ResumeLayout(false);
-            this.tabLog.PerformLayout();
             this.tabHelp.ResumeLayout(false);
             this.tabHelp.PerformLayout();
             this.tabAbout.ResumeLayout(false);
             this.tabAbout.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private Button cmdStart;
-        private TextBox txtMessage;
         private Button cmdConnect;
         private TextBox txtPort;
         private Label lblIPAddress;
@@ -332,7 +358,12 @@ namespace RobX.Controller
         private TextBox txtAbout;
         private TabPage tabHelp;
         private TextBox txtHelp;
-        private TextBox txtLog;
+        private ListView lstLog;
+        private ListView lstMessage;
+        private ColumnHeader colLogTime;
+        private ColumnHeader colLogText;
+        private ColumnHeader colMessageTime;
+        private ColumnHeader colMessageText;
 
     }
 }
