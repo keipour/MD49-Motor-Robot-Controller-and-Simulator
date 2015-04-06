@@ -1,0 +1,21 @@
+﻿F12:  Toggle control using the keyboard
+When control is given to keyboard, these keys work:
+Up arrow key       -  Move robot forward
+Down arrow key  -  Move robot backward
+Right arrow key   -  Rotate robot clockwise
+Left arrow key     -   Rotate robot counter-clockwise
+Shift key              -   Stop robot
+
+1 : Static inertial axes view centered at (0, 0)
+2 : Static inertial axes view with (0, 0) at lower-left corner
+%%pagebreak%%
+F10: Stop robot
+A : Keep aspect ratio on/off
+F5 : Start simulation
+F6 : Continue simulation
+F7 : Stop simulation
+Esc : Exit simulation
+S  : Statistics on/off
+O : Obstacles on/off
+G  : Grids on/off
+T  : Robot trace on/off

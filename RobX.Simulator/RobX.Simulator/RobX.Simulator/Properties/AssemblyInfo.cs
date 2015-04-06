@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RobX Simulator Ver 2.0")]
-[assembly: AssemblyProduct("RobX Simulator Ver 2.0")]
+[assembly: AssemblyTitle("RobX Simulator")]
+[assembly: AssemblyProduct("RobX Simulator")]
 [assembly: AssemblyDescription("Simulator for RobX robot using Microsot XNA")]
 [assembly: AssemblyCompany("Azarakhsh Keipour")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
@@ -33,3 +33,4 @@ using System.Runtime.InteropServices;
 //
 [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: NeutralResourcesLanguage("en-US")]
+[assembly: AssemblyFileVersionAttribute("2.0.0.0")]

@@ -9,6 +9,7 @@ using RobX.Library.Communication.TCP;
 using RobX.Library.Tools;
 using RobX.Simulator.Properties;
 using System.Drawing;
+using System.IO;
 
 # endregion
 
@@ -61,6 +62,14 @@ namespace RobX.Simulator
 
         private void frmSimulator_Load(object sender, EventArgs e)
         {
+            var helpText = File.ReadAllText(@"Content\Help.txt").Split(new[] { "%%pagebreak%%" }, 
+                StringSplitOptions.RemoveEmptyEntries);
+            txtHelp1.Text = helpText[0].TrimEnd();
+            txtHelp2.Text = helpText[1].TrimStart();
+
+            txtAbout.Text = File.ReadAllText(@"Content\About.txt").Replace(@"%%version%%", ProductVersion);
+            Text = Text.Replace(@"%%version%%", ProductVersion);
+
             LoadSettings();
             frmSimulator_Resize(sender, e);
 

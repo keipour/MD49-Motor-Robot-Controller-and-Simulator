@@ -112,12 +112,12 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="cmdRefresh.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -135,37 +135,6 @@
         mVSiLwhA/ZAaljENBbdieHIX7K5DdLm0oscae9jLGW/0H8TPpE1UuCrqgzA0EQXn7zjBYaq5xxp7fN4F
         IX7nEJUka7ZLNibX3PNpcyBJfwGEv/odvS7UswAAAABJRU5ErkJggg==
 </value>
-  </data>
-  <data name="txtHelp.Text" xml:space="preserve">
-    <value>
-F1  -  Help (this page)
-Esc -  Exit
-F10 -  Stop robot
-F12 -  Toggle control of the robot using the keyboard
-
-When control is given to keyboard, these keys work:
-
-Up arrow key       -  Move robot forward
-Down arrow key  -  Move robot backward
-Right arrow key   -  Rotate robot clockwise
-Left arrow key     -   Rotate robot counter-clockwise
-Shift key               -   Stop robot</value>
-  </data>
-  <data name="txtAbout.Text" xml:space="preserve">
-    <value>RobX Robot Hardware Interface 
-A hardware interface for a differential drive robot with MD49 motor drivers.
-Version: 1.1 (March 2015)
-
-Image Processing and Computer Vision Lab (Prof. Mansour Jamzad)
-Computer Engineering Department, 
-Sharif University of Technology,
-Tehran, Iran.
-
-Developer: 
-Azarakhsh Keipour ( keipour @ gmail.com )
-
-Special thanks to: 
-Mohammadreza Mousaei ( m.mousaei @ gmail.com )</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

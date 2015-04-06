@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RobX Hardware Interface Ver 1.1")]
+[assembly: AssemblyTitle("RobX Hardware Interface")]
 [assembly: AssemblyDescription("Hardware interface to the RobX robot")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Azarakhsh Keipour")]
-[assembly: AssemblyProduct("RobX Hardware Interface Ver 1.1")]
+[assembly: AssemblyProduct("RobX Hardware Interface")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

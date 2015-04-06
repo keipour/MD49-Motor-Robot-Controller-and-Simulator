@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("RobX Controller Ver 1.1")]
+[assembly: AssemblyTitle("RobX Controller")]
 [assembly: AssemblyDescription("Controller for RobX robot")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RobX Controller Ver 1.1")]
+[assembly: AssemblyProduct("RobX Controller")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

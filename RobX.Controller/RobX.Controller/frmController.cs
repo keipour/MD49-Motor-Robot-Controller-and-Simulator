@@ -2,6 +2,7 @@
 
 using System;
 using System.Drawing;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using RobX.Controller.Properties;
@@ -56,6 +57,10 @@ namespace RobX.Controller
             _controller.SentData += RobotSentData;
             _controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
             _controller.RobotStatusChanged += RobotStatusChanged;
+
+            txtHelp.Text = File.ReadAllText(@"Content\Help.txt");
+            txtAbout.Text = File.ReadAllText(@"Content\About.txt").Replace(@"%%version%%", ProductVersion);
+            Text = Text.Replace(@"%%version%%", ProductVersion);
         }
 
         private void frmLog_FormClosing(object sender, FormClosingEventArgs e)

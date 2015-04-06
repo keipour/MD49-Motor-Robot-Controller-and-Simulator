@@ -11,6 +11,7 @@ using RobX.Library.Communication.COM;
 using RobX.Library.Communication.TCP;
 using RobX.Library.Robot;
 using RobX.Library.Tools;
+using System.IO;
 
 # endregion
 
@@ -60,6 +61,10 @@ namespace RobX.Interface
             _robot.SentData += RobotSentData;
             _robot.StatusChanged += RobotStatusChanged;
             btnRefresh_Click(sender, e);
+
+            txtHelp.Text = File.ReadAllText(@"Content\Help.txt");
+            txtAbout.Text = File.ReadAllText(@"Content\About.txt").Replace(@"%%version%%", ProductVersion);
+            Text = Text.Replace(@"%%version%%", ProductVersion);
         }
 
         private void frmLog_KeyDown(object sender, KeyEventArgs e)

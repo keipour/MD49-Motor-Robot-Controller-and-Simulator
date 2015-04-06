@@ -1,0 +1,14 @@
+﻿RobX Robot Hardware Interface 
+A hardware interface for a differential drive robot with MD49 motor drivers.
+Version: %%version%%
+
+Image Processing and Computer Vision Lab (Prof. Mansour Jamzad)
+Computer Engineering Department, 
+Sharif University of Technology,
+Tehran, Iran.
+
+Developer: 
+Azarakhsh Keipour ( keipour @ gmail.com )
+
+Special thanks to: 
+Mohammadreza Mousaei ( m.mousaei @ gmail.com )

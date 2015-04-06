@@ -205,7 +205,6 @@ namespace RobX.Simulator
             this.txtHelp2.Size = new System.Drawing.Size(182, 133);
             this.txtHelp2.TabIndex = 1;
             this.txtHelp2.TabStop = false;
-            this.txtHelp2.Text = resources.GetString("txtHelp2.Text");
             // 
             // txtHelp1
             // 
@@ -220,7 +219,6 @@ namespace RobX.Simulator
             this.txtHelp1.Size = new System.Drawing.Size(475, 133);
             this.txtHelp1.TabIndex = 0;
             this.txtHelp1.TabStop = false;
-            this.txtHelp1.Text = resources.GetString("txtHelp1.Text");
             // 
             // tabAbout
             // 
@@ -245,7 +243,6 @@ namespace RobX.Simulator
             this.txtAbout.Size = new System.Drawing.Size(475, 133);
             this.txtAbout.TabIndex = 6;
             this.txtAbout.TabStop = false;
-            this.txtAbout.Text = resources.GetString("txtAbout.Text");
             // 
             // frmSimulator
             // 
@@ -259,7 +256,7 @@ namespace RobX.Simulator
             this.MinimumSize = new System.Drawing.Size(499, 568);
             this.Name = "frmSimulator";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "RobX Robot Simulator Ver 2.0";
+            this.Text = "RobX Robot Simulator Ver %%version%%";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmSimulator_FormClosing);
             this.Load += new System.EventHandler(this.frmSimulator_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmSimulator_KeyDown);

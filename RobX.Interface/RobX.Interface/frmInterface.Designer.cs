@@ -208,7 +208,7 @@ namespace RobX.Interface
             this.tabHelp.Controls.Add(this.txtHelp);
             this.tabHelp.Location = new System.Drawing.Point(4, 22);
             this.tabHelp.Name = "tabHelp";
-            this.tabHelp.Size = new System.Drawing.Size(456, 416);
+            this.tabHelp.Size = new System.Drawing.Size(452, 277);
             this.tabHelp.TabIndex = 2;
             this.tabHelp.Text = "Help (F1)";
             this.tabHelp.UseVisualStyleBackColor = true;
@@ -224,10 +224,9 @@ namespace RobX.Interface
             this.txtHelp.Multiline = true;
             this.txtHelp.Name = "txtHelp";
             this.txtHelp.ReadOnly = true;
-            this.txtHelp.Size = new System.Drawing.Size(456, 416);
+            this.txtHelp.Size = new System.Drawing.Size(452, 277);
             this.txtHelp.TabIndex = 8;
             this.txtHelp.TabStop = false;
-            this.txtHelp.Text = resources.GetString("txtHelp.Text");
             // 
             // tabAbout
             // 
@@ -235,7 +234,7 @@ namespace RobX.Interface
             this.tabAbout.Location = new System.Drawing.Point(4, 22);
             this.tabAbout.Name = "tabAbout";
             this.tabAbout.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAbout.Size = new System.Drawing.Size(456, 416);
+            this.tabAbout.Size = new System.Drawing.Size(452, 277);
             this.tabAbout.TabIndex = 1;
             this.tabAbout.Text = "About";
             this.tabAbout.UseVisualStyleBackColor = true;
@@ -250,10 +249,9 @@ namespace RobX.Interface
             this.txtAbout.Multiline = true;
             this.txtAbout.Name = "txtAbout";
             this.txtAbout.ReadOnly = true;
-            this.txtAbout.Size = new System.Drawing.Size(450, 410);
+            this.txtAbout.Size = new System.Drawing.Size(446, 271);
             this.txtAbout.TabIndex = 7;
             this.txtAbout.TabStop = false;
-            this.txtAbout.Text = resources.GetString("txtAbout.Text");
             // 
             // frmInterface
             // 
@@ -268,7 +266,7 @@ namespace RobX.Interface
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(476, 418);
             this.Name = "frmInterface";
-            this.Text = "RobX Hardware Interface Ver 1.1";
+            this.Text = "RobX Hardware Interface Ver %%version%%";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLog_FormClosing);
             this.Load += new System.EventHandler(this.frmLog_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmLog_KeyDown);

@@ -256,7 +256,6 @@ namespace RobX.Controller
             this.txtHelp.Size = new System.Drawing.Size(456, 197);
             this.txtHelp.TabIndex = 8;
             this.txtHelp.TabStop = false;
-            this.txtHelp.Text = resources.GetString("txtHelp.Text");
             // 
             // tabAbout
             // 
@@ -281,7 +280,6 @@ namespace RobX.Controller
             this.txtAbout.ReadOnly = true;
             this.txtAbout.Size = new System.Drawing.Size(450, 191);
             this.txtAbout.TabIndex = 7;
-            this.txtAbout.Text = resources.GetString("txtAbout.Text");
             // 
             // lstMessage
             // 
@@ -322,7 +320,7 @@ namespace RobX.Controller
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(480, 561);
             this.Name = "frmController";
-            this.Text = "RobX Controller Ver 1.1";
+            this.Text = "RobX Controller Ver %%version%%";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmLog_FormClosing);
             this.Load += new System.EventHandler(this.frmLog_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.frmLog_KeyDown);
