@@ -130,6 +130,7 @@ namespace RobX.Library.Tools
         /// <param name="itemText">String of the item that should be added to the log.</param>
         /// <param name="type">Type of the new item.</param>
         /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
+        /// <param name="backColor">Background color of the new item.</param>
         public void AddItem(string itemText, LogItem.LogItemTypes type, Color backColor, bool addTime = false)
         {
             AddItem(itemText, LogItem.DetermineTypeColor(type), backColor, addTime);

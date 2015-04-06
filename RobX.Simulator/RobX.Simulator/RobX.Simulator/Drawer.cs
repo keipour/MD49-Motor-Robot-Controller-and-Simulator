@@ -104,9 +104,9 @@ namespace RobX.Simulator
             double xscale = 1.0F, double yscale = 1.0F)
         {
             // Rectangle that the robot should fit in
-            var destRect = new Rectangle((int)(xscale * (ConvertX((int)env.Robot.X, xCenter) - Library.Commons.Robot.Radius)),
-                (int)(yscale * (ConvertY((int)env.Robot.Y, yCenter) - Library.Commons.Robot.Radius)),
-                (int)(xscale * 2 * Library.Commons.Robot.Radius), (int)(yscale * 2 * Library.Commons.Robot.Radius));
+            var destRect = new Rectangle((int)(xscale * (ConvertX((int)env.Robot.X, xCenter) - Library.Robot.Robot.Radius)),
+                (int)(yscale * (ConvertY((int)env.Robot.Y, yCenter) - Library.Robot.Robot.Radius)),
+                (int)(xscale * 2 * Library.Robot.Robot.Radius), (int)(yscale * 2 * Library.Robot.Robot.Radius));
 
             // Calculate integer angle of the robot
             var angleIndex = ((int)(ConvertAngle(env.Robot.Angle)) % 360 + 360) % 360;
@@ -170,7 +170,7 @@ namespace RobX.Simulator
                         (int)(xscale * obs.Rectangle.Width),
                         (int)(yscale * obs.Rectangle.Height));
 
-                    if (obs.IsIntersected(env.Robot.X, env.Robot.Y, Library.Commons.Robot.Radius))
+                    if (obs.IsIntersected(env.Robot.X, env.Robot.Y, Library.Robot.Robot.Radius))
                         color = obs.CollisionColor;
                 }
                 else

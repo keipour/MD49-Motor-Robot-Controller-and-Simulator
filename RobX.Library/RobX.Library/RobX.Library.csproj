@@ -60,7 +60,7 @@
     <Compile Include="Tools\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Communication\Events.cs" />
-    <Compile Include="Commons\Robot.cs" />
+    <Compile Include="Robot\Robot.cs" />
     <Compile Include="Communication\TCP\TCPServer.cs" />
   </ItemGroup>
   <ItemGroup>

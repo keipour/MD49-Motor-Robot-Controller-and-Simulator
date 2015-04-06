@@ -127,70 +127,16 @@ namespace RobX.Simulator
 
         # endregion
 
-        # region Public Functions (WheelSpeeds)
+        # region Public Functions (MotorSpeedToRealSpeed)
 
         /// <summary>
         /// Calculates normalized individual wheel speeds (in millimeters per second).
         /// </summary>
-        /// <param name="wheelSpeed1">Speed of wheel 1.</param>
-        /// <param name="wheelSpeed2">Speed of wheel 2.</param>
-        public void WheelSpeeds(out double wheelSpeed1, out double wheelSpeed2)
+        /// <param name="leftWheelSpeed">Real speed of left wheel.</param>
+        /// <param name="rightWheelSpeed">Real speed of right wheel.</param>
+        public void MotorSpeedToRealSpeed(out double leftWheelSpeed, out double rightWheelSpeed)
         {
-            wheelSpeed1 = 0;
-            wheelSpeed2 = 0;
-
-            switch (_previousmode)
-            {
-                case 0:
-                    wheelSpeed1 = Speed1 - 128;
-                    wheelSpeed2 = Speed2 - 128;
-                    break;
-                case 1:
-                    wheelSpeed1 = Methods.ConvertUnsignedByteToSigned(Speed1);
-                    wheelSpeed2 = Methods.ConvertUnsignedByteToSigned(Speed2);
-                    break;
-                case 2:
-                    if (Speed1 >= 128)                  // if forward direction
-                    {
-                        wheelSpeed1 = Speed1 + Speed2 - 256;
-                        if (wheelSpeed1 > 127) wheelSpeed1 = 127;
-
-                        wheelSpeed2 = Speed1 - Speed2;
-                        if (wheelSpeed2 > 127) wheelSpeed2 = 127;
-                    }
-                    else                              // if backward direction
-                    {
-                        wheelSpeed1 = Speed1 - Speed2;
-                        if (wheelSpeed1 < -128) wheelSpeed1 = -128;
-
-                        wheelSpeed2 = Speed1 + Speed2 - 256;
-                        if (wheelSpeed2 < -128) wheelSpeed2 = -128;
-                    }
-                    break;
-                case 3:
-                    int speed1 = Methods.ConvertUnsignedByteToSigned(Speed1);
-                    int speed2 = Methods.ConvertUnsignedByteToSigned(Speed2);
-
-                    if (speed1 >= 0)                  // if forward direction
-                    {
-                        wheelSpeed1 = speed1 + speed2;
-                        if (wheelSpeed1 > 127) wheelSpeed1 = 127;
-
-                        wheelSpeed2 = speed1 - speed2;
-                        if (wheelSpeed2 > 127) wheelSpeed2 = 127;
-                    }
-                    else                              // if backward direction
-                    {
-                        wheelSpeed1 = speed1 - speed2;
-                        if (wheelSpeed1 < -128) wheelSpeed1 = -128;
-
-                        wheelSpeed2 = speed1 + speed2;
-                        if (wheelSpeed2 < -128) wheelSpeed2 = -128;
-                    }
-                    break;
-            }
-            wheelSpeed1 *= Library.Commons.Robot.RobotSpeedToMmpS;
-            wheelSpeed2 *= Library.Commons.Robot.RobotSpeedToMmpS;
+            Library.Robot.Robot.MotorSpeedToRealSpeed(_previousmode, Speed1, Speed2, out leftWheelSpeed, out rightWheelSpeed);
         }
 
         # endregion

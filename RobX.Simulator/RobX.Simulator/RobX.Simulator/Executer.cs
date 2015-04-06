@@ -498,7 +498,7 @@ namespace RobX.Simulator
                 environment.Robot.Trace.Add(trace);
 
             // Stop if robot timeout is set to true and timeout has happened
-            if ((starttime - _lastCommandTime).TotalMilliseconds > Library.Commons.Robot.MotorTimeoutInMs && 
+            if ((starttime - _lastCommandTime).TotalMilliseconds > Library.Robot.Robot.MotorTimeoutInMs && 
                 robot.Timeout)
             {
                 if (robot.Mode == 0 || robot.Mode == 2)
@@ -515,52 +515,18 @@ namespace RobX.Simulator
 
             // Calculate wheel speeds in millimeters per second
             double speed1, speed2;
-            robot.WheelSpeeds(out speed1, out speed2);
+            robot.MotorSpeedToRealSpeed(out speed1, out speed2);
             
             // Calculate elapsed simulation time
             var totaltime = (endtime - starttime).TotalMilliseconds / 1000.0F * Simulator.SimulationSpeed;
 
-            // --------------------- Forward kinematics for differential drive robot ------------------------ //
+            // Forward kinematics for differential drive robot
+            Library.Robot.Robot.ForwardKinematics(totaltime, speed1, speed2, ref environment.Robot.X, 
+                ref environment.Robot.Y, ref environment.Robot.Angle);
 
-            // Check if wheel speeds are equal
-            if (Math.Abs(speed1 - speed2) < 0.00001) // if speed are equal
-            {
-                environment.Robot.X += speed1 * Math.Cos(Math.PI / 180 * environment.Robot.Angle) * totaltime;
-                environment.Robot.Y += speed1 * Math.Sin(Math.PI / 180 * environment.Robot.Angle) * totaltime;
-            }
-            else // if wheel speeds are not equal
-            {
-                const double l = 2 * Library.Commons.Robot.Radius; // Distance between centers of two wheels
-                var r = l / 2 * (speed1 + speed2) / (speed2 - speed1);   // Radius of rotation
-                var w = (speed2 - speed1) / l;                           // Angular velocity of rotation
-                
-                // Calculate center of rotation
-                var icCx = environment.Robot.X - r * Math.Sin(Math.PI / 180 * environment.Robot.Angle);
-                var icCy = environment.Robot.Y + r * Math.Cos(Math.PI / 180 * environment.Robot.Angle);
-
-                // Calculate new x, y and angle of robot
-                var wt = w * totaltime;
-                var newX = Math.Cos(wt) * (environment.Robot.X - icCx) - Math.Sin(wt) * (environment.Robot.Y - icCy) + icCx;
-                var newY = Math.Sin(wt) * (environment.Robot.X - icCx) + Math.Cos(wt) * (environment.Robot.Y - icCy) + icCy;
-                var newAngle = (environment.Robot.Angle + wt * 180 / Math.PI) % 360;
-
-                // Replace old position values
-                environment.Robot.X = newX;
-                environment.Robot.Y = newY;
-                environment.Robot.Angle = newAngle;
-            }
-
-            // ----------------------------- Calculate Wheel Encoder Counts --------------------------------
-            // Calculate wheel movement in millimeters
-            var distance1 = speed1 * totaltime;
-            var distance2 = speed2 * totaltime;
-
-            // Calculate encoder counts
-            var encoder1 = (int)(distance1 / Library.Commons.Robot.EncoderCount2mM);
-            var encoder2 = (int)(distance2 / Library.Commons.Robot.EncoderCount2mM);
-
-            robot.Encoder1 = robot.Encoder1 + encoder1;
-            robot.Encoder2 = robot.Encoder2 + encoder2;
+            // Calculate wheel encoder counts
+            robot.Encoder1 = robot.Encoder1 + Library.Robot.Robot.DistanceToEncoderCount(speed1 * totaltime);
+            robot.Encoder2 = robot.Encoder2 + Library.Robot.Robot.DistanceToEncoderCount(speed2 * totaltime);
         }
 
         # endregion

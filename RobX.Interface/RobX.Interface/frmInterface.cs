@@ -9,6 +9,7 @@ using RobX.Library.Commons;
 using RobX.Library.Communication;
 using RobX.Library.Communication.COM;
 using RobX.Library.Communication.TCP;
+using RobX.Library.Robot;
 using RobX.Library.Tools;
 
 # endregion
@@ -147,14 +148,11 @@ namespace RobX.Interface
         {
             if (!CheckInputErrors(false)) return false;
 
-            if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int)Robot.BaudRate,
-                Robot.DataBits, Robot.Parity, Robot.StopBits) == false)
-            {
-                _communicationLog.AddItem("Error! Selected COM port is busy right now!", true, _userLogBackColor);
-                return false;
-            }
-
-            return StartServer();
+            if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int) Robot.BaudRate,
+                Robot.DataBits, Robot.Parity, Robot.StopBits)) return StartServer();
+            
+            _communicationLog.AddItem("Error! Selected COM port is busy right now!", true, _userLogBackColor);
+            return false;
         }
 
         private bool StartServer()

@@ -14,7 +14,6 @@ namespace RobX.Library.Communication.TCP
     // ReSharper disable once InconsistentNaming
     public class TCPClient
     {
-
         # region Private Fields
 
         private TcpClient _tcpClient = new TcpClient();

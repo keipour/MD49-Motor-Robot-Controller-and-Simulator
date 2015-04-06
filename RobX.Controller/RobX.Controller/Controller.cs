@@ -25,7 +25,7 @@ namespace RobX.Controller
         /// <summary>
         /// Type of robot: Real robot / Simulation.
         /// </summary>
-        public Library.Commons.Robot.RobotType RobotType;
+        public Library.Robot.Robot.RobotType RobotType;
 
         /// <summary>
         /// Indicates whether the controller is connected to the robot (via network) or not.
@@ -90,7 +90,7 @@ namespace RobX.Controller
         /// Constructor for the Controller class.
         /// </summary>
         /// <param name="robotType"></param>
-        public Controller(Library.Commons.Robot.RobotType robotType)
+        public Controller(Library.Robot.Robot.RobotType robotType)
         {
             RobotType = robotType;
             Robot = new Robot(robotType);
@@ -278,32 +278,32 @@ namespace RobX.Controller
         public void PrepareForExecution()
         {
             Robot.DisableTimeout();
-            Robot.SetMode(Library.Commons.Robot.SpeedModes.Mode0);
+            Robot.SetMode(Library.Robot.Robot.SpeedModes.Mode0);
         }
 
         /// <summary>
         /// Sets robot wheel speeds for a specified amount of time.
         /// </summary>
-        /// <param name="milliseconds">Execution time in milliseconds.</param>
+        /// <param name="time">Execution time in milliseconds.</param>
         /// <param name="wheel1Speed">Speed of wheel 1 (in the range -127 to 127).</param>
         /// <param name="wheel2Speed">Speed of wheel 2 (in the range -127 to 127).</param>
         /// <param name="showMessage">If true, invoke RobotStatusChanged event with a message.</param>
-        public void SetSpeedMilliseconds(double milliseconds, sbyte wheel1Speed, sbyte wheel2Speed,
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input time is negative.</exception>
+        public void SetSpeedMilliseconds(double time, sbyte wheel1Speed, sbyte wheel2Speed,
             bool showMessage = true)
         {
-            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (time < 0) throw new ArgumentOutOfRangeException("time", @"Error! Time can't be negative!");
 
             if (showMessage && RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Setting the speed of the left wheel to " + wheel1Speed +
-                    " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
-                    wheel2Speed + " (" + (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
-                    " mm/s) for " + milliseconds.ToString("0.00") + " milliseconds."));
+                    " (" + (wheel1Speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
+                    wheel2Speed + " (" + (wheel2Speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
             Robot.SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
-
-            if (milliseconds > 0)
-                Thread.Sleep(TimeSpan.FromMilliseconds(milliseconds/Settings.Default.SimulationSpeed));
+            if (time > 0)
+                Thread.Sleep(TimeSpan.FromMilliseconds(time/Settings.Default.SimulationSpeed));
         }
 
         /// <summary>
@@ -319,13 +319,13 @@ namespace RobX.Controller
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot " + ((wheel1Speed < wheel2Speed) ? "counter-" : "") + "clockwise " +
                     degrees.ToString("0.0") + " degrees with the speed of the left wheel set to " +
-                    wheel1Speed + " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    wheel1Speed + " (" + (wheel1Speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) and the right wheel set to " + wheel2Speed + " (" +
-                    (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
+                    (wheel2Speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
-            var deltaV = (wheel1Speed - wheel2Speed)*Robot.RobotSpeedToMmpS/1000F;
+            var deltaV = (wheel1Speed - wheel2Speed)*Library.Robot.Robot.RobotSpeedToMmpS/1000F;
             var radians = degrees*Math.PI/180F;
-            var milliseconds = Math.Abs(2*Robot.Radius*radians/deltaV);
+            var milliseconds = Math.Abs(2*Library.Robot.Robot.Radius*radians/deltaV);
 
             Robot.SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
             SetSpeedMilliseconds(milliseconds, wheel1Speed, wheel2Speed, false);
@@ -338,15 +338,16 @@ namespace RobX.Controller
         /// <param name="wheel1Speed">Speed of wheel 1 (in the range -127 to 127).</param>
         /// <param name="wheel2Speed">Speed of wheel 2 (in the range -127 to 127).</param>
         /// <param name="showMessage">If true, invoke RobotStatusChanged event with a message.</param>
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input distance is negative.</exception>
         public void SetSpeedMillimeters(double distance, sbyte wheel1Speed, sbyte wheel2Speed, bool showMessage = true)
         {
-            if (distance < 0) throw new Exception("Error! Distance can't be negative!");
+            if (distance < 0) throw new ArgumentOutOfRangeException("distance", @"Error! Distance can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Setting the speed of the left wheel to " + wheel1Speed +
-                    " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
-                    wheel2Speed + " (" + (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " (" + (wheel1Speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
+                    wheel2Speed + " (" + (wheel2Speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
             throw new NotImplementedException("Error! This function is not implemented yet!");
@@ -359,44 +360,46 @@ namespace RobX.Controller
         {
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopping robot."));
-            Robot.SetMode(Library.Commons.Robot.SpeedModes.Mode0);
+            Robot.SetMode(Library.Robot.Robot.SpeedModes.Mode0);
             SetSpeedMilliseconds(0, 0, 0, false);
         }
 
         /// <summary>
         /// Moves robot in forward direction for a specified amount of time in milliseconds.
         /// </summary>
-        /// <param name="milliseconds">Amount of time in milliseconds.</param>
+        /// <param name="time">Amount of time in time in milliseconds.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
-        public void MoveForwardMilliseconds(double milliseconds, sbyte speed)
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input time is negative.</exception>
+        public void MoveForwardMilliseconds(double time, sbyte speed)
         {
-            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (time < 0) throw new ArgumentOutOfRangeException("time", @"Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
-                    " mm/s) for " + milliseconds.ToString("0.00") + " milliseconds."));
+                    speed + " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
-            SetSpeedMilliseconds(milliseconds, speed, speed, false);
+            SetSpeedMilliseconds(time, speed, speed, false);
         }
 
         /// <summary>
         /// Moves robot in backward direction for a specified amount of time in milliseconds.
         /// </summary>
-        /// <param name="milliseconds">Amount of time in milliseconds.</param>
+        /// <param name="time">Amount of time in time in milliseconds.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
-        public void MoveBackwardMilliseconds(double milliseconds, sbyte speed)
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input time is negative.</exception>
+        public void MoveBackwardMilliseconds(double time, sbyte speed)
         {
-            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (time < 0) throw new ArgumentOutOfRangeException("time", @"Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
-                    " mm/s) for " + milliseconds.ToString("0.00") + " milliseconds."));
+                    speed + " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
-            SetSpeedMilliseconds(milliseconds, (sbyte) (-speed), (sbyte) (-speed), false);
+            SetSpeedMilliseconds(time, (sbyte) (-speed), (sbyte) (-speed), false);
         }
 
         /// <summary>
@@ -404,17 +407,18 @@ namespace RobX.Controller
         /// </summary>
         /// <param name="distance">Distance to go in millimeters.</param>
         /// <param name="speed">Speed of the robot (in the range of -127 to 127).</param>
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input distance is negative.</exception>
         public void MoveForwardMillimeters(double distance, sbyte speed)
         {
-            if (distance < 0) throw new Exception("Error! Distance can't be negative!");
+            if (distance < 0) throw new ArgumentOutOfRangeException("distance", @"Error! Distance can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
-            var timeout = distance/(Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
+            var timeout = distance/(Library.Robot.Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
             SetSpeedMilliseconds(timeout, speed, speed, false);
         }
 
@@ -423,22 +427,23 @@ namespace RobX.Controller
         /// </summary>
         /// <param name="distance">Distance to go in millimeters.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input distance is negative.</exception>
         public void MoveBackwardMillimeters(double distance, sbyte speed)
         {
-            if (distance < 0) throw new Exception("Error! Distance can't be negative!");
+            if (distance < 0) throw new ArgumentOutOfRangeException("distance", @"Error! Distance can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
-            var timeout = distance/(Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
+            var timeout = distance/(Library.Robot.Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
             SetSpeedMilliseconds(timeout, (sbyte) (-speed), (sbyte) (-speed), false);
         }
 
         /// <summary>
-        /// Rotates robot in counter-clockwise direction for a specified degrees.
+        /// Rotates robot in counter-clockwise direction for a specified amount of degrees.
         /// </summary>
         /// <param name="degrees">Amount of degrees to turn.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
@@ -448,13 +453,13 @@ namespace RobX.Controller
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot counter-clockwise around center of robot " +
                     degrees.ToString("0.0") + " degrees with the speed set to " + speed +
-                    " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
+                    " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
             SetSpeedDegrees(degrees, (sbyte) (-speed), speed, false);
         }
 
         /// <summary>
-        /// Rotates robot in clockwise direction for a specified degrees.
+        /// Rotates robot in clockwise direction for a specified amount of degrees.
         /// </summary>
         /// <param name="degrees">Amount of degrees to turn.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
@@ -464,45 +469,47 @@ namespace RobX.Controller
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot " +
                     degrees.ToString("0.0") + " degrees with the speed set to " + speed +
-                    " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
+                    " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
             SetSpeedDegrees(degrees, speed, (sbyte) (-speed), false);
         }
 
         /// <summary>
-        /// Rotates robot in counter-clockwise direction for a specified distance.
+        /// Rotates robot in counter-clockwise direction for a specified amount of time.
         /// </summary>
-        /// <param name="milliseconds">Distance to turn in millimeters.</param>
+        /// <param name="time">Time to turn in milliseconds.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
-        public void RotateLeftMilliseconds(double milliseconds, sbyte speed)
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input time is negative.</exception>
+        public void RotateLeftMilliseconds(double time, sbyte speed)
         {
-            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (time < 0) throw new ArgumentOutOfRangeException("time", @"Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot counter-clockwise around center of robot with the speed set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
-                    " mm/s) + for " + milliseconds.ToString("0.00") + " milliseconds."));
+                    speed + " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) + for " + time.ToString("0.00") + " milliseconds."));
 
-            SetSpeedMilliseconds(milliseconds, (sbyte) (-speed), speed, false);
+            SetSpeedMilliseconds(time, (sbyte) (-speed), speed, false);
         }
 
         /// <summary>
-        /// Rotates robot in clockwise direction for a specified distance.
+        /// Rotates robot in clockwise direction for a specified amount of time.
         /// </summary>
-        /// <param name="milliseconds">Distance to turn in millimeters.</param>
+        /// <param name="time">Time to turn in milliseconds.</param>
         /// <param name="speed">Speed of the robot (in the range -127 to 127).</param>
-        public void RotateRightMilliseconds(double milliseconds, sbyte speed)
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input time is negative.</exception>
+        public void RotateRightMilliseconds(double time, sbyte speed)
         {
-            if (milliseconds < 0) throw new Exception("Error! Time can't be negative!");
+            if (time < 0) throw new ArgumentOutOfRangeException("time", @"Error! Time can't be negative!");
 
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot with the speed set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
-                    " mm/s) + for " + milliseconds.ToString("0.00") + " milliseconds."));
+                    speed + " (" + (speed*Library.Robot.Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " mm/s) + for " + time.ToString("0.00") + " milliseconds."));
 
-            SetSpeedMilliseconds(milliseconds, speed, (sbyte) (-speed), false);
+            SetSpeedMilliseconds(time, speed, (sbyte) (-speed), false);
         }
 
         /// <summary>
@@ -542,16 +549,6 @@ namespace RobX.Controller
         public string GetErrorDescription()
         {
             return _errorString;
-        }
-
-        /// <summary>
-        /// Converts real speed (millimeters per second) to robot wheel speed.
-        /// </summary>
-        /// <param name="millimetersPerSecond">Real speed in millimeters per second.</param>
-        /// <returns>Robot wheel speed (in range -127 to 127).</returns>
-        public static int MMpsToWheelSpeed(double millimetersPerSecond)
-        {
-            return (int) (millimetersPerSecond/Robot.RobotSpeedToMmpS);
         }
 
         /// <summary>

@@ -13,39 +13,10 @@ namespace RobX.Controller
     /// </summary>
     public class Robot
     {
-        # region Public Constants
-
-        /// <summary>
-        /// Motor encoder count per shaft turn.
-        /// </summary>
-        public const int EncoderCountPerTurn = 980;
-
-        /// <summary>
-        /// Converts robot speed to millimeters per second.
-        /// </summary>
-        public const double RobotSpeedToMmpS = 6.25F;
-
-        /// <summary>
-        /// Converts encoder count to millimeters.
-        /// </summary>
-        public const double EncoderCount2mM = WheelDiameter*Math.PI/EncoderCountPerTurn;
-
-        /// <summary>
-        /// Diameter of robot wheels in millimeters.
-        /// </summary>
-        public const double WheelDiameter = 125.0F;
-
-        /// <summary>
-        /// The robot radius in millimeters.
-        /// </summary>
-        public const int Radius = 250;
-
-        # endregion
-
         # region Private Variables 
 
         private readonly TCPClient _robotClient;
-        private readonly Library.Commons.Robot.RobotType _robotType;
+        private readonly Library.Robot.Robot.RobotType _robotType;
 
         # endregion
 
@@ -84,7 +55,7 @@ namespace RobX.Controller
         /// Constructor for the robot class.
         /// </summary>
         /// <param name="robotType">Specifies robot type (Simulation vs. Real).</param>
-        public Robot(Library.Commons.Robot.RobotType robotType)
+        public Robot(Library.Robot.Robot.RobotType robotType)
         {
             _robotType = robotType;
 
@@ -419,7 +390,7 @@ namespace RobX.Controller
         /// 3 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
         /// </summary>
         /// <returns>Mode of the motor (0 - 3).</returns>
-        public void SetMode(Library.Commons.Robot.SpeedModes mode)
+        public void SetMode(Library.Robot.Robot.SpeedModes mode)
         {
             byte[] buffer = {0x00, 0x34, (byte) mode};
             _robotClient.SendData(buffer);
@@ -478,7 +449,7 @@ namespace RobX.Controller
         /// <param name="x">X position of the robot in the environment in millimeters.</param>
         public void SetX(short x)
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return;
             byte[] buffer = {0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF)};
             _robotClient.SendData(buffer);
         }
@@ -489,7 +460,7 @@ namespace RobX.Controller
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>
         public void SetY(short y)
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return;
             byte[] buffer = {0x00, 0x42, (byte) (y >> 8), (byte) (y & 0xFF)};
             _robotClient.SendData(buffer);
         }
@@ -500,7 +471,7 @@ namespace RobX.Controller
         /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
         public void SetAngle(short angle)
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return;
             byte[] buffer = {0x00, 0x43, (byte) (angle >> 8), (byte) (angle & 0xFF)};
             _robotClient.SendData(buffer);
         }
@@ -512,7 +483,7 @@ namespace RobX.Controller
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>
         public void SetXy(short x, short y)
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return;
             byte[] buffer =
             {
                 0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
@@ -529,7 +500,7 @@ namespace RobX.Controller
         /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
         public void SetXyAngle(short x, short y, short angle)
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return;
             byte[] buffer =
             {
                 0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
@@ -545,7 +516,7 @@ namespace RobX.Controller
         /// <param name="speed">Ten times the new simulation speed (1 = 0.1x).</param>
         public void SetSimulationSpeed(ushort speed)
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return;
             byte[] buffer = {0x00, 0x51, (byte) (speed >> 8), (byte) (speed & 0xFF)};
             _robotClient.SendData(buffer);
         }
@@ -556,7 +527,7 @@ namespace RobX.Controller
         /// <returns>Ten time the simulation speed of the simulator (1 = 0.1x).</returns>
         public ushort GetSimulationSpeed()
         {
-            if (_robotType == Library.Commons.Robot.RobotType.Real) return 0;
+            if (_robotType == Library.Robot.Robot.RobotType.Real) return 0;
             byte[] buffer = {0x00, 0x52};
             _robotClient.SendData(buffer);
             buffer = _robotClient.ReceiveData(true, 2);
