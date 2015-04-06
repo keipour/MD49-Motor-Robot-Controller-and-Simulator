@@ -121,9 +121,18 @@ namespace RobX.Library.Communication.TCP
                 _listenThread = new Thread(ListenForClients) {IsBackground = true};
                 _listenThread.Start();
                 
-                // Determine if the tcpListener started successfully.
+                // Determine if the tcpListener started successfully in 1000 milliseconds.
                 _startedListening = false;
-                while (_startedListening == false && Port != -1) { }
+
+                var now = DateTime.Now;
+                while (_startedListening == false && Port != -1)
+                {
+                    if (!((DateTime.Now - now).TotalMilliseconds > 1000)) continue;
+                    
+                    StopServer();
+                    break;
+                }
+
                 return IsRunning();
             }
             catch (Exception e)
