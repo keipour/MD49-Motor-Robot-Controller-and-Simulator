@@ -34,7 +34,7 @@ namespace RobX.Library.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Red")]
+        [global::System.Configuration.DefaultSettingValueAttribute("DarkRed")]
         public global::System.Drawing.Color ErrorLogItemColor {
             get {
                 return ((global::System.Drawing.Color)(this["ErrorLogItemColor"]));
@@ -61,10 +61,19 @@ namespace RobX.Library.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DarkOrange")]
+        [global::System.Configuration.DefaultSettingValueAttribute("OrangeRed")]
         public global::System.Drawing.Color WarningLogItemColor {
             get {
                 return ((global::System.Drawing.Color)(this["WarningLogItemColor"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
+        public global::System.Drawing.Color DefaultLogItemBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["DefaultLogItemBackColor"]));
             }
         }
     }

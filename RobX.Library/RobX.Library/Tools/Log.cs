@@ -66,15 +66,16 @@ namespace RobX.Library.Tools
 
         # endregion
 
-        # region Public Methods
+        # region Public Methods (Add Item)
 
         /// <summary>
-        /// Adds an item to the end of current log with a specified type.
+        /// Adds an item to the end of current log with a specified text and background colors.
         /// </summary>
         /// <param name="itemText">String of the item that should be added to the log.</param>
-        /// <param name="type">Color of the new item.</param>
+        /// <param name="color">Color of the new item.</param>
+        /// <param name="backColor">Background color of the new item.</param>
         /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
-        public void AddItem(string itemText, Color type, bool addTime = false)
+        public void AddItem(string itemText, Color color, Color backColor, bool addTime = false)
         {
             if (addTime)
             {
@@ -85,30 +86,69 @@ namespace RobX.Library.Tools
             Text += itemText + Environment.NewLine;
             _newText += itemText + Environment.NewLine;
 
-            _newItems.Add(new LogItem(itemText, type, addTime));
+            _newItems.Add(new LogItem(itemText, color, backColor, addTime));
             CallItemsAddedEvent();
         }
 
         /// <summary>
-        /// Adds an item to the end of current log with a specified item type.
+        /// Adds an item to the end of current log with a specified text color.
+        /// </summary>
+        /// <param name="itemText">String of the item that should be added to the log.</param>
+        /// <param name="color">Color of the new item.</param>
+        /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
+        public void AddItem(string itemText, Color color, bool addTime = false)
+        {
+            AddItem(itemText, color, Properties.Settings.Default.DefaultLogItemBackColor, addTime);
+        }
+
+        /// <summary>
+        /// Adds an item to the end of current log with a specified item text type.
         /// </summary>
         /// <param name="itemText">String of the item that should be added to the log.</param>
         /// <param name="type">Type of the new item.</param>
         /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
         public void AddItem(string itemText, LogItem.LogItemTypes type, bool addTime = false)
         {
-            AddItem(itemText, LogItem.DetermineTypeColor(type), addTime);
+            AddItem(itemText, LogItem.DetermineTypeColor(type), 
+                Properties.Settings.Default.DefaultLogItemBackColor, addTime);
         }
 
         /// <summary>
-        /// Adds an item to the end of current log with auto-coloring.
+        /// Adds an item to the end of current log with text auto-coloring.
         /// </summary>
         /// <param name="itemText">String of the item that should be added to the log.</param>
         /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
         public void AddItem(string itemText = "", bool addTime = false)
         {
-            AddItem(itemText, LogItem.DetermineTypeColor(LogItem.DetermineItemType(itemText)), addTime);
+            AddItem(itemText, LogItem.DetermineTypeColor(LogItem.DetermineItemType(itemText)),
+                Properties.Settings.Default.DefaultLogItemBackColor, addTime);
         }
+
+        /// <summary>
+        /// Adds an item to the end of current log with a specified item type and background color.
+        /// </summary>
+        /// <param name="itemText">String of the item that should be added to the log.</param>
+        /// <param name="type">Type of the new item.</param>
+        /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
+        public void AddItem(string itemText, LogItem.LogItemTypes type, Color backColor, bool addTime = false)
+        {
+            AddItem(itemText, LogItem.DetermineTypeColor(type), backColor, addTime);
+        }
+
+        /// <summary>
+        /// Adds an item to the end of current log with text auto-coloring and a specified background color.
+        /// </summary>
+        /// <param name="itemText">String of the item that should be added to the log.</param>
+        /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
+        /// <param name="backColor">Background color of the new item.</param>
+        public void AddItem(string itemText, bool addTime, Color backColor)
+        {
+            AddItem(itemText, LogItem.DetermineTypeColor(LogItem.DetermineItemType(itemText)), backColor, addTime);
+        }
+
+        # endregion
+
+        # region Public Methods (Clear)
 
         /// <summary>
         /// Clears the entire log.
@@ -125,37 +165,78 @@ namespace RobX.Library.Tools
                 LogCleared(this, new LogEventArgs(null, null));
         }
 
+        # endregion
+
+        # region Public Methods (Add Bytes)
+
         /// <summary>
         /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log 
-        /// with a specified color.
+        /// with specified text and background colors.
+        /// </summary>
+        /// <param name="bytes">The array that should be added to the log.</param>
+        /// <param name="color">Color of the new log item.</param>
+        /// <param name="backColor">Background color of the new item.</param>
+        public void AddBytes(byte[] bytes, Color color, Color backColor)
+        {
+            var byteText = bytes.Aggregate("", (current, t) => current + ("0x" + t.ToString("X2") + "(" + t + ") "));
+            AddItem(byteText, color, backColor);
+        }
+
+        /// <summary>
+        /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log 
+        /// with a specified log item type and background color.
+        /// </summary>
+        /// <param name="bytes">The array that should be added to the log.</param>
+        /// <param name="type">Type of the new log item.</param>
+        /// <param name="backColor">Background color of the new item.</param>
+        public void AddBytes(byte[] bytes, LogItem.LogItemTypes type, Color backColor)
+        {
+            AddBytes(bytes, LogItem.DetermineTypeColor(type), backColor);
+        }
+
+        /// <summary>
+        /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log 
+        /// with text auto-coloring and specified background color.
+        /// </summary>
+        /// <param name="backColor">Background color of the new item.</param>
+        /// <param name="bytes">The array that should be added to the log.</param>
+        public void AddBytes(Color backColor, byte[] bytes)
+        {
+            AddBytes(bytes, LogItem.DetermineTypeColor(LogItem.LogItemTypes.Default), backColor);
+        }
+
+        /// <summary>
+        /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log 
+        /// with a specified text color.
         /// </summary>
         /// <param name="bytes">The array that should be added to the log.</param>
         /// <param name="color">Color of the new log item.</param>
         public void AddBytes(byte[] bytes, Color color)
         {
             var byteText = bytes.Aggregate("", (current, t) => current + ("0x" + t.ToString("X2") + "(" + t + ") "));
-            AddItem(byteText, color);
+            AddItem(byteText, color, Properties.Settings.Default.DefaultLogItemBackColor);
         }
 
         /// <summary>
         /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log 
-        /// with a specified log item type.
+        /// with a specified log item text type.
         /// </summary>
         /// <param name="bytes">The array that should be added to the log.</param>
         /// <param name="type">Type of the new log item.</param>
         public void AddBytes(byte[] bytes, LogItem.LogItemTypes type)
         {
-            AddBytes(bytes, LogItem.DetermineTypeColor(type));
+            AddBytes(bytes, LogItem.DetermineTypeColor(type), Properties.Settings.Default.DefaultLogItemBackColor);
         }
 
         /// <summary>
         /// Adds an item containing an array of bytes (hex and decimal representations) to the end of current log 
-        /// with auto-coloring.
+        /// with text auto-coloring.
         /// </summary>
         /// <param name="bytes">The array that should be added to the log.</param>
         public void AddBytes(byte[] bytes)
         {
-            AddBytes(bytes, LogItem.DetermineTypeColor(LogItem.LogItemTypes.Default));
+            AddBytes(bytes, LogItem.DetermineTypeColor(LogItem.LogItemTypes.Default), 
+                Properties.Settings.Default.DefaultLogItemBackColor);
         }
 
         # endregion
@@ -187,6 +268,11 @@ namespace RobX.Library.Tools
             /// </summary>
             public Color Color;
 
+            /// <summary>
+            /// Back color of the item.
+            /// </summary>
+            public Color BackColor;
+
             # endregion
 
             # region Private Methods
@@ -196,13 +282,15 @@ namespace RobX.Library.Tools
             /// </summary>
             /// <param name="text">Text of the log item.</param>
             /// <param name="color">Color of the log item.</param>
+            /// <param name="backColor">Back color of the log item.</param>
             /// <param name="showTime">If true, shows item's creation time when printing item.</param>
-            private void CreateLogItem(string text, Color color, bool showTime)
+            private void CreateLogItem(string text, Color color, Color backColor, bool showTime)
             {
                 ShowTime = showTime;
                 Text = text;
                 Time = DateTime.Now;
                 Color = color;
+                BackColor = backColor;
             }
 
             # endregion
@@ -210,35 +298,71 @@ namespace RobX.Library.Tools
             # region Contructors
 
             /// <summary>
-            /// Constructor for the LogItem class with a specified type.
+            /// Constructor for the LogItem class with a specified text and background colors.
+            /// </summary>
+            /// <param name="text">Text of the log item.</param>
+            /// <param name="color">Color of the log item.</param>
+            /// <param name="backColor">Background color of the log item.</param>
+            /// <param name="showTime">If true, shows item's creation time when printing item.</param>
+            public LogItem(string text, Color color, Color backColor, bool showTime = false)
+            {
+                CreateLogItem(text, color, backColor, showTime);
+            }
+
+            /// <summary>
+            /// Constructor for the LogItem class with a specified text type and background color.
+            /// </summary>
+            /// <param name="text">Text of the log item.</param>
+            /// <param name="type">Type of the log item.</param>
+            /// <param name="backColor">Background color of the log item.</param>
+            /// <param name="showTime">If true, shows item's creation time when printing item.</param>
+            public LogItem(string text, LogItemTypes type, Color backColor, bool showTime = false)
+            {
+                CreateLogItem(text, DetermineTypeColor(type), backColor, showTime);
+            }
+
+            /// <summary>
+            /// Constructor for the LogItem class with text auto-coloring and a specified background color.
+            /// </summary>
+            /// <param name="text">Text of the log item.</param>
+            /// <param name="backColor">Background color of the log item.</param>
+            /// <param name="showTime">If true, shows item's creation time when printing item.</param>
+            public LogItem(string text, bool showTime, Color backColor)
+            {
+                CreateLogItem(text, DetermineTypeColor(DetermineItemType(text)), backColor, showTime);
+            }
+
+            /// <summary>
+            /// Constructor for the LogItem class with a specified text color.
             /// </summary>
             /// <param name="text">Text of the log item.</param>
             /// <param name="color">Color of the log item.</param>
             /// <param name="showTime">If true, shows item's creation time when printing item.</param>
             public LogItem(string text, Color color, bool showTime = false)
             {
-                CreateLogItem(text, color, showTime);
+                CreateLogItem(text, color, Properties.Settings.Default.DefaultLogItemBackColor, showTime);
             }
 
             /// <summary>
-            /// Constructor for the LogItem class with a specified type.
+            /// Constructor for the LogItem class with a specified text type.
             /// </summary>
             /// <param name="text">Text of the log item.</param>
             /// <param name="type">Type of the log item.</param>
             /// <param name="showTime">If true, shows item's creation time when printing item.</param>
             public LogItem(string text, LogItemTypes type, bool showTime = false)
             {
-                CreateLogItem(text, DetermineTypeColor(type), showTime);
+                CreateLogItem(text, DetermineTypeColor(type), Properties.Settings.Default.DefaultLogItemBackColor, showTime);
             }
 
             /// <summary>
-            /// Constructor for the LogItem class with auto-coloring.
+            /// Constructor for the LogItem class with text auto-coloring.
             /// </summary>
             /// <param name="text">Text of the log item.</param>
             /// <param name="showTime">If true, shows item's creation time when printing item.</param>
             public LogItem(string text = "", bool showTime = false)
             {
-                CreateLogItem(text, DetermineTypeColor(DetermineItemType(text)), showTime);
+                CreateLogItem(text, DetermineTypeColor(DetermineItemType(text)), 
+                    Properties.Settings.Default.DefaultLogItemBackColor, showTime);
             }
 
             # endregion
@@ -350,7 +474,7 @@ namespace RobX.Library.Tools
             // ReSharper disable once LoopCanBePartlyConvertedToQuery
             foreach (var line in lines)
             {
-                var listItem = new ListViewItem(new[] {timestring, line}) {ForeColor = item.Color};
+                var listItem = new ListViewItem(new[] {timestring, line}) {ForeColor = item.Color, BackColor = item.BackColor};
                 Commons.Extensions.ListAddItemPrivate(listView, listItem);
                 timestring = String.Empty;
             }

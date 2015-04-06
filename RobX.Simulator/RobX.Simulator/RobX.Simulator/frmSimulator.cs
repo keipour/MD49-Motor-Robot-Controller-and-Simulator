@@ -1,12 +1,14 @@
 ﻿# region Includes
 
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using RobX.Library.Commons;
 using RobX.Library.Communication;
 using RobX.Library.Communication.TCP;
 using RobX.Library.Tools;
 using RobX.Simulator.Properties;
+using System.Drawing;
 
 # endregion
 
@@ -22,6 +24,8 @@ namespace RobX.Simulator
 
         private readonly TCPServer _robotServer =  new TCPServer();
         private readonly Log _serverLog = new Log();
+        private readonly Color _logBackColor = Color.Linen;
+        private readonly Color _userLogBackColor = Color.Khaki;
 
         # endregion
 
@@ -117,7 +121,7 @@ namespace RobX.Simulator
         {
             if (Methods.IsValidPort(txtServerPort.Text)) return true;
             
-            _serverLog.AddItem("Error! Invalid server port number!", Log.LogItem.LogItemTypes.Error);
+            _serverLog.AddItem("Error! Invalid server port number!", Log.LogItem.LogItemTypes.Error, _userLogBackColor);
             return false;
         }
 
@@ -263,17 +267,17 @@ namespace RobX.Simulator
         private void TcpReceivedData(object sender, CommunicationEventArgs e)
         {
             Simulator.AddCommands(e.Data);
-            _serverLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
+            _serverLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive, _logBackColor);
         }
 
         private void TcpSentData(object sender, CommunicationEventArgs e)
         {
-            _serverLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
+            _serverLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send, _logBackColor);
         }
 
         private void TcpStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
-            _serverLog.AddItem(e.Status, true);
+            _serverLog.AddItem(e.Status, true, _logBackColor);
         }
 
         private void TcpBeforeSendingData(object sender, CommunicationEventArgs e)
@@ -324,7 +328,7 @@ namespace RobX.Simulator
         // ReSharper disable once InconsistentNaming
         private void lstLogAddItems(object sender, LogEventArgs e)
         {
-            foreach (var item in e.Items)
+            foreach (var item in e.Items.ToList())
                 lstLog.AddLogItem(item);
         }
 

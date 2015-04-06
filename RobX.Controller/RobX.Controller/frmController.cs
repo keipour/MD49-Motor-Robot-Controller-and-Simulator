@@ -1,6 +1,7 @@
 ﻿# region Includes
 
 using System;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 using RobX.Controller.Properties;
@@ -24,6 +25,8 @@ namespace RobX.Controller
         private readonly Log _messageLog = new Log();
         private Controller _controller = new Controller(Library.Commons.Robot.RobotType.Simulation);
         private Thread _executionThread;
+        private readonly Color _logBackColor = Color.Linen;
+        private readonly Color _userLogBackColor = Color.Khaki;
 
         # endregion
 
@@ -154,11 +157,11 @@ namespace RobX.Controller
             var ipValid = Methods.IsValidIpAddress(txtIPAddress.Text);
 
             if (ipValid == false)
-                _messageLog.AddItem("Invalid IP address format!", Log.LogItem.LogItemTypes.Error);
+                _messageLog.AddItem("Invalid IP address format!", Log.LogItem.LogItemTypes.Error, _userLogBackColor);
 
             if (Methods.IsValidPort(txtPort.Text)) return ipValid;
 
-            _messageLog.AddItem("Invalid TCP port number!", Log.LogItem.LogItemTypes.Error);
+            _messageLog.AddItem("Invalid TCP port number!", Log.LogItem.LogItemTypes.Error, _userLogBackColor);
             return false;
         }
 
@@ -213,22 +216,22 @@ namespace RobX.Controller
 
         private void RobotReceivedData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive, _logBackColor);
         }
 
         private void RobotSentData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send, _logBackColor);
         }
 
         private void RobotCommunicationStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
-            _communicationLog.AddItem(e.Status, true);
+            _communicationLog.AddItem(e.Status, true, _logBackColor);
         }
 
         private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
-            _messageLog.AddItem(e.Status, true);
+            _messageLog.AddItem(e.Status, true, _logBackColor);
         }
 
         # endregion

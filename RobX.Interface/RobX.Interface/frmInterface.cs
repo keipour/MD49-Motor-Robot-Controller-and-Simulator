@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using RobX.Interface.Properties;
 using RobX.Library.Commons;
@@ -26,6 +27,9 @@ namespace RobX.Interface
         private readonly TCPServer _server = new TCPServer();
         private readonly ComClient _robot = new ComClient();
         private List<ComPort> _comPorts;
+        private readonly Color _comPortLogBackColor = Color.Linen;
+        private readonly Color _serverLogBackColor = Color.LightBlue;
+        private readonly Color _userLogBackColor = Color.Khaki;
 
         # endregion
 
@@ -91,34 +95,34 @@ namespace RobX.Interface
 
         private void TcpReceivedData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive, _serverLogBackColor);
             _robot.SendData(e.Data);
         }
 
         private void TcpSentData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send, _serverLogBackColor);
         }
 
         private void TcpStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
-            _communicationLog.AddItem(e.Status, true);
+            _communicationLog.AddItem(e.Status, true, _serverLogBackColor);
         }
 
         private void RobotReceivedData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Receive, _comPortLogBackColor);
             _server.SendData(e.Data);
         }
 
         private void RobotSentData(object sender, CommunicationEventArgs e)
         {
-            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send);
+            _communicationLog.AddBytes(e.Data, Log.LogItem.LogItemTypes.Send, _comPortLogBackColor);
         }
 
         private void RobotStatusChanged(object sender, CommunicationStatusEventArgs e)
         {
-            _communicationLog.AddItem(e.Status, true);
+            _communicationLog.AddItem(e.Status, true, _comPortLogBackColor);
         }
 
         # endregion
@@ -130,12 +134,12 @@ namespace RobX.Interface
             var serverPortValid = Methods.IsValidPort(txtServerPort.Text);
             if (checkServerPort)
                 if (serverPortValid == false)
-                    _communicationLog.AddItem("Input Error! Invalid TCP port number!", true);
+                    _communicationLog.AddItem("Input Error! Invalid TCP port number!", true, _userLogBackColor);
 
             if (!checkComPort || cboCOMPorts.Items.Count != 0)
                 return (serverPortValid || !checkServerPort);
 
-            _communicationLog.AddItem("Error! No COM devices are connected to the system!", true);
+            _communicationLog.AddItem("Error! No COM devices are connected to the system!", true, _userLogBackColor);
             return false;
         }
 
@@ -146,7 +150,7 @@ namespace RobX.Interface
             if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int)Robot.BaudRate,
                 Robot.DataBits, Robot.Parity, Robot.StopBits) == false)
             {
-                _communicationLog.AddItem("Error! Selected COM port is busy right now!", true);
+                _communicationLog.AddItem("Error! Selected COM port is busy right now!", true, _userLogBackColor);
                 return false;
             }
 
@@ -157,7 +161,8 @@ namespace RobX.Interface
         {
             if (!CheckInputErrors(true, false)) return false;
             if (_server.StartServer(Int32.Parse(txtServerPort.Text))) return true;
-            _communicationLog.AddItem("Error! Could not start TCP Server on port " + txtServerPort.Text + "!", true);
+            _communicationLog.AddItem("Error! Could not start TCP Server on port " + txtServerPort.Text + "!", 
+                true, _userLogBackColor);
             return false;
         }
 

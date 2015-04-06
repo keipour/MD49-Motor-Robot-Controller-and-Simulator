@@ -6,7 +6,7 @@
       <Value Profile="(Default)">Black</Value>
     </Setting>
     <Setting Name="ErrorLogItemColor" Type="System.Drawing.Color" Scope="Application">
-      <Value Profile="(Default)">Red</Value>
+      <Value Profile="(Default)">DarkRed</Value>
     </Setting>
     <Setting Name="ReceiveLogItemColor" Type="System.Drawing.Color" Scope="Application">
       <Value Profile="(Default)">LightSeaGreen</Value>
@@ -15,7 +15,10 @@
       <Value Profile="(Default)">DodgerBlue</Value>
     </Setting>
     <Setting Name="WarningLogItemColor" Type="System.Drawing.Color" Scope="Application">
-      <Value Profile="(Default)">DarkOrange</Value>
+      <Value Profile="(Default)">OrangeRed</Value>
+    </Setting>
+    <Setting Name="DefaultLogItemBackColor" Type="System.Drawing.Color" Scope="Application">
+      <Value Profile="(Default)">White</Value>
     </Setting>
   </Settings>
 </SettingsFile>

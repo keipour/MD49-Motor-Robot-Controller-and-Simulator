@@ -5,9 +5,6 @@
     <Setting Name="COMPort" Type="System.String" Scope="User">
       <Value Profile="(Default)">COM5</Value>
     </Setting>
-    <Setting Name="FormSize" Type="System.Drawing.Size" Scope="User">
-      <Value Profile="(Default)">480, 561</Value>
-    </Setting>
     <Setting Name="FormPosition" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">0, 0</Value>
     </Setting>
@@ -34,6 +31,9 @@
     </Setting>
     <Setting Name="ToggleKeyboardControl" Type="System.Windows.Forms.Keys" Scope="Application">
       <Value Profile="(Default)">F12</Value>
+    </Setting>
+    <Setting Name="FormSize" Type="System.Drawing.Size" Scope="User">
+      <Value Profile="(Default)">476, 418</Value>
     </Setting>
   </Settings>
 </SettingsFile>
