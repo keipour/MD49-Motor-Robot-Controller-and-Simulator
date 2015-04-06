@@ -38,7 +38,7 @@ namespace RobX.Simulator
 
         # endregion
 
-        # region Public Static Methods
+        # region Public Static Methods (Draw Functions)
 
         /// <summary>
         /// Initializes the current graphics engine for the first time of use.
@@ -130,7 +130,8 @@ namespace RobX.Simulator
         /// <param name="lineWidth">Width of the line in pixels.</param>
         /// <param name="pattern">Pattern used to draw the line. If pattern is null, draws a solid line. Otherwise uses the pattern 
         /// array to draw a dashed line.</param>
-        public static void DrawVerticalLine(this SpriteBatch sprite, int x, int startY, int endY, Color color, int lineWidth = 10, int[] pattern = null)
+        public static void DrawVerticalLine(this SpriteBatch sprite, int x, int startY, int endY, 
+            Color color, int lineWidth = 10, int[] pattern = null)
         {
             if (pattern == null)
             {
@@ -208,12 +209,15 @@ namespace RobX.Simulator
         /// <param name="point2">Ending point of the line.</param>
         /// <param name="color">Color of the line.</param>
         /// <param name="lineWidth">Width of the line in pixels.</param>
-        public static void DrawLineSegment(this SpriteBatch sprite, Vector2 point1, Vector2 point2, Color color, int lineWidth)
+        public static void DrawLineSegment(this SpriteBatch sprite, System.Drawing.PointF point1, 
+            System.Drawing.PointF point2, Color color, int lineWidth)
         {
-            var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
-            var length = Vector2.Distance(point1, point2);
 
-            sprite.Draw(_pixel, point1, null, color, angle, Vector2.Zero, new Vector2(length, lineWidth), SpriteEffects.None, 0f);
+            var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
+            var length = Vector2.Distance(PointFtoVector2(point1), PointFtoVector2(point2));
+
+            sprite.Draw(_pixel, PointFtoVector2(point1), null, color, angle, Vector2.Zero, 
+                new Vector2(length, lineWidth), SpriteEffects.None, 0f);
         }
 
         /// <summary>
@@ -223,7 +227,7 @@ namespace RobX.Simulator
         /// <param name="points">Ordered collection of points defining the path.</param>
         /// <param name="color">Color of the path.</param>
         /// <param name="lineWidth">Width of the lines (in pixels) connecting the consecutive points in the path.</param>
-        public static void DrawPath(this SpriteBatch sprite, Vector2[] points, Color color, int lineWidth = 1)
+        public static void DrawPath(this SpriteBatch sprite, System.Drawing.PointF[] points, Color color, int lineWidth = 1)
         {
             var count = points.Length;
             if (count < 2) return;
@@ -239,13 +243,57 @@ namespace RobX.Simulator
         /// <param name="points">Ordered collection of points defining the polygon.</param>
         /// <param name="color">Color of the polygon border.</param>
         /// <param name="lineWidth">Width of the lines (in pixels) connecting the consecutive points of the polygon.</param>
-        public static void DrawPolygon(this SpriteBatch sprite, Vector2[] points, Color color, int lineWidth = 1)
+        public static void DrawPolygon(this SpriteBatch sprite, System.Drawing.PointF[] points, Color color, int lineWidth = 1)
         {
             var count = points.Length;
             if (count < 2) return;
 
             DrawPath(sprite, points, color, lineWidth);
             DrawLineSegment(sprite, points[count - 1], points[0], color, lineWidth);
+        }
+
+        # endregion
+
+        # region Public Static Methods (Useful Methods)
+
+        /// <summary>
+        /// Converts XNA color structure (Microsoft.XNA.Framework.Color) to GDI color structure (System.Drawing.Color).
+        /// </summary>
+        /// <param name="xnaColor">XNA color (Microsoft.XNA.Framework.Color) object.</param>
+        /// <returns>GDI color (System.Drawing.Color) object.</returns>
+        public static System.Drawing.Color XnaColorToSystem(Color xnaColor)
+        {
+            return System.Drawing.Color.FromArgb(xnaColor.A, xnaColor.R, xnaColor.G, xnaColor.B);
+        }
+
+        /// <summary>
+        /// Converts GDI color structure (System.Drawing.Color) to XNA color structure (Microsoft.XNA.Framework.Color).
+        /// </summary>
+        /// <param name="gdiColor">GDI color (System.Drawing.Color) object.</param>
+        /// <returns>XNA color (Microsoft.XNA.Framework.Color) object.</returns>
+        public static Color SystemColorToXna(System.Drawing.Color gdiColor)
+        {
+            return new Color(gdiColor.R, gdiColor.G, gdiColor.B, gdiColor.A);
+        }
+
+        /// <summary>
+        /// Converts GDI PointF structure (System.Drawing.PointF) to XNA Vector2 structure (Microsoft.XNA.Framework.Vector2).
+        /// </summary>
+        /// <param name="gdiPointF">GDI PointF (System.Drawing.PointF) object.</param>
+        /// <returns>XNA Vector2 (Microsoft.XNA.Framework.Vector2) object.</returns>
+        public static Vector2 PointFtoVector2(System.Drawing.PointF gdiPointF)
+        {
+            return new Vector2(gdiPointF.X, gdiPointF.Y);
+        }
+
+        /// <summary>
+        /// Converts XNA Vector2 structure (Microsoft.XNA.Framework.Vector2) to GDI PointF structure (System.Drawing.PointF).
+        /// </summary>
+        /// <param name="xnaVector2">XNA Vector2 (Microsoft.XNA.Framework.Vector2) object.</param>
+        /// <returns>GDI PointF (System.Drawing.PointF) object.</returns>
+        public static System.Drawing.PointF Vector2ToPointF(Vector2 xnaVector2)
+        {
+            return new System.Drawing.PointF(xnaVector2.X, xnaVector2.Y);
         }
 
         # endregion

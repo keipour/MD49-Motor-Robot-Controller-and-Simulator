@@ -1,10 +1,13 @@
 ﻿# region Includes
 
 using System;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RobX.Library.Commons;
 using RobX.Simulator.Properties;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 # endregion
 
@@ -132,7 +135,7 @@ namespace RobX.Simulator
             if (env.Robot.Trace.Count < 2) return;
 
             // Calculate scaled positions of the trace points
-            var points = new Vector2[env.Robot.Trace.Count];
+            var points = new PointF[env.Robot.Trace.Count];
             for (var i = 0; i < points.Length; ++i)
             {
                 points[i].X = (float)(xscale * ConvertX((int)env.Robot.Trace[i].X, xCenter));
@@ -160,7 +163,7 @@ namespace RobX.Simulator
                 // Calculate scaled properties of the obstacle
                 var obs = env.Obstacles[i];
                 var rect = new Rectangle();
-                var color = obs.Color;
+                var color = GraphicsEngine.SystemColorToXna(obs.Color);
 
                 if (obs.Type == Obstacle.ObstacleType.RectangleFilled ||
                     obs.Type == Obstacle.ObstacleType.RectangleBorder)
@@ -171,7 +174,7 @@ namespace RobX.Simulator
                         (int)(yscale * obs.Rectangle.Height));
 
                     if (obs.IsIntersected(env.Robot.X, env.Robot.Y, Library.Robot.Robot.Radius))
-                        color = obs.CollisionColor;
+                        color = GraphicsEngine.SystemColorToXna(obs.CollisionColor);
                 }
                 else
                 {

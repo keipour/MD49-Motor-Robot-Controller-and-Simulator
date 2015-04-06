@@ -1,7 +1,7 @@
 ﻿# region Includes
 
 using System;
-using Microsoft.Xna.Framework;
+using System.Drawing;
 
 # endregion
 
@@ -52,7 +52,7 @@ namespace RobX.Library.Commons
         /// <summary>
         /// Contains points for the current obstacle (if type is Polygon).
         /// </summary>
-        public Vector2[] Points;
+        public PointF[] Points;
 
         /// <summary>
         /// Color of the obstacle when there is no collision with robot.
@@ -135,7 +135,7 @@ namespace RobX.Library.Commons
         /// </summary>
         /// <param name="points">Array of vertex points of the polygon (positions in millimeters).</param>
         /// <param name="borderwidth">Width of the polygon border in pixels.</param>
-        public void SetPolygon(Vector2[] points, int borderwidth = 4)
+        public void SetPolygon(PointF[] points, int borderwidth = 4)
         {
             SetPolygon(points, Color, borderwidth);
         }
@@ -146,7 +146,7 @@ namespace RobX.Library.Commons
         /// <param name="points">Array of vertex points of the polygon (positions in millimeters).</param>
         /// <param name="color">Color of the polygon border.</param>
         /// <param name="borderwidth">Width of the polygon border in pixels.</param>
-        public void SetPolygon(Vector2[] points, Color color, int borderwidth = 4)
+        public void SetPolygon(PointF[] points, Color color, int borderwidth = 4)
         {
             Points = points;
             Type = ObstacleType.Polygon;
@@ -223,7 +223,7 @@ namespace RobX.Library.Commons
         /// <param name="points">Array of vertex points of the polygon in millimeters (positions in millimeters).</param>
         /// <param name="color">Color of the polygon border.</param>
         /// <param name="borderwidth">Width of the polygon border.</param>
-        public Obstacle(Vector2[] points, Color color, int borderwidth = 4)
+        public Obstacle(PointF[] points, Color color, int borderwidth = 4)
         {
             SetPolygon(points, color, borderwidth);
         }
@@ -233,7 +233,7 @@ namespace RobX.Library.Commons
         /// </summary>
         /// <param name="points">Array of vertex points of the polygon in millimeters (positions in millimeters)</param>
         /// <param name="borderwidth">Width of the polygon border.</param>
-        public Obstacle(Vector2[] points, int borderwidth = 4)
+        public Obstacle(PointF[] points, int borderwidth = 4)
         {
             SetPolygon(points, borderwidth);
         }
@@ -253,7 +253,7 @@ namespace RobX.Library.Commons
         {
             if (Type == ObstacleType.RectangleFilled)
             {
-                var rectangleCenter = new Vector2((Rectangle.X + Rectangle.Width / 2),
+                var rectangleCenter = new PointF((Rectangle.X + Rectangle.Width / 2),
                                                  (Rectangle.Y + Rectangle.Height / 2));
 
                 double width = Rectangle.Width / 2F;
@@ -278,11 +278,11 @@ namespace RobX.Library.Commons
                 return (cornerDistanceSq <= (Math.Pow(radius, 2)));
             }
             
-            var pc = new Vector2((float)centerX, (float)centerY);
-            var p1 = new Vector2(Rectangle.Left, Rectangle.Top);
-            var p2 = new Vector2(Rectangle.Left, Rectangle.Bottom);
-            var p3 = new Vector2(Rectangle.Right, Rectangle.Bottom);
-            var p4 = new Vector2(Rectangle.Right, Rectangle.Top);
+            var pc = new PointF((float)centerX, (float)centerY);
+            var p1 = new PointF(Rectangle.Left, Rectangle.Top);
+            var p2 = new PointF(Rectangle.Left, Rectangle.Bottom);
+            var p3 = new PointF(Rectangle.Right, Rectangle.Bottom);
+            var p4 = new PointF(Rectangle.Right, Rectangle.Top);
             if (FindDistanceToLine(pc, p1, p2) <= radius) return true;
             if (FindDistanceToLine(pc, p1, p4) <= radius) return true;
             if (FindDistanceToLine(pc, p2, p3) <= radius) return true;
@@ -296,7 +296,7 @@ namespace RobX.Library.Commons
         /// <param name="p1">Point 1 of the line segment.</param>
         /// <param name="p2">Point 2 of the line segment.</param>
         /// <returns>The distance between the point pt and the segment p1 --> p2.</returns>
-        private static double FindDistanceToLine(Vector2 pt, Vector2 p1, Vector2 p2)
+        private static double FindDistanceToLine(PointF pt, PointF p1, PointF p2)
         {
             var dx = p2.X - p1.X;
             var dy = p2.Y - p1.Y;
