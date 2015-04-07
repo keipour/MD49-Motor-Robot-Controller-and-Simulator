@@ -12,15 +12,12 @@ namespace RobX.Library.Communication.TCP
     /// TCP client class that can connect to a TCP server and send/receive data over network.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public class TCPClient
+    public class TCPClient : IClientInterface
     {
         # region Private Fields
 
         private TcpClient _tcpClient = new TcpClient();
         private NetworkStream _clientStream;
-        private int _clientPort = -1;
-        private int _remoteClientPort = -1;
-        private int _remoteServerPort = -1;
 
         # endregion
 
@@ -29,12 +26,12 @@ namespace RobX.Library.Communication.TCP
         /// <summary>
         /// Port of the current TCP client.
         /// </summary>
-        public int ClientPort { get { return _clientPort; } }
+        public int ClientPort { get; private set; }
 
         /// <summary>
         /// Port of the remote connected TCP client.
         /// </summary>
-        public int RemoteClientPort { get { return _remoteClientPort; } }
+        public int RemoteClientPort { get; private set; }
 
         /// <summary>
         /// IP address of remote connected TCP client.
@@ -44,12 +41,26 @@ namespace RobX.Library.Communication.TCP
         /// <summary>
         /// Port of the remote connected TCP server.
         /// </summary>
-        public int RemoteServerPort { get { return _remoteServerPort; } }
+        public int RemoteServerPort { get; private set; }
 
         /// <summary>
         /// IP address of remote connected TCP server.
         /// </summary>
         public IPAddress RemoteServerIpAddress { get; private set; }
+
+        # endregion
+
+        # region Constructor
+
+        /// <summary>
+        /// Constructor for the TCPClient Class
+        /// </summary>
+        public TCPClient()
+        {
+            RemoteServerPort = -1;
+            RemoteClientPort = -1;
+            ClientPort = -1;
+        }
 
         # endregion
 
@@ -103,7 +114,7 @@ namespace RobX.Library.Communication.TCP
 
                 // Assign ip and port variables of the remote server
                 RemoteServerIpAddress = IPAddress.Parse(ip);
-                _remoteServerPort = port;
+                RemoteServerPort = port;
                 var serverEndPoint = new IPEndPoint(RemoteServerIpAddress, port);
 
                 // Connect to the server
@@ -112,10 +123,10 @@ namespace RobX.Library.Communication.TCP
 
                 // Assign ip and port variables of the connected remote server's client
                 RemoteClientIpAddress = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address;
-                _remoteClientPort = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port;
+                RemoteClientPort = ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port;
 
                 // Assign local client's port
-                _clientPort = ((IPEndPoint)_tcpClient.Client.LocalEndPoint).Port;
+                ClientPort = ((IPEndPoint)_tcpClient.Client.LocalEndPoint).Port;
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
@@ -129,15 +140,19 @@ namespace RobX.Library.Communication.TCP
             catch (Exception e)
             {
                 RemoteServerIpAddress = null;
-                _remoteServerPort = -1;
+                RemoteServerPort = -1;
                 RemoteClientIpAddress = null;
-                _remoteClientPort = -1;
-                _clientPort = -1;
+                RemoteClientPort = -1;
+                ClientPort = -1;
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
                     StatusChanged(this, new CommunicationStatusEventArgs("Connection error! Could not connect to " +
                         ip + " (port " + port + "). " + e.Message + "."));
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
 
                 return false;
             }
@@ -150,7 +165,7 @@ namespace RobX.Library.Communication.TCP
         /// <param name="timeout">Timeout for send operation (in milliseconds). 
         /// The operation fails if sending the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        public void SendData(byte[] data, int timeout = 1000)
+        public bool SendData(byte[] data, int timeout = 1000)
         {
             try
             {
@@ -174,6 +189,8 @@ namespace RobX.Library.Communication.TCP
                 // Invoke SentData event
                 if (SentData != null)
                     SentData(this, new CommunicationEventArgs(data));
+
+                return true;
             }
             catch (Exception e)
             {
@@ -185,25 +202,37 @@ namespace RobX.Library.Communication.TCP
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
                     ErrorOccured(this, new EventArgs());
+                return false;
             }
         }
 
         /// <summary>
         /// Receive data from the remote server.
         /// </summary>
-        /// <param name="blocking">Block code execution until some data is available.</param>
-        /// <param name="buffersize">Maximum number of bytes to read from network.</param>
+        /// <param name="numOfBytes">Number of bytes to read.</param>
+        /// <param name="readBuffer">Buffer to put read data.</param>
+        /// <param name="checkAvailableData"><para>Check if data is available before trying to read data.</para>
+        /// <para>Warning: Setting this parameter to true results in non-blocking operation.</para></param>
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        /// <returns>Array of bytes received from the remote server.</returns>
-        public byte[] ReceiveData(bool blocking = false, int buffersize = 4096, int timeout = 1000)
+        /// <returns>Returns true if successfully read any data; otherwise returns false.</returns>
+        public bool ReceiveData(int numOfBytes, out byte[] readBuffer, bool checkAvailableData = false, int timeout = 1000)
         {
+            readBuffer = null;
+
             // Check if there is data to receive
             try
             {
-                if (blocking == false && _clientStream.DataAvailable == false)
-                    return null;
+                if (checkAvailableData && _clientStream.DataAvailable == false)
+                {
+                    // Invoke StatusChanged event
+                    if (StatusChanged != null)
+                        StatusChanged(this, new CommunicationStatusEventArgs("Warning! There is no data to read from " +
+                        RemoteServerIpAddress + " (port " + RemoteServerPort + ") server."));
+
+                    return false;
+                }
             }
             catch (Exception e)
             {
@@ -216,10 +245,10 @@ namespace RobX.Library.Communication.TCP
                 if (ErrorOccured != null)
                     ErrorOccured(this, new EventArgs());
 
-                return null;
+                return false;
             }
 
-            var message = new byte[buffersize];
+            var message = new byte[numOfBytes];
 
             try
             {
@@ -234,18 +263,32 @@ namespace RobX.Library.Communication.TCP
                 {
                     // Invoke StatusChanged event
                     if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Connection to " +
+                        StatusChanged(this, new CommunicationStatusEventArgs("Error! Probably the connection to " +
                         RemoteServerIpAddress + " (port " + RemoteServerPort + ") is closed by the server."));
 
                     // Invoke ErrorOccured event
                     if (ErrorOccured != null)
                         ErrorOccured(this, new EventArgs());
-                    
-                    return null;
+
+                    return false;
                 }
 
-                var result = new byte[bytesRead];
-                Array.Copy(message, result, bytesRead);
+                readBuffer = new byte[bytesRead];
+                Array.Copy(message, readBuffer, bytesRead);
+
+                if (bytesRead < numOfBytes)
+                {
+                    // Invoke StatusChanged event
+                    if (StatusChanged != null)
+                        StatusChanged(this, new CommunicationStatusEventArgs("Warning! Not enough bytes read from " +
+                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")."));
+
+                    // Invoke ErrorOccured event
+                    if (ErrorOccured != null)
+                        ErrorOccured(this, new EventArgs());
+
+                    return true;
+                }
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
@@ -254,9 +297,9 @@ namespace RobX.Library.Communication.TCP
 
                 // Invoke ReceivedData event
                 if (ReceivedData != null)
-                    ReceivedData(this, new CommunicationEventArgs(result));
+                    ReceivedData(this, new CommunicationEventArgs(readBuffer));
 
-                return result;
+                return true;
             }
             catch (Exception e)
             {
@@ -269,7 +312,8 @@ namespace RobX.Library.Communication.TCP
                 if (ErrorOccured != null)
                     ErrorOccured(this, new EventArgs());
 
-                return null;
+                readBuffer = null;
+                return false;
             }
         }
 

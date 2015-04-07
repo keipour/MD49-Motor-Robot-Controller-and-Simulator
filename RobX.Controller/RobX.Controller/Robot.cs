@@ -1,6 +1,7 @@
 ﻿# region Includes
 
 using System;
+using System.Linq;
 using RobX.Library.Communication;
 using RobX.Library.Communication.TCP;
 
@@ -123,6 +124,21 @@ namespace RobX.Controller
 
         # endregion
 
+        # region Private Functions
+
+        // This function reads bytes from remote client. Fills return array with zero if anythig goes wrong.
+        private byte[] ReadBytes(int bytesToRead)
+        {
+            byte[] buffer;
+            
+            if (!_robotClient.ReceiveData(bytesToRead, out buffer) || buffer.Length < bytesToRead) 
+                return Enumerable.Repeat<byte>(0, bytesToRead).ToArray();
+
+            return buffer;
+        }
+
+        # endregion
+
         # region Public Functions
 
         /// <summary>
@@ -144,8 +160,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x26};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -156,8 +172,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x27};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -168,8 +184,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x28};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -182,7 +198,9 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x2C};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 3);
+
+            buffer = ReadBytes(3);
+
             volts = buffer[0];
             current1 = buffer[1];
             current2 = buffer[2];
@@ -196,8 +214,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x29};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -210,8 +228,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x21};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -224,8 +242,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x22};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -236,7 +254,9 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x23};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 4);
+
+            buffer = ReadBytes(4);
+            
             int result = buffer[3];
             result += buffer[2] << 8;
             result += buffer[1] << 16;
@@ -252,7 +272,9 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x24};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 4);
+
+            buffer = ReadBytes(4);
+
             int result = buffer[3];
             result += buffer[2] << 8;
             result += buffer[1] << 16;
@@ -269,11 +291,14 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x25};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 8);
+
+            buffer = ReadBytes(8);
+
             encoder1 = buffer[3];
             encoder1 += buffer[2] << 8;
             encoder1 += buffer[1] << 16;
             encoder1 += buffer[0] << 24;
+
             encoder2 = buffer[7];
             encoder2 += buffer[6] << 8;
             encoder2 += buffer[5] << 16;
@@ -288,8 +313,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x2A};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -306,8 +331,8 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x2B};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
-            return buffer[0];
+
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -325,7 +350,9 @@ namespace RobX.Controller
         {
             byte[] buffer = {0x00, 0x2D};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 1);
+
+            buffer = ReadBytes(1);
+
             voltsUnder16 = (buffer[0] & (1 << 7)) == 1;
             voltsOver30 = (buffer[0] & (1 << 6)) == 1;
             motor1Trip = (buffer[0] & (1 << 2)) == 1;
@@ -530,7 +557,8 @@ namespace RobX.Controller
             if (_robotType == Library.Robot.Robot.RobotType.Real) return 0;
             byte[] buffer = {0x00, 0x52};
             _robotClient.SendData(buffer);
-            buffer = _robotClient.ReceiveData(true, 2);
+
+            buffer = ReadBytes(2);
             ushort result = buffer[1];
             result += (ushort) (buffer[0] << 8);
             return result;

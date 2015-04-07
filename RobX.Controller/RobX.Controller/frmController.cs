@@ -137,24 +137,11 @@ namespace RobX.Controller
             // Return if still is not connected
             if (_controller.IsConnected == false) return;
 
-            //Controller.Robot.ResetEncoders();
-
-            //txtMessage.AddLine("Encoder 1: " + Controller.Robot.GetEncoder1());
-            //txtMessage.AddLine("Encoder 2: " + Controller.Robot.GetEncoder2());
-
-            //Controller.Robot.SetSpeeds(148, 148);
-
-            //Thread.Sleep(4000);
-
-            //int enc1 = Controller.Robot.GetVolts();
-            //int enc2 = Controller.Robot.GetVolts();
-
-            //txtMessage.AddLine("Encoder 1: " + enc1.ToString());
-            //txtMessage.AddLine("Encoder 2: " + enc2.ToString());
-
             UserCommands.AddCommands(ref _controller);
 
             _controller.ExecuteCommandQueue();
+            //_messageLog.AddItem("Encoder 1: " + _controller.Robot.GetEncoder1());
+            //_messageLog.AddItem("Encoder 2: " + _controller.Robot.GetEncoder2());
         }
 
         private bool CheckInputErrors()

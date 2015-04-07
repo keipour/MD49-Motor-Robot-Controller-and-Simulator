@@ -10,18 +10,8 @@ namespace RobX.Library.Communication.COM
     /// <summary>
     /// A class that can connect to a COM serial port and transmit/read data to/from a COM device.
     /// </summary>
-    public class ComClient
+    public class ComClient : IClientInterface
     {
-        # region Private Fields
-
-        private int _dataBits = 8;
-        private Parity _parity = Parity.None;
-        private StopBits _stopBits = StopBits.One;
-        private int _baudRate = 9600;
-        private string _portName = "";
-
-        # endregion
-
         # region Public Fields
 
         /// <summary>
@@ -32,31 +22,36 @@ namespace RobX.Library.Communication.COM
         /// <summary>
         /// Number of data bits for Rx/Tx connection with COM port.
         /// </summary>
-        public int DataBits { get { return _dataBits; } }
+        public int DataBits { get; private set; }
 
         /// <summary>
         /// Parity for Rx/Tx connection with COM port.
         /// </summary>
-        public Parity Parity { get { return _parity; } }
+        public Parity Parity { get; private set; }
 
         /// <summary>
         /// Number of stop bits for Rx/Tx connection with COM port.
         /// </summary>
-        public StopBits StopBits { get { return _stopBits; } }
+        public StopBits StopBits { get; private set; }
 
         /// <summary>
         /// Baud rate for connection with COM port.
         /// </summary>
-        public int BaudRate { get { return _baudRate; } }
+        public int BaudRate { get; private set; }
 
         /// <summary>
         /// Name of the COM port.
         /// </summary>
-        public string PortName { get { return _portName; } }
-       
+        public string PortName { get; private set; }
+
+        /// <summary>
+        /// Specifies if the client should listen for data received from COM port.
+        /// </summary>
+        public bool IsListeningForData;
+
         # endregion
 
-        # region Event Handlers
+        # region Events
 
         /// <summary>
         /// Event handler for ReceivedData event (will be invoked after data is received).
@@ -78,6 +73,11 @@ namespace RobX.Library.Communication.COM
         /// </summary>
         public event CommunicationStatusEventHandler StatusChanged;
 
+        /// <summary>
+        /// This event is invoked when an error occures in the connection with the communication.
+        /// </summary>
+        public event EventHandler ErrorOccured;
+
         # endregion
 
         # region Public Methods
@@ -87,6 +87,12 @@ namespace RobX.Library.Communication.COM
         /// </summary>
         public ComClient()
         {
+            DataBits = 8;
+            Parity = Parity.None;
+            StopBits = StopBits.One;
+            BaudRate = 9600;
+            PortName = "";
+            IsListeningForData = false;
             // Initialize serial port
             SerialPort = new SerialPort();
             SerialPort.DataReceived += DataReceivedHandler;
@@ -112,11 +118,11 @@ namespace RobX.Library.Communication.COM
                         " with baud rate " + baudRate + "..."));
 
                 // Assign class fields
-                _baudRate = baudRate;
-                _dataBits = dataBits;
-                _parity = parity;
-                _stopBits = stopBits;
-                _portName = portName;
+                BaudRate = baudRate;
+                DataBits = dataBits;
+                Parity = parity;
+                StopBits = stopBits;
+                PortName = portName;
 
                 // Set input parameters
                 SerialPort.BaudRate = baudRate;
@@ -141,8 +147,12 @@ namespace RobX.Library.Communication.COM
             {
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connection Error! " + e.Message + ".")); 
-                
+                    StatusChanged(this, new CommunicationStatusEventArgs("Connection Error! " + e.Message.Replace("PortName", PortName) + "."));
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
+
                 return false;
             }
         }
@@ -150,28 +160,41 @@ namespace RobX.Library.Communication.COM
         /// <summary>
         /// Read data from the COM port.
         /// </summary>
-        /// <param name="numOfBytes">Number of bytes to read</param>
-        /// <param name="readBuffer">Buffer to put read data</param>
-        /// <param name="checkDataAvailable">Checks if data is available before trying to read data. 
-        /// Setting this parameter to true results in non-blocking operation.</param>
+        /// <param name="numOfBytes">Number of bytes to read.</param>
+        /// <param name="readBuffer">Buffer to put read data.</param>
+        /// <param name="checkAvailableData"><para>Check if data is available before trying to read data.</para>
+        /// <para>Warning: Setting this parameter to true results in non-blocking operation.</para></param>
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        /// <returns>Returns true if successfully read any data; false indicates socket error.</returns>
-        public bool ReceiveData(byte numOfBytes, ref byte[] readBuffer, bool checkDataAvailable = false, int timeout = 500)
+        /// <returns>Returns true if successfully read any data; otherwise returns false.</returns>
+        public bool ReceiveData(int numOfBytes, out byte[] readBuffer, bool checkAvailableData = false, int timeout = 500)
         {
+            readBuffer = null;
+
             try
             {
-                if (checkDataAvailable)
-                    if (SerialPort.BytesToRead == 0) 
-                        return false;
+                if (checkAvailableData && SerialPort.BytesToRead == 0)
+                {
+                    // Invoke StatusChanged event
+                    if (StatusChanged != null)
+                        StatusChanged(this, new CommunicationStatusEventArgs("Warning! No data is available to read from " 
+                            + PortName + " port!"));
+
+                    return false;
+                }
             }
             catch (Exception e)
             {
                 // Invoke StatusChanged event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error reading data from " + PortName + " port! " 
-                        + e.Message + "."));
+                    StatusChanged(this, new CommunicationStatusEventArgs("Error reading data from " + PortName + " port! "
+                        + e.Message.Replace("PortName", PortName) + "."));
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
+
                 return false;
             }
 
@@ -201,8 +224,13 @@ namespace RobX.Library.Communication.COM
                     // Invoke StatusChange event
                     if (StatusChanged != null)
                         StatusChanged(this, new CommunicationStatusEventArgs("Error reading data from " + PortName + " port! " 
-                            + e.Message + "."));
-                    
+                            + e.Message.Replace("PortName", PortName) + "."));
+
+                    // Invoke ErrorOccured event
+                    if (ErrorOccured != null)
+                        ErrorOccured(this, new EventArgs());
+
+                    readBuffer = null;
                     return false;
                 }
             }
@@ -247,8 +275,12 @@ namespace RobX.Library.Communication.COM
             {
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error writing data to " + PortName + " port! " 
-                        + e.Message + "."));
+                    StatusChanged(this, new CommunicationStatusEventArgs("Error writing data to " + PortName + " port! "
+                        + e.Message.Replace("PortName", PortName) + "."));
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
 
                 return false;
             }
@@ -265,11 +297,13 @@ namespace RobX.Library.Communication.COM
         /// <param name="e">Event argument varialbe.</param>
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
+            if (IsListeningForData == false) return;
+
             var sp = (SerialPort)sender;
             var numOfBytes = sp.BytesToRead;
 
-            var readBuffer = new byte[numOfBytes];
-            ReceiveData((byte)numOfBytes, ref readBuffer);
+            byte[] readBuffer;
+            ReceiveData(numOfBytes, out readBuffer);
         }
 
         # endregion

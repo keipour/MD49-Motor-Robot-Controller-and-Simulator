@@ -52,6 +52,9 @@ namespace RobX.Interface
             frmLog_Resize(sender, e);
             cboCOMPorts.Select();
 
+            // Set to listen for incoming data
+            _robot.IsListeningForData = true;
+
             _communicationLog.ItemsAdded += lstLogAddItems;
             _communicationLog.LogCleared += lstLogClear;
             _server.ReceivedData += TcpReceivedData;

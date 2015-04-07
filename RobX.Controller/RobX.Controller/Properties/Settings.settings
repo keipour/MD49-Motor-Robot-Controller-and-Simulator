@@ -1,20 +1,18 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)"
-              GeneratedClassNamespace="RobX_Controller.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="RobX.Controller.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="SimulatorIP" Type="System.String" Scope="User">
       <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>
     <Setting Name="RealIP" Type="System.String" Scope="User">
-      <Value Profile="(Default)">172.20.62.204</Value>
+      <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>
     <Setting Name="SimulatorPort" Type="System.String" Scope="User">
       <Value Profile="(Default)">1371</Value>
     </Setting>
     <Setting Name="RealPort" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1371</Value>
+      <Value Profile="(Default)">1370</Value>
     </Setting>
     <Setting Name="RobotType" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>

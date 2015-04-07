@@ -37,7 +37,7 @@ namespace RobX.Controller.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("172.20.62.204")]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
         public string RealIP {
             get {
                 return ((string)(this["RealIP"]));
@@ -61,7 +61,7 @@ namespace RobX.Controller.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1371")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1370")]
         public string RealPort {
             get {
                 return ((string)(this["RealPort"]));

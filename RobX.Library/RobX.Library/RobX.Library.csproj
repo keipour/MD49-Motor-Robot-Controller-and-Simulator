@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commons\Obstacle.cs" />
+    <Compile Include="Communication\IClientInterface.cs" />
     <Compile Include="Communication\COM\ComClient.cs" />
     <Compile Include="Communication\COM\ComPort.cs" />
     <Compile Include="Communication\TCP\TCPClient.cs" />
