@@ -76,6 +76,11 @@ namespace RobX.Simulator
             _serverLog.ItemsAdded += lstLogAddItems;
             _serverLog.LogCleared += lstLogClear;
 
+            _robotServer.ReceivedData += TcpReceivedData;
+            _robotServer.SentData += TcpSentData;
+            _robotServer.StatusChanged += TcpStatusChanged;
+            _robotServer.BeforeSendingData += TcpBeforeSendingData;
+            
             // Start Server
             StartServer();
 
@@ -137,14 +142,6 @@ namespace RobX.Simulator
         private void StartServer()
         {
             if (CheckInputErrors() == false) return;
-
-            if (_robotServer.IsRunning() == false)
-            {
-                _robotServer.ReceivedData += TcpReceivedData;
-                _robotServer.SentData += TcpSentData;
-                _robotServer.StatusChanged += TcpStatusChanged;
-                _robotServer.BeforeSendingData += TcpBeforeSendingData;
-            }
             _robotServer.StartServer(ushort.Parse(Settings.Default.ServerPort));
         }
 

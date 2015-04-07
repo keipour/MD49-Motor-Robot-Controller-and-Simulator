@@ -305,7 +305,7 @@ namespace RobX.Controller
         // ReSharper disable once InconsistentNaming
         private void lstMessageAddItems(object sender, LogEventArgs e)
         {
-            foreach (var item in e.Items)
+            foreach (var item in e.Items.ToArray())
                 lstMessage.AddLogItem(item);
         }
 
@@ -318,7 +318,7 @@ namespace RobX.Controller
         // ReSharper disable once InconsistentNaming
         private void lstLogAddItems(object sender, LogEventArgs e)
         {
-            foreach (var item in e.Items)
+            foreach (var item in e.Items.ToArray())
                 lstLog.AddLogItem(item);
         }
 

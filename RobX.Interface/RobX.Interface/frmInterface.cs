@@ -156,20 +156,13 @@ namespace RobX.Interface
         {
             if (!CheckInputErrors(false)) return false;
 
-            if (_robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int) Robot.BaudRate,
-                Robot.DataBits, Robot.Parity, Robot.StopBits)) return StartServer();
-            
-            _communicationLog.AddItem("Error! Selected COM port is busy right now!", true, _userLogBackColor);
-            return false;
+            return _robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int) Robot.BaudRate,
+                Robot.DataBits, Robot.Parity, Robot.StopBits) && StartServer();
         }
 
         private bool StartServer()
         {
-            if (!CheckInputErrors(true, false)) return false;
-            if (_server.StartServer(Int32.Parse(txtServerPort.Text))) return true;
-            _communicationLog.AddItem("Error! Could not start TCP Server on port " + txtServerPort.Text + "!", 
-                true, _userLogBackColor);
-            return false;
+            return CheckInputErrors(true, false) && _server.StartServer(Int32.Parse(txtServerPort.Text));
         }
 
         private void SaveProperties()
@@ -227,10 +220,9 @@ namespace RobX.Interface
         private void cmdConnect_Click(object sender, EventArgs e)
         {
             SaveProperties();
-            if (!Connect()) return;
-
-            cmdConnect.Text = @"Re&connect";
             cmdStartServer.Visible = true;
+            cmdConnect.Text = @"Re&connect";
+            Connect();
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -259,7 +251,7 @@ namespace RobX.Interface
         // ReSharper disable once InconsistentNaming
         private void lstLogAddItems(object sender, LogEventArgs e)
         {
-            foreach (var item in e.Items)
+            foreach (var item in e.Items.ToArray())
                 lstLog.AddLogItem(item);
         }
 
