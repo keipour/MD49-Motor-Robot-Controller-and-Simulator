@@ -8,14 +8,21 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.CodeDom.Compiler;
+using System.Configuration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+
 namespace RobX.Interface.Properties {
     
     
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    [CompilerGenerated()]
+    [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
+    internal sealed partial class Settings : ApplicationSettingsBase {
         
-        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        private static Settings defaultInstance = ((Settings)(Synchronized(new Settings())));
         
         public static Settings Default {
             get {
@@ -23,9 +30,9 @@ namespace RobX.Interface.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("COM5")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("COM5")]
         public string COMPort {
             get {
                 return ((string)(this["COMPort"]));
@@ -35,21 +42,21 @@ namespace RobX.Interface.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
-        public global::System.Drawing.Point FormPosition {
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("0, 0")]
+        public Point FormPosition {
             get {
-                return ((global::System.Drawing.Point)(this["FormPosition"]));
+                return ((Point)(this["FormPosition"]));
             }
             set {
                 this["FormPosition"] = value;
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1370")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("1370")]
         public string ServerPort {
             get {
                 return ((string)(this["ServerPort"]));
@@ -59,75 +66,75 @@ namespace RobX.Interface.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Up")]
-        public global::System.Windows.Forms.Keys ForwardKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Up")]
+        public Keys ForwardKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["ForwardKey"]));
+                return ((Keys)(this["ForwardKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Down")]
-        public global::System.Windows.Forms.Keys BackwardKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Down")]
+        public Keys BackwardKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["BackwardKey"]));
+                return ((Keys)(this["BackwardKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Right")]
-        public global::System.Windows.Forms.Keys RotateClockwiseKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Right")]
+        public Keys RotateClockwiseKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["RotateClockwiseKey"]));
+                return ((Keys)(this["RotateClockwiseKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Left")]
-        public global::System.Windows.Forms.Keys RotateCounterClockwiseKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Left")]
+        public Keys RotateCounterClockwiseKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["RotateCounterClockwiseKey"]));
+                return ((Keys)(this["RotateCounterClockwiseKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ShiftKey")]
-        public global::System.Windows.Forms.Keys StopKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("ShiftKey")]
+        public Keys StopKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["StopKey"]));
+                return ((Keys)(this["StopKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("F10")]
-        public global::System.Windows.Forms.Keys GlobalStopKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("F10")]
+        public Keys GlobalStopKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["GlobalStopKey"]));
+                return ((Keys)(this["GlobalStopKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("F12")]
-        public global::System.Windows.Forms.Keys ToggleKeyboardControl {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("F12")]
+        public Keys ToggleKeyboardControl {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["ToggleKeyboardControl"]));
+                return ((Keys)(this["ToggleKeyboardControl"]));
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("476, 418")]
-        public global::System.Drawing.Size FormSize {
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("476, 418")]
+        public Size FormSize {
             get {
-                return ((global::System.Drawing.Size)(this["FormSize"]));
+                return ((Size)(this["FormSize"]));
             }
             set {
                 this["FormSize"] = value;

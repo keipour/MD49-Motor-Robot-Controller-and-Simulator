@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using RobX.Library.Commons;
 using RobX.Simulator.Properties;
+
 // ReSharper disable InconsistentlySynchronizedField
 
 # endregion

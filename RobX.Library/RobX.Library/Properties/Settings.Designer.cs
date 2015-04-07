@@ -8,14 +8,20 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.CodeDom.Compiler;
+using System.Configuration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+
 namespace RobX.Library.Properties {
     
     
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    [CompilerGenerated()]
+    [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
+    internal sealed partial class Settings : ApplicationSettingsBase {
         
-        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        private static Settings defaultInstance = ((Settings)(Synchronized(new Settings())));
         
         public static Settings Default {
             get {
@@ -23,57 +29,57 @@ namespace RobX.Library.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
-        public global::System.Drawing.Color DefaultLogItemColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Black")]
+        public Color DefaultLogItemColor {
             get {
-                return ((global::System.Drawing.Color)(this["DefaultLogItemColor"]));
+                return ((Color)(this["DefaultLogItemColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DarkRed")]
-        public global::System.Drawing.Color ErrorLogItemColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("DarkRed")]
+        public Color ErrorLogItemColor {
             get {
-                return ((global::System.Drawing.Color)(this["ErrorLogItemColor"]));
+                return ((Color)(this["ErrorLogItemColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("LightSeaGreen")]
-        public global::System.Drawing.Color ReceiveLogItemColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("LightSeaGreen")]
+        public Color ReceiveLogItemColor {
             get {
-                return ((global::System.Drawing.Color)(this["ReceiveLogItemColor"]));
+                return ((Color)(this["ReceiveLogItemColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DodgerBlue")]
-        public global::System.Drawing.Color SendLogItemColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("DodgerBlue")]
+        public Color SendLogItemColor {
             get {
-                return ((global::System.Drawing.Color)(this["SendLogItemColor"]));
+                return ((Color)(this["SendLogItemColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("OrangeRed")]
-        public global::System.Drawing.Color WarningLogItemColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("OrangeRed")]
+        public Color WarningLogItemColor {
             get {
-                return ((global::System.Drawing.Color)(this["WarningLogItemColor"]));
+                return ((Color)(this["WarningLogItemColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("White")]
-        public global::System.Drawing.Color DefaultLogItemBackColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("White")]
+        public Color DefaultLogItemBackColor {
             get {
-                return ((global::System.Drawing.Color)(this["DefaultLogItemBackColor"]));
+                return ((Color)(this["DefaultLogItemBackColor"]));
             }
         }
     }

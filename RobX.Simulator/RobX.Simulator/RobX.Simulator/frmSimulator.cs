@@ -1,6 +1,8 @@
 ﻿# region Includes
 
 using System;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using RobX.Library.Commons;
@@ -8,8 +10,6 @@ using RobX.Library.Communication;
 using RobX.Library.Communication.TCP;
 using RobX.Library.Tools;
 using RobX.Simulator.Properties;
-using System.Drawing;
-using System.IO;
 
 # endregion
 
@@ -62,12 +62,17 @@ namespace RobX.Simulator
 
         private void frmSimulator_Load(object sender, EventArgs e)
         {
-            var helpText = File.ReadAllText(@"Content\Help.txt").Split(new[] { "%%pagebreak%%" }, 
-                StringSplitOptions.RemoveEmptyEntries);
+            // Read help and about files
+            var settingsCollection = Methods.GetApplicationSettings(Application.ExecutablePath,
+                "applicationSettings/RobX_Simulator_v2.Settings");
+
+            var helpText = Methods.ReadFormattedFile(@"Content\SimulatorHelp.txt", "%%", "%%", settingsCollection)
+                .Split(new[] { "%%pagebreak%%" }, StringSplitOptions.RemoveEmptyEntries);
+
             txtHelp1.Text = helpText[0].TrimEnd();
             txtHelp2.Text = helpText[1].TrimStart();
 
-            txtAbout.Text = File.ReadAllText(@"Content\About.txt").Replace(@"%%version%%", ProductVersion);
+            txtAbout.Text = File.ReadAllText(@"Content\SimulatorAbout.txt").Replace(@"%%version%%", ProductVersion);
             Text = Text.Replace(@"%%version%%", ProductVersion);
 
             LoadSettings();

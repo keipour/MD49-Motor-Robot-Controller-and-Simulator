@@ -1,8 +1,11 @@
 ﻿# region Includes
 
 using System;
+using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 # endregion
 
@@ -209,8 +212,8 @@ namespace RobX.Simulator
         /// <param name="point2">Ending point of the line.</param>
         /// <param name="color">Color of the line.</param>
         /// <param name="lineWidth">Width of the line in pixels.</param>
-        public static void DrawLineSegment(this SpriteBatch sprite, System.Drawing.PointF point1, 
-            System.Drawing.PointF point2, Color color, int lineWidth)
+        public static void DrawLineSegment(this SpriteBatch sprite, PointF point1, 
+            PointF point2, Color color, int lineWidth)
         {
 
             var angle = (float)Math.Atan2(point2.Y - point1.Y, point2.X - point1.X);
@@ -227,7 +230,7 @@ namespace RobX.Simulator
         /// <param name="points">Ordered collection of points defining the path.</param>
         /// <param name="color">Color of the path.</param>
         /// <param name="lineWidth">Width of the lines (in pixels) connecting the consecutive points in the path.</param>
-        public static void DrawPath(this SpriteBatch sprite, System.Drawing.PointF[] points, Color color, int lineWidth = 1)
+        public static void DrawPath(this SpriteBatch sprite, PointF[] points, Color color, int lineWidth = 1)
         {
             var count = points.Length;
             if (count < 2) return;
@@ -243,7 +246,7 @@ namespace RobX.Simulator
         /// <param name="points">Ordered collection of points defining the polygon.</param>
         /// <param name="color">Color of the polygon border.</param>
         /// <param name="lineWidth">Width of the lines (in pixels) connecting the consecutive points of the polygon.</param>
-        public static void DrawPolygon(this SpriteBatch sprite, System.Drawing.PointF[] points, Color color, int lineWidth = 1)
+        public static void DrawPolygon(this SpriteBatch sprite, PointF[] points, Color color, int lineWidth = 1)
         {
             var count = points.Length;
             if (count < 2) return;
@@ -281,7 +284,7 @@ namespace RobX.Simulator
         /// </summary>
         /// <param name="gdiPointF">GDI PointF (System.Drawing.PointF) object.</param>
         /// <returns>XNA Vector2 (Microsoft.XNA.Framework.Vector2) object.</returns>
-        public static Vector2 PointFtoVector2(System.Drawing.PointF gdiPointF)
+        public static Vector2 PointFtoVector2(PointF gdiPointF)
         {
             return new Vector2(gdiPointF.X, gdiPointF.Y);
         }
@@ -291,9 +294,9 @@ namespace RobX.Simulator
         /// </summary>
         /// <param name="xnaVector2">XNA Vector2 (Microsoft.XNA.Framework.Vector2) object.</param>
         /// <returns>GDI PointF (System.Drawing.PointF) object.</returns>
-        public static System.Drawing.PointF Vector2ToPointF(Vector2 xnaVector2)
+        public static PointF Vector2ToPointF(Vector2 xnaVector2)
         {
-            return new System.Drawing.PointF(xnaVector2.X, xnaVector2.Y);
+            return new PointF(xnaVector2.X, xnaVector2.Y);
         }
 
         # endregion

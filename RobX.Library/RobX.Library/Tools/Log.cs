@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using RobX.Library.Commons;
+using RobX.Library.Properties;
 
 # endregion
 
@@ -98,7 +100,7 @@ namespace RobX.Library.Tools
         /// <param name="addTime">If true, adds current time to the beginning of the new line.</param>
         public void AddItem(string itemText, Color color, bool addTime = false)
         {
-            AddItem(itemText, color, Properties.Settings.Default.DefaultLogItemBackColor, addTime);
+            AddItem(itemText, color, Settings.Default.DefaultLogItemBackColor, addTime);
         }
 
         /// <summary>
@@ -110,7 +112,7 @@ namespace RobX.Library.Tools
         public void AddItem(string itemText, LogItem.LogItemTypes type, bool addTime = false)
         {
             AddItem(itemText, LogItem.DetermineTypeColor(type), 
-                Properties.Settings.Default.DefaultLogItemBackColor, addTime);
+                Settings.Default.DefaultLogItemBackColor, addTime);
         }
 
         /// <summary>
@@ -121,7 +123,7 @@ namespace RobX.Library.Tools
         public void AddItem(string itemText = "", bool addTime = false)
         {
             AddItem(itemText, LogItem.DetermineTypeColor(LogItem.DetermineItemType(itemText)),
-                Properties.Settings.Default.DefaultLogItemBackColor, addTime);
+                Settings.Default.DefaultLogItemBackColor, addTime);
         }
 
         /// <summary>
@@ -215,7 +217,7 @@ namespace RobX.Library.Tools
         public void AddBytes(byte[] bytes, Color color)
         {
             var byteText = bytes.Aggregate("", (current, t) => current + ("0x" + t.ToString("X2") + "(" + t + ") "));
-            AddItem(byteText, color, Properties.Settings.Default.DefaultLogItemBackColor);
+            AddItem(byteText, color, Settings.Default.DefaultLogItemBackColor);
         }
 
         /// <summary>
@@ -226,7 +228,7 @@ namespace RobX.Library.Tools
         /// <param name="type">Type of the new log item.</param>
         public void AddBytes(byte[] bytes, LogItem.LogItemTypes type)
         {
-            AddBytes(bytes, LogItem.DetermineTypeColor(type), Properties.Settings.Default.DefaultLogItemBackColor);
+            AddBytes(bytes, LogItem.DetermineTypeColor(type), Settings.Default.DefaultLogItemBackColor);
         }
 
         /// <summary>
@@ -237,7 +239,7 @@ namespace RobX.Library.Tools
         public void AddBytes(byte[] bytes)
         {
             AddBytes(bytes, LogItem.DetermineTypeColor(LogItem.LogItemTypes.Default), 
-                Properties.Settings.Default.DefaultLogItemBackColor);
+                Settings.Default.DefaultLogItemBackColor);
         }
 
         # endregion
@@ -341,7 +343,7 @@ namespace RobX.Library.Tools
             /// <param name="showTime">If true, shows item's creation time when printing item.</param>
             public LogItem(string text, Color color, bool showTime = false)
             {
-                CreateLogItem(text, color, Properties.Settings.Default.DefaultLogItemBackColor, showTime);
+                CreateLogItem(text, color, Settings.Default.DefaultLogItemBackColor, showTime);
             }
 
             /// <summary>
@@ -352,7 +354,7 @@ namespace RobX.Library.Tools
             /// <param name="showTime">If true, shows item's creation time when printing item.</param>
             public LogItem(string text, LogItemTypes type, bool showTime = false)
             {
-                CreateLogItem(text, DetermineTypeColor(type), Properties.Settings.Default.DefaultLogItemBackColor, showTime);
+                CreateLogItem(text, DetermineTypeColor(type), Settings.Default.DefaultLogItemBackColor, showTime);
             }
 
             /// <summary>
@@ -363,7 +365,7 @@ namespace RobX.Library.Tools
             public LogItem(string text = "", bool showTime = false)
             {
                 CreateLogItem(text, DetermineTypeColor(DetermineItemType(text)), 
-                    Properties.Settings.Default.DefaultLogItemBackColor, showTime);
+                    Settings.Default.DefaultLogItemBackColor, showTime);
             }
 
             # endregion
@@ -404,16 +406,16 @@ namespace RobX.Library.Tools
                 switch (type)
                 {
                     case LogItemTypes.Error:
-                        return Properties.Settings.Default.ErrorLogItemColor;
+                        return Settings.Default.ErrorLogItemColor;
                     case LogItemTypes.Warning:
-                        return Properties.Settings.Default.WarningLogItemColor;
+                        return Settings.Default.WarningLogItemColor;
                     case LogItemTypes.Receive:
-                        return Properties.Settings.Default.ReceiveLogItemColor;
+                        return Settings.Default.ReceiveLogItemColor;
                     case LogItemTypes.Send:
-                        return Properties.Settings.Default.SendLogItemColor;
+                        return Settings.Default.SendLogItemColor;
                 }
 
-                return Properties.Settings.Default.DefaultLogItemColor;
+                return Settings.Default.DefaultLogItemColor;
             }
 
             # endregion
@@ -476,7 +478,7 @@ namespace RobX.Library.Tools
             foreach (var line in lines)
             {
                 var listItem = new ListViewItem(new[] {timestring, line}) {ForeColor = item.Color, BackColor = item.BackColor};
-                Commons.Extensions.ListAddItemPrivate(listView, listItem);
+                Extensions.ListAddItemPrivate(listView, listItem);
                 timestring = String.Empty;
             }
         }

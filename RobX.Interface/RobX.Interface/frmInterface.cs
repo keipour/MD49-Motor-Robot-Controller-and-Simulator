@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using RobX.Interface.Properties;
 using RobX.Library.Commons;
@@ -11,7 +12,6 @@ using RobX.Library.Communication.COM;
 using RobX.Library.Communication.TCP;
 using RobX.Library.Robot;
 using RobX.Library.Tools;
-using System.IO;
 
 # endregion
 
@@ -65,8 +65,12 @@ namespace RobX.Interface
             _robot.StatusChanged += RobotStatusChanged;
             btnRefresh_Click(sender, e);
 
-            txtHelp.Text = File.ReadAllText(@"Content\Help.txt");
-            txtAbout.Text = File.ReadAllText(@"Content\About.txt").Replace(@"%%version%%", ProductVersion);
+            // Read help and about files
+            var settingsCollection = Methods.GetApplicationSettings(Application.ExecutablePath,
+                "applicationSettings/RobX.Interface.Properties.Settings");
+
+            txtHelp.Text = Methods.ReadFormattedFile(@"Content\InterfaceHelp.txt", "%%", "%%", settingsCollection);
+            txtAbout.Text = File.ReadAllText(@"Content\InterfaceAbout.txt").Replace(@"%%version%%", ProductVersion);
             Text = Text.Replace(@"%%version%%", ProductVersion);
         }
 
@@ -152,6 +156,7 @@ namespace RobX.Interface
             return false;
         }
 
+        // ReSharper disable once UnusedMethodReturnValue.Local
         private bool Connect()
         {
             if (!CheckInputErrors(false)) return false;

@@ -1,0 +1,14 @@
+﻿
+F1  -  Help (this page)
+%%StartKey%%  -  Start execution of predefined commands
+Esc -  Exit
+%%GlobalStopKey%% -  Stop robot
+%%ToggleKeyboardControl%% -  Toggle control using the keyboard
+
+When control is given to keyboard, these keys work:
+
+%%ForwardKey%% key           -  Move robot forward
+%%BackwardKey%% key      -  Move robot backward
+%%RotateClockwiseKey%% key       -  Rotate robot clockwise
+%%RotateCounterClockwiseKey%% key          -   Rotate robot counter-clockwise
+%%StopKey%% key   -   Stop robot

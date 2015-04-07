@@ -58,8 +58,12 @@ namespace RobX.Controller
             _controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
             _controller.RobotStatusChanged += RobotStatusChanged;
 
-            txtHelp.Text = File.ReadAllText(@"Content\Help.txt");
-            txtAbout.Text = File.ReadAllText(@"Content\About.txt").Replace(@"%%version%%", ProductVersion);
+            // Read help and about files
+            var settingsCollection = Methods.GetApplicationSettings(Application.ExecutablePath,
+                "applicationSettings/RobX.Controller.Properties.Settings");
+
+            txtHelp.Text = Methods.ReadFormattedFile(@"Content\ControllerHelp.txt", "%%", "%%", settingsCollection);
+            txtAbout.Text = File.ReadAllText(@"Content\ControllerAbout.txt").Replace(@"%%version%%", ProductVersion);
             Text = Text.Replace(@"%%version%%", ProductVersion);
         }
 

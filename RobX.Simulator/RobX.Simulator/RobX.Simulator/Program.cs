@@ -1,6 +1,7 @@
 # region Includes
 
 using System;
+using System.Windows.Forms;
 
 # endregion
 
@@ -15,7 +16,7 @@ namespace RobX.Simulator
         [STAThread]
         static void Main()
         {
-            System.Windows.Forms.Application.EnableVisualStyles();
+            Application.EnableVisualStyles();
             var form = new frmSimulator();
             form.Show();
             // This line creates a XNA object in the form created earlier.

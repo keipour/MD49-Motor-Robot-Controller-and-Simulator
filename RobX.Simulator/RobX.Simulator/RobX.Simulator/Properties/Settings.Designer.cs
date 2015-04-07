@@ -8,14 +8,22 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.CodeDom.Compiler;
+using System.Configuration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+using Color = Microsoft.Xna.Framework.Color;
+
 namespace RobX.Simulator.Properties {
     
     
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+    [CompilerGenerated()]
+    [GeneratedCode("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "10.0.0.0")]
+    internal sealed partial class Settings : ApplicationSettingsBase {
         
-        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        private static Settings defaultInstance = ((Settings)(Synchronized(new Settings())));
         
         public static Settings Default {
             get {
@@ -23,54 +31,54 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("32, 178, 170, 255")]
-        public global::Microsoft.Xna.Framework.Color GroundColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("32, 178, 170, 255")]
+        public Color GroundColor {
             get {
-                return ((global::Microsoft.Xna.Framework.Color)(this["GroundColor"]));
+                return ((Color)(this["GroundColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("211, 211, 211, 255")]
-        public global::Microsoft.Xna.Framework.Color GridLineColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("211, 211, 211, 255")]
+        public Color GridLineColor {
             get {
-                return ((global::Microsoft.Xna.Framework.Color)(this["GridLineColor"]));
+                return ((Color)(this["GridLineColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("255, 255, 255, 255")]
-        public global::Microsoft.Xna.Framework.Color GridFontColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("255, 255, 255, 255")]
+        public Color GridFontColor {
             get {
-                return ((global::Microsoft.Xna.Framework.Color)(this["GridFontColor"]));
+                return ((Color)(this["GridFontColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("255, 255, 0, 255")]
-        public global::Microsoft.Xna.Framework.Color StatisticsFontColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("255, 255, 0, 255")]
+        public Color StatisticsFontColor {
             get {
-                return ((global::Microsoft.Xna.Framework.Color)(this["StatisticsFontColor"]));
+                return ((Color)(this["StatisticsFontColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("255, 0, 0, 255")]
-        public global::Microsoft.Xna.Framework.Color RobotTraceColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("255, 0, 0, 255")]
+        public Color RobotTraceColor {
             get {
-                return ((global::Microsoft.Xna.Framework.Color)(this["RobotTraceColor"]));
+                return ((Color)(this["RobotTraceColor"]));
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1371")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("1371")]
         public string ServerPort {
             get {
                 return ((string)(this["ServerPort"]));
@@ -80,18 +88,18 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("200")]
         public int UpdateRate {
             get {
                 return ((int)(this["UpdateRate"]));
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("True")]
         public bool DrawGrids {
             get {
                 return ((bool)(this["DrawGrids"]));
@@ -101,9 +109,9 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("True")]
         public bool DrawStatistics {
             get {
                 return ((bool)(this["DrawStatistics"]));
@@ -113,9 +121,9 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("True")]
         public bool DrawObstacles {
             get {
                 return ((bool)(this["DrawObstacles"]));
@@ -125,9 +133,9 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("True")]
         public bool DrawRobotTrace {
             get {
                 return ((bool)(this["DrawRobotTrace"]));
@@ -137,21 +145,21 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("499, 568")]
-        public global::System.Drawing.Size FormSize {
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("499, 568")]
+        public Size FormSize {
             get {
-                return ((global::System.Drawing.Size)(this["FormSize"]));
+                return ((Size)(this["FormSize"]));
             }
             set {
                 this["FormSize"] = value;
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("False")]
         public bool KeepAspectRatio {
             get {
                 return ((bool)(this["KeepAspectRatio"]));
@@ -161,96 +169,96 @@ namespace RobX.Simulator.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
-        public global::System.Drawing.Point FormPosition {
+        [UserScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("0, 0")]
+        public Point FormPosition {
             get {
-                return ((global::System.Drawing.Point)(this["FormPosition"]));
+                return ((Point)(this["FormPosition"]));
             }
             set {
                 this["FormPosition"] = value;
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("1")]
         public double DefaultSimulationSpeed {
             get {
                 return ((double)(this["DefaultSimulationSpeed"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("255, 0, 0, 255")]
-        public global::Microsoft.Xna.Framework.Color SimulationSpeedColor {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("255, 0, 0, 255")]
+        public Color SimulationSpeedColor {
             get {
-                return ((global::Microsoft.Xna.Framework.Color)(this["SimulationSpeedColor"]));
+                return ((Color)(this["SimulationSpeedColor"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Up")]
-        public global::System.Windows.Forms.Keys ForwardKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Up")]
+        public Keys ForwardKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["ForwardKey"]));
+                return ((Keys)(this["ForwardKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Down")]
-        public global::System.Windows.Forms.Keys BackwardKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Down")]
+        public Keys BackwardKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["BackwardKey"]));
+                return ((Keys)(this["BackwardKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Right")]
-        public global::System.Windows.Forms.Keys RotateClockwiseKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Right")]
+        public Keys RotateClockwiseKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["RotateClockwiseKey"]));
+                return ((Keys)(this["RotateClockwiseKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Left")]
-        public global::System.Windows.Forms.Keys RotateCounterClockwiseKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("Left")]
+        public Keys RotateCounterClockwiseKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["RotateCounterClockwiseKey"]));
+                return ((Keys)(this["RotateCounterClockwiseKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ShiftKey")]
-        public global::System.Windows.Forms.Keys StopKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("ShiftKey")]
+        public Keys StopKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["StopKey"]));
+                return ((Keys)(this["StopKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("F10")]
-        public global::System.Windows.Forms.Keys GlobalStopKey {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("F10")]
+        public Keys GlobalStopKey {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["GlobalStopKey"]));
+                return ((Keys)(this["GlobalStopKey"]));
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("F12")]
-        public global::System.Windows.Forms.Keys ToggleKeyboardControl {
+        [ApplicationScopedSetting()]
+        [DebuggerNonUserCode()]
+        [DefaultSettingValue("F12")]
+        public Keys ToggleKeyboardControl {
             get {
-                return ((global::System.Windows.Forms.Keys)(this["ToggleKeyboardControl"]));
+                return ((Keys)(this["ToggleKeyboardControl"]));
             }
         }
     }

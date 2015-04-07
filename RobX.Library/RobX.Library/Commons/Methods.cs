@@ -1,6 +1,11 @@
 ﻿# region Includes
 
+using System;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.IO;
 using System.Net;
+using System.Xml;
 
 # endregion
 
@@ -59,6 +64,88 @@ namespace RobX.Library.Commons
         {
             IPAddress ip;
             return IPAddress.TryParse(str, out ip);
+        }
+
+        # endregion
+
+        # region String and File Manipulation Methods
+
+        /// <summary>
+        /// Reads a text file and replaces all special text keys with their equivalent values in the (key, value) pair.
+        /// </summary>
+        /// <param name="fileName">Path and name of the text file that should be read.</param>
+        /// <param name="startTag">Starting tag to specify the special key.</param>
+        /// <param name="endTag">Ending tag to specify the special key.</param>
+        /// <param name="replaceParameters">The collection of (key, value) pairs.</param>
+        /// <returns>The text of the file with replaced (key, value) pairs.</returns>
+        public static string ReadFormattedFile(string fileName, string startTag, string endTag,
+            NameValueCollection replaceParameters = null)
+        {
+            try
+            {
+                var text = File.ReadAllText(fileName);
+
+                if (replaceParameters == null) return text;
+
+                for (var i = 0; i < replaceParameters.Count; ++i)
+                    text = text.Replace(startTag + replaceParameters.GetKey(i) + endTag, replaceParameters[i]);
+
+                return text;
+
+            }
+            catch (Exception)
+            {
+                return String.Empty;
+            }
+        }
+
+        # endregion
+
+        # region Settings Loader
+
+        /// <summary>
+        /// Reads settings from application configuration.
+        /// </summary>
+        /// <param name="applicationPath">Path to the executable file of the application.</param>
+        /// <param name="sectionName">XML path to the settings section of the application configuration. For example: 
+        /// applicationSettings/MyProject.Properties.Settings. Check the app.cpnfig to get an idea about the path.</param>
+        /// <returns>Name-value pairs of the settings read by the function.</returns>
+        public static NameValueCollection GetApplicationSettings(string applicationPath, string sectionName)
+        {
+            try
+            {
+                // Read application settings from application exe
+                var config = ConfigurationManager.OpenExeConfiguration(applicationPath);
+
+                // Read application settings section from application configuration
+                var myParamsSection = config.GetSection(sectionName);
+
+                // Convert application configuration to XML
+                var myParamsSectionRawXml = myParamsSection.SectionInformation.GetRawXml();
+                var sectionXmlDoc = new XmlDocument();
+                sectionXmlDoc.Load(new StringReader(myParamsSectionRawXml));
+
+                // Read name-value pairs from XML
+                var resultNameValueCol = new NameValueCollection();
+                if (sectionXmlDoc.DocumentElement == null) return resultNameValueCol;
+
+                var xmlNodeList = sectionXmlDoc.DocumentElement.SelectNodes("//setting");
+
+                if (xmlNodeList == null) return resultNameValueCol;
+
+                foreach (XmlNode node in xmlNodeList)
+                {
+                    var nameNode = node.SelectSingleNode("@name");
+                    if (nameNode == null) continue;
+
+                    resultNameValueCol.Add(nameNode.Value, node.InnerText);
+                }
+                return resultNameValueCol;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         # endregion
