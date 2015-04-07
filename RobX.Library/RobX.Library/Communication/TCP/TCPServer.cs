@@ -80,8 +80,10 @@ namespace RobX.Library.Communication.TCP
         /// Stops listening to the current port if it is already running.
         /// </summary>
         /// <param name="port">Port on which the server should listen.</param>
+        /// <param name="timeout">Timeout for starting the server (in milliseconds). 
+        /// The operation fails if sending the data could not start for the specified amount of time.</param>
         /// <returns>Returns true if server starts successfully, otherwise returns false.</returns>
-        public bool StartServer(int port)
+        public bool StartServer(int port, int timeout = 1000)
         {
             try
             {
@@ -114,26 +116,44 @@ namespace RobX.Library.Communication.TCP
                 foreach (var ipAddress in IpAddresses)
                     if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
                         if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Started TCP server on " +
-                                                                                 ipAddress + " (port " + port + ")."));
+                            StatusChanged(this, new CommunicationStatusEventArgs("Starting TCP server on " +
+                                ipAddress + " (port " + port + ")."));
 
                 // Start the TCP server on a new thread
-                _listenThread = new Thread(ListenForClients) {IsBackground = true};
+                _listenThread = new Thread(ListenForClients) { IsBackground = true };
                 _listenThread.Start();
-                
-                // Determine if the tcpListener started successfully in 1000 milliseconds.
-                _startedListening = false;
 
+                // Determine if the tcpListener started successfully in timeout milliseconds.
+                _startedListening = false;
                 var now = DateTime.Now;
                 while (_startedListening == false && Port != -1)
                 {
-                    if (!((DateTime.Now - now).TotalMilliseconds > 1000)) continue;
-                    
+                    if (!((DateTime.Now - now).TotalMilliseconds > timeout)) continue;
+
                     StopServer();
                     break;
                 }
 
-                return IsRunning();
+                if (IsRunning())
+                {
+                    // Invoke StatusChange event for each new server
+                    // ReSharper disable once LoopCanBePartlyConvertedToQuery
+                    foreach (var ipAddress in IpAddresses)
+                        if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
+                            if (StatusChanged != null)
+                                StatusChanged(this, new CommunicationStatusEventArgs("Successfully started TCP server on " +
+                                    ipAddress + " (port " + port + ")."));
+                    return true;
+                }
+
+                Port = -1;
+
+                // Invoke StatusChange event
+                if (StatusChanged != null)
+                    StatusChanged(this, new CommunicationStatusEventArgs("Error! Could not start TCP server on port " 
+                        + port + ". "));
+
+                return false;
             }
             catch (Exception e)
             {
@@ -141,8 +161,8 @@ namespace RobX.Library.Communication.TCP
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start TCP server on port " + port + 
-                        ". " + e.Message + "."));
+                    StatusChanged(this, new CommunicationStatusEventArgs("Error! Could not start TCP server on port " 
+                        + port + ". " + e.Message + "."));
 
                 return false;
             }
@@ -288,7 +308,7 @@ namespace RobX.Library.Communication.TCP
             catch (Exception e)
             {
                 bytesRead = -1;
-                
+
                 // Invoke StatusChange event
                 if (StatusChanged != null)
                     StatusChanged(this, new CommunicationStatusEventArgs("Error! " + e.Message + "."));
@@ -333,7 +353,7 @@ namespace RobX.Library.Communication.TCP
 
                 // Invoke StatusChange event
                 if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start listening on port " + tempport + 
+                    StatusChanged(this, new CommunicationStatusEventArgs("Could not start listening on port " + tempport +
                         ". " + e.Message + "."));
                 return;
             }
@@ -361,7 +381,7 @@ namespace RobX.Library.Communication.TCP
                         " (port " + ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port + ")."));
 
                 // Create a thread to handle communication with connected client
-                var clientThread = new Thread(HandleClientComm) {IsBackground = true};
+                var clientThread = new Thread(HandleClientComm) { IsBackground = true };
                 clientThread.Start();
             }
         }
