@@ -19,17 +19,17 @@ namespace RobX.Controller
 
             controller.SetXyAngle(1500, 7550 - 2500, 0);
 
-            controller.AddCommandToQueue(new Command(Command.Types.MoveForwardForDistance, 2400, 20));
-            controller.AddCommandToQueue(new Command(Command.Types.SetSpeedForDegrees, 90, 30, 10));
-            controller.AddCommandToQueue(new Command(Command.Types.MoveForwardForDistance, 3020, 20));
-            controller.AddCommandToQueue(new Command(Command.Types.SetSpeedForDegrees, -90, 10, 25));
-            controller.AddCommandToQueue(new Command(Command.Types.MoveForwardForDistance, 1000, 20));
-            controller.AddCommandToQueue(new Command(Command.Types.MoveBackwardForDistance, 1000, 20));
-            controller.AddCommandToQueue(new Command(Command.Types.SetSpeedForDegrees, 90, -10, -25));
-            controller.AddCommandToQueue(new Command(Command.Types.MoveBackwardForDistance, 3020, 20));
-            controller.AddCommandToQueue(new Command(Command.Types.SetSpeedForDegrees, -90, -30, -10));
-            controller.AddCommandToQueue(new Command(Command.Types.MoveBackwardForDistance, 2000, 20));
-            controller.AddCommandToQueue(new Command(Command.Types.Stop));
+            controller.Commands.Enqueue(new Command(Command.Types.MoveForwardForDistance, 2400, 20));
+            controller.Commands.Enqueue(new Command(Command.Types.SetSpeedForDegrees, 90, 30, 10));
+            controller.Commands.Enqueue(new Command(Command.Types.MoveForwardForDistance, 3020, 20));
+            controller.Commands.Enqueue(new Command(Command.Types.SetSpeedForDegrees, -90, 10, 25));
+            controller.Commands.Enqueue(new Command(Command.Types.MoveForwardForDistance, 1000, 20));
+            controller.Commands.Enqueue(new Command(Command.Types.MoveBackwardForDistance, 1000, 20));
+            controller.Commands.Enqueue(new Command(Command.Types.SetSpeedForDegrees, 90, -10, -25));
+            controller.Commands.Enqueue(new Command(Command.Types.MoveBackwardForDistance, 3020, 20));
+            controller.Commands.Enqueue(new Command(Command.Types.SetSpeedForDegrees, -90, -30, -10));
+            controller.Commands.Enqueue(new Command(Command.Types.MoveBackwardForDistance, 2000, 20));
+            controller.Commands.Enqueue(new Command(Command.Types.Stop));
         }
     }
 }

@@ -1,13 +1,12 @@
 ﻿#region Includes
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using RobX.Library.Communication;
-// ReSharper disable UnusedMember.Global
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
 namespace RobX.Library.Robot
 {
     /// <summary>
@@ -22,14 +21,16 @@ namespace RobX.Library.Robot
         /// </summary>
         private string _errorString = "";
 
+        private double _simulationSpeed = 1.0F;
+
+        # endregion
+
+        # region Public Fields
+
         /// <summary>
         /// Contains controller commands in queue for processing.
         /// </summary>
-        private readonly LinkedList<Command> _commands = new LinkedList<Command>();
-
-        private readonly object _commandsLock = new object();
-
-        private double _simulationSpeed = 1.0F;
+        public readonly CommandQueue Commands = new CommandQueue();
 
         # endregion
 
@@ -55,16 +56,6 @@ namespace RobX.Library.Robot
         # region Public Functions
 
         /// <summary>
-        /// Adds a command to the command processing queue.
-        /// </summary>
-        /// <param name="cmd">Command to be added.</param>
-        public void AddCommandToQueue(Command cmd)
-        {
-            lock (_commandsLock)
-                _commands.AddLast(cmd);
-        }
-
-        /// <summary>
         /// Executes sequentially all the high-level commands in the queue.
         /// </summary>
         public void ExecuteCommandQueue()
@@ -74,12 +65,8 @@ namespace RobX.Library.Robot
 
             while (true)
             {
-                Command cmd;
-                lock (_commandsLock)
-                {
-                    if (_commands.Count == 0) return;
-                    cmd = _commands.First.Value;
-                }
+                var cmd = Commands.Dequeue();
+                if (cmd == null) return;
 
                 switch (cmd.Type)
                 {
@@ -120,13 +107,6 @@ namespace RobX.Library.Robot
                         StopRobot();
                         break;
                 }
-
-                // Delete the first command from queue
-                lock (_commandsLock)
-                {
-                    if (_commands.Count > 0)
-                        _commands.RemoveFirst();
-                }
             }
         }
 
@@ -135,14 +115,9 @@ namespace RobX.Library.Robot
         /// </summary>
         public void StopExecution()
         {
-            lock (_commandsLock)
-            {
-                if (_commands.Count <= 0) return;
-
-                if (RobotStatusChanged != null)
-                    RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopped execution of command queue."));
-                _commands.Clear();
-            }
+            Commands.Clear();
+            if (RobotStatusChanged != null)
+                RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopped execution of command queue."));
         }
 
         /// <summary>

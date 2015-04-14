@@ -58,6 +58,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Robot\Command.cs" />
+    <Compile Include="Robot\CommandQueue.cs" />
     <Compile Include="Robot\Controller.cs" />
     <Compile Include="Robot\MotorDriver.cs" />
     <Compile Include="Tools\Events.cs" />
