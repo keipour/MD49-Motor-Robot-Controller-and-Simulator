@@ -1,5 +1,6 @@
 ﻿# region Includes
 
+using System;
 using System.Collections.Generic;
 
 # endregion
@@ -23,7 +24,7 @@ namespace RobX.Library.Robot
 
         # endregion
 
-        # region Public Functions
+        # region Public Queue Functions
 
         /// <summary>
         /// Adds a command to the end of command processing queue.
@@ -73,6 +74,28 @@ namespace RobX.Library.Robot
                 var cmd = _commands.First.Value;
                 _commands.RemoveFirst();
                 return cmd;
+            }
+        }
+
+        # endregion
+
+        # region Public Functions
+
+        /// <summary>
+        /// Adds commands to the queue by parsing a string containing a list of commands.
+        /// Each command should be in a separate line.
+        /// </summary>
+        /// <param name="commandList">Command list.</param>
+        public void AddCommandsFromString(string commandList)
+        {
+            var lines = commandList.Split(new[] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                Command cmd;
+                if (Command.TryParse(line, out cmd) == false)
+                    continue;
+                Enqueue(cmd);
             }
         }
 
