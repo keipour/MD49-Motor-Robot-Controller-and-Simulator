@@ -18,17 +18,17 @@ namespace RobX.Simulator
         /// <summary>
         /// Variable for Robot settings.
         /// </summary>
-        public RobotProperties Robot = new RobotProperties();
+        public readonly RobotProperties Robot = new RobotProperties();
 
         /// <summary>
         /// Variable for Ground settings.
         /// </summary>
-        public GroundProperties Ground = new GroundProperties();
+        public readonly GroundProperties Ground = new GroundProperties();
 
         /// <summary>
         /// The list of all obstacles in the environment.
         /// </summary>
-        public List<Obstacle> Obstacles = new List<Obstacle>();
+        public readonly List<Obstacle> Obstacles = new List<Obstacle>();
 
         # endregion
 
@@ -68,22 +68,22 @@ namespace RobX.Simulator
             /// <summary>
             /// The vertical position of the robot in millimeters.
             /// </summary>
-            public double X = 0;
+            public double X;
 
             /// <summary>
             /// The horizontal position of the robot in millimeters.
             /// </summary>
-            public double Y = 0;
+            public double Y;
 
             /// <summary>
             /// The robot angle (in degrees).
             /// </summary>
-            public double Angle = 0;
+            public double Angle;
 
             /// <summary>
             /// The trace (path) of the robot in the simulation.
             /// </summary>
-            public List<PointF> Trace = new List<PointF>();
+            public readonly List<PointF> Trace = new List<PointF>();
         }
 
         # endregion

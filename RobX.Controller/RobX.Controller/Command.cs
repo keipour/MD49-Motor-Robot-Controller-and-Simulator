@@ -80,7 +80,7 @@
         /// <summary>
         /// Type of controller command.
         /// </summary>
-        public Types Type;
+        public readonly Types Type;
 
         /// <summary>
         /// <para>Works as follows (range: -127 to +127):</para>
@@ -90,14 +90,14 @@
         /// <para>4. For left (counter-clockwise) rotation the speed of left wheel will be -Speed1 and the speed of right wheel will be Speed1.</para>
         /// <para>5. For stop command it has no effect.</para>
         /// </summary>
-        public sbyte Speed1;
+        public readonly sbyte Speed1;
 
         /// <summary>
         /// <para>Works as follows (range: -127 to +127):</para>
         /// <para>1. For SetSpeed commands is the speed of the right wheel.</para>
         /// <para>2. For other commands it has no effect.</para>
         /// </summary>
-        public sbyte Speed2;
+        public readonly sbyte Speed2;
 
         /// <summary>
         /// <para>Works as follows:</para>
@@ -106,7 +106,7 @@
         /// <para>3. For degree commands it is interpreted as the degree.</para>
         /// <para>4. For stop command it has no effect.</para>
         /// </summary>
-        public double Amount;
+        public readonly double Amount;
 
         # endregion
 

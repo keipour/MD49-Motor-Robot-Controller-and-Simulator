@@ -57,6 +57,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Robot\MotorDriver.cs" />
     <Compile Include="Tools\Events.cs" />
     <Compile Include="Tools\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

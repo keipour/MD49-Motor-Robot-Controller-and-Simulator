@@ -1,4 +1,5 @@
-﻿namespace RobX.Library.Commons
+﻿// ReSharper disable UnusedMember.Global
+namespace RobX.Library.Commons
 {
     /// <summary>
     /// This namespace contains common methods, properties and extensions for all sub-projects of the solution.

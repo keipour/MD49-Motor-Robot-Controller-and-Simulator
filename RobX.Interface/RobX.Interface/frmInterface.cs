@@ -161,8 +161,8 @@ namespace RobX.Interface
         {
             if (!CheckInputErrors(false)) return false;
 
-            return _robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int) Robot.BaudRate,
-                Robot.DataBits, Robot.Parity, Robot.StopBits) && StartServer();
+            return _robot.Connect(_comPorts[cboCOMPorts.SelectedIndex].Name, (int) MotorDriver.BaudRate,
+                MotorDriver.DataBits, MotorDriver.Parity, MotorDriver.StopBits) && StartServer();
         }
 
         private bool StartServer()

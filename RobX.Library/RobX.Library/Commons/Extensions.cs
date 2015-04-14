@@ -1,6 +1,7 @@
 ﻿# region Includes
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -13,6 +14,7 @@ namespace RobX.Library.Commons
     /// <summary>
     /// This class is used to add extension functions to the globally-used classes in the project.
     /// </summary>
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class Extensions
     {
         # region TextBox Add Line Extension
@@ -99,6 +101,7 @@ namespace RobX.Library.Commons
         /// </summary>
         /// <param name="textBox">The textbox instance which should be validated.</param>
         /// <param name="e">Key press event argument (contains information about the pressed key).</param>
+        // ReSharper disable once UnusedParameter.Global
         public static void ValidateInput_TCPPort(this TextBox textBox, KeyPressEventArgs e)
         {
             if (char.IsDigit(e.KeyChar)) return;

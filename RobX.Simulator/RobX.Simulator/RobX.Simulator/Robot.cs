@@ -74,7 +74,8 @@ namespace RobX.Simulator
         /// Turn on/off speed regulation: If the required speed is not being achieved, increase power to the motors 
         /// until it reaches the desired rate (or the motors reach the maximum output).
         /// </summary>
-        public bool Regulator = false;
+        // ReSharper disable once NotAccessedField.Global
+        public bool Regulator;
 
         /// <summary>
         /// Turn on/off motor timeout: Robot will automatically stop if there is no serial communications within 2 seconds.

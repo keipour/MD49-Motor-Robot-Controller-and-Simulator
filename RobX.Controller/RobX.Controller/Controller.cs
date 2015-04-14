@@ -22,11 +22,12 @@ namespace RobX.Controller
         /// <summary>
         /// Low-level interface for robot control.
         /// </summary>
-        public Robot Robot;
+        public readonly Robot Robot;
 
         /// <summary>
         /// Type of robot: Real robot / Simulation.
         /// </summary>
+        // ReSharper disable once NotAccessedField.Global
         public Robot.RobotType RobotType;
 
         /// <summary>
@@ -177,6 +178,7 @@ namespace RobX.Controller
         /// <param name="ipAddress">IP address of the robot (or simulator).</param>
         /// <param name="port">Port number of the robot (or simulator).</param>
         /// <returns>Returns true if successfully connected to the robot.</returns>
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public bool Connect(String ipAddress, int port)
         {
             var robotClient = new TCPClient();
@@ -281,7 +283,7 @@ namespace RobX.Controller
         public void PrepareForExecution()
         {
             Robot.DisableTimeout();
-            Robot.SetMode(Robot.SpeedModes.Mode0);
+            Robot.SetMode(MotorDriver.SpeedModes.Mode0);
         }
 
         /// <summary>
@@ -346,7 +348,7 @@ namespace RobX.Controller
         {
             if (distance < 0) throw new ArgumentOutOfRangeException("distance", @"Error! Distance can't be negative!");
 
-            if (RobotStatusChanged != null)
+            if (RobotStatusChanged != null && showMessage)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Setting the speed of the left wheel to " + wheel1Speed +
                     " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
@@ -363,7 +365,7 @@ namespace RobX.Controller
         {
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopping robot."));
-            Robot.SetMode(Robot.SpeedModes.Mode0);
+            Robot.SetMode(MotorDriver.SpeedModes.Mode0);
             SetSpeedMilliseconds(0, 0, 0, false);
         }
 
@@ -521,6 +523,7 @@ namespace RobX.Controller
         /// <returns>Returns true if there are no errors. If there is an error, it is possible to 
         /// get the error string using <see cref="GetErrorDescription"/> function.</returns>
         // ReSharper disable once FunctionComplexityOverflow
+        // ReSharper disable once UnusedMember.Global
         public bool CheckHealth()
         {
             bool voltsUnder16, voltsOver30, motor1Trip;
@@ -549,6 +552,7 @@ namespace RobX.Controller
         /// Returns a string containing the errors occured in the recent <see cref="CheckHealth"/> function call.
         /// </summary>
         /// <returns>The string describing the error occured.</returns>
+        // ReSharper disable once UnusedMember.Global
         public string GetErrorDescription()
         {
             return _errorString;
@@ -558,6 +562,7 @@ namespace RobX.Controller
         /// Estimates the delay of communication with robot by sending a single command and calculating the responce time.
         /// </summary>
         /// <returns>Estimated delay of communication with robot in milliseconds.</returns>
+        // ReSharper disable once UnusedMember.Global
         public TimeSpan CalculateDelay()
         {
             var now = DateTime.Now;

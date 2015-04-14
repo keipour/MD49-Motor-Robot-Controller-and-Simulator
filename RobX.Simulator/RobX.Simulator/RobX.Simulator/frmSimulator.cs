@@ -152,7 +152,7 @@ namespace RobX.Simulator
 
         private void StartSimulation()
         {
-            Simulator.RunSimulation(picSimulation, 10, Simulator.RenderOptions.RenderType.StaticAxisZeroCornered);
+            Simulator.RunSimulation(Simulator.RenderOptions.RenderType.StaticAxisZeroCornered);
         }
 
         private void HandleHotKeys(KeyEventArgs e)

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 using RobX.Library.Commons;
 using RobX.Library.Properties;
+// ReSharper disable UnusedMember.Global
 
 # endregion
 
@@ -43,6 +44,7 @@ namespace RobX.Library.Tools
         /// <summary>
         /// Complete type of the log.
         /// </summary>
+        // ReSharper disable once NotAccessedField.Global
         public string Text = "";
 
         /// <summary>
@@ -179,7 +181,7 @@ namespace RobX.Library.Tools
         /// <param name="bytes">The array that should be added to the log.</param>
         /// <param name="color">Color of the new log item.</param>
         /// <param name="backColor">Background color of the new item.</param>
-        public void AddBytes(byte[] bytes, Color color, Color backColor)
+        public void AddBytes(IEnumerable<byte> bytes, Color color, Color backColor)
         {
             var byteText = bytes.Aggregate("", (current, t) => current + ("0x" + t.ToString("X2") + "(" + t + ") "));
             AddItem(byteText, color, backColor);
@@ -192,7 +194,7 @@ namespace RobX.Library.Tools
         /// <param name="bytes">The array that should be added to the log.</param>
         /// <param name="type">Type of the new log item.</param>
         /// <param name="backColor">Background color of the new item.</param>
-        public void AddBytes(byte[] bytes, LogItem.LogItemTypes type, Color backColor)
+        public void AddBytes(IEnumerable<byte> bytes, LogItem.LogItemTypes type, Color backColor)
         {
             AddBytes(bytes, LogItem.DetermineTypeColor(type), backColor);
         }
@@ -203,7 +205,7 @@ namespace RobX.Library.Tools
         /// </summary>
         /// <param name="backColor">Background color of the new item.</param>
         /// <param name="bytes">The array that should be added to the log.</param>
-        public void AddBytes(Color backColor, byte[] bytes)
+        public void AddBytes(Color backColor, IEnumerable<byte> bytes)
         {
             AddBytes(bytes, LogItem.DetermineTypeColor(LogItem.LogItemTypes.Default), backColor);
         }
@@ -214,7 +216,7 @@ namespace RobX.Library.Tools
         /// </summary>
         /// <param name="bytes">The array that should be added to the log.</param>
         /// <param name="color">Color of the new log item.</param>
-        public void AddBytes(byte[] bytes, Color color)
+        public void AddBytes(IEnumerable<byte> bytes, Color color)
         {
             var byteText = bytes.Aggregate("", (current, t) => current + ("0x" + t.ToString("X2") + "(" + t + ") "));
             AddItem(byteText, color, Settings.Default.DefaultLogItemBackColor);
@@ -226,7 +228,7 @@ namespace RobX.Library.Tools
         /// </summary>
         /// <param name="bytes">The array that should be added to the log.</param>
         /// <param name="type">Type of the new log item.</param>
-        public void AddBytes(byte[] bytes, LogItem.LogItemTypes type)
+        public void AddBytes(IEnumerable<byte> bytes, LogItem.LogItemTypes type)
         {
             AddBytes(bytes, LogItem.DetermineTypeColor(type), Settings.Default.DefaultLogItemBackColor);
         }
@@ -236,7 +238,7 @@ namespace RobX.Library.Tools
         /// with text auto-coloring.
         /// </summary>
         /// <param name="bytes">The array that should be added to the log.</param>
-        public void AddBytes(byte[] bytes)
+        public void AddBytes(IEnumerable<byte> bytes)
         {
             AddBytes(bytes, LogItem.DetermineTypeColor(LogItem.LogItemTypes.Default), 
                 Settings.Default.DefaultLogItemBackColor);

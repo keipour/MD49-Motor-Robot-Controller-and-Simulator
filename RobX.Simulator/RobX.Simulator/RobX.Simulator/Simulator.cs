@@ -2,10 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using RobX.Library.Commons;
 using RobX.Simulator.Properties;
-
 // ReSharper disable InconsistentlySynchronizedField
 
 # endregion
@@ -22,12 +20,12 @@ namespace RobX.Simulator
         /// <summary>
         /// Exclusive lock for Simulator.SendByte variable (to avoid multithreading issues).
         /// </summary>
-        internal static object SendByteLock = new object();
+        internal static readonly object SendByteLock = new object();
 
         /// <summary>
         /// Exclusive lock for Simulator.Commands variable (to avoid multithreading issues).
         /// </summary>
-        internal static object CommandsLock = new object();
+        internal static readonly object CommandsLock = new object();
 
         # endregion
 
@@ -51,7 +49,7 @@ namespace RobX.Simulator
         /// <summary>
         /// Contains render options of the simulation.
         /// </summary>
-        public RenderOptions Render = new RenderOptions();
+        public readonly RenderOptions Render = new RenderOptions();
 
         /// <summary>
         /// Indicates whether the simulation is running.
@@ -61,7 +59,7 @@ namespace RobX.Simulator
         /// <summary>
         /// Instance of the Drawer class that draws the frames of the simulation.
         /// </summary>
-        public Drawer Drawer = new Drawer();
+        public readonly Drawer Drawer = new Drawer();
 
         # endregion
 
@@ -98,10 +96,6 @@ namespace RobX.Simulator
 
             // Execute all commands received before the current time
             while (_executer.ExecuteNextStep(ref _commands, ref _sendBytes, ref Robot, ref Environment, _currenttime, ref _lasttime)) { }
-
-            // Render current frame
-            //Drawing.Render(ref control, ref Environment, Robot, System.Drawing.Color.LightSkyBlue,
-            //    starttime, currenttime, Render.Type, Render.Grid, Render.Obstacles, Render.Statistics, Render.RobotTrace);
 
             // Preserve the time of the last simulation step
             _lasttime = _currenttime;
@@ -141,7 +135,7 @@ namespace RobX.Simulator
         /// Adds an array of commands to the received queue for further processing.
         /// </summary>
         /// <param name="code">The received 8-bit byte array.</param>
-        public void AddCommands(byte[] code)
+        public void AddCommands(IEnumerable<byte> code)
         {
             // Use lock to avoid multithreading issues
             lock (CommandsLock)
@@ -154,11 +148,8 @@ namespace RobX.Simulator
         /// <summary>
         /// Start simulation.
         /// </summary>
-        /// <param name="control">Control to draw simulation that has Graphics (Form, PictureBox, etc.).</param>
-        /// <param name="interval">Minimum interval (in milliseconds) between two consecutive simulation frames.</param>
         /// <param name="renderType">Render type for simulation frames.</param>
-        public void RunSimulation(Control control, int interval,
-            RenderOptions.RenderType renderType = RenderOptions.RenderType.StaticAxisZeroCentered)
+        public void RunSimulation(RenderOptions.RenderType renderType = RenderOptions.RenderType.StaticAxisZeroCentered)
         {
             Render.Type = renderType;
             _lasttime = DateTime.Now;

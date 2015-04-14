@@ -50,6 +50,7 @@ namespace RobX.Library.Communication
         /// The operation fails if sending the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
         /// <returns>Returns true if successfully sent data; false indicates connection error.</returns>
+        // ReSharper disable once UnusedMethodReturnValue.Global
         bool SendData(byte[] data, int timeout = 1000);
 
         /// <summary>

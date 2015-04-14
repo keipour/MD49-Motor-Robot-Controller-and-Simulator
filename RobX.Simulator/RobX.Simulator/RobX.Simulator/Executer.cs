@@ -499,7 +499,7 @@ namespace RobX.Simulator
                 environment.Robot.Trace.Add(trace);
 
             // Stop if robot timeout is set to true and timeout has happened
-            if ((starttime - _lastCommandTime).TotalMilliseconds > Library.Robot.Robot.MotorTimeoutInMs && 
+            if ((starttime - _lastCommandTime).TotalMilliseconds > Library.Robot.MotorDriver.MotorTimeoutInMs && 
                 robot.Timeout)
             {
                 if (robot.Mode == 0 || robot.Mode == 2)

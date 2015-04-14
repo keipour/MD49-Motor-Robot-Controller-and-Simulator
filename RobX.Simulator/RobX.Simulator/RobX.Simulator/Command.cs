@@ -16,7 +16,7 @@ namespace RobX.Simulator
         /// <summary>
         /// Code of the command received by the robot.
         /// </summary>
-        public byte Code;
+        public readonly byte Code;
 
         /// <summary>
         /// Time at which the command is received by the robot.

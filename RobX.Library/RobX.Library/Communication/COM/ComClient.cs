@@ -17,7 +17,7 @@ namespace RobX.Library.Communication.COM
         /// <summary>
         /// COM serial port interface.
         /// </summary>
-        public SerialPort SerialPort;
+        public readonly SerialPort SerialPort;
 
         /// <summary>
         /// Number of data bits for Rx/Tx connection with COM port.
