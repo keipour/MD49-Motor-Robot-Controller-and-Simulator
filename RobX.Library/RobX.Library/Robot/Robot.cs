@@ -5,6 +5,7 @@ using RobX.Library.Commons;
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
 namespace RobX.Library.Robot
 {
     /// <summary>
@@ -39,7 +40,7 @@ namespace RobX.Library.Robot
         /// <summary>
         /// Converts encoder count to distance in millimeters for EMG49 motor set used in RobX robot.
         /// </summary>
-        public const double EncoderCount2mM = WheelDiameter * Math.PI / EncoderCountPerTurn;
+        public const double EncoderCountToDistance = WheelDiameter * Math.PI / EncoderCountPerTurn;
 
         # endregion
 
@@ -185,7 +186,7 @@ namespace RobX.Library.Robot
         /// <returns>Encoder count for the given distance.</returns>
         public static int DistanceToEncoderCount(double distance)
         {
-            return (int)(distance / EncoderCount2mM);
+            return (int)(distance / EncoderCountToDistance);
         }
 
         /// <summary>
@@ -313,6 +314,18 @@ namespace RobX.Library.Robot
             ushort result = buffer[1];
             result += (ushort)(buffer[0] << 8);
             return result;
+        }
+
+        /// <summary>
+        /// Estimates the delay of communication with robot by sending a single command and calculating the responce time.
+        /// </summary>
+        /// <returns>Estimated delay of communication with robot in milliseconds.</returns>
+        // ReSharper disable once UnusedMember.Global
+        public TimeSpan CalculateDelay()
+        {
+            var now = DateTime.Now;
+            GetVersion();
+            return DateTime.Now - now;
         }
 
         # endregion

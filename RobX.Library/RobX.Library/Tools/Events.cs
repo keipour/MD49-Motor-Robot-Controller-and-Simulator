@@ -25,18 +25,15 @@ namespace RobX.Library.Tools
     /// </summary>
     public class LogEventArgs : EventArgs
     {
-        private readonly string _mText;
-        private readonly List<Log.LogItem> _mItems;
-
         /// <summary>
         /// Text added to the log.
         /// </summary>
-        public string Text { get { return _mText; } }
+        public string Text { get; private set; }
 
         /// <summary>
         /// LogItems added to the log.
         /// </summary>
-        public List<Log.LogItem> Items { get { return _mItems; } }
+        public List<Log.LogItem> Items { get; private set; }
 
         /// <summary>
         /// Constructor for LogEventArgs event argument class.
@@ -45,8 +42,8 @@ namespace RobX.Library.Tools
         /// <param name="items">New items added to the log.</param>
         public LogEventArgs(string text, List<Log.LogItem> items)
         {
-            _mText = text;
-            _mItems = items;
+            Text = text;
+            Items = items;
         }
     }
 

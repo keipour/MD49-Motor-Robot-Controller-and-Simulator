@@ -9,6 +9,7 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
 namespace RobX.Simulator
 {
     /// <summary>

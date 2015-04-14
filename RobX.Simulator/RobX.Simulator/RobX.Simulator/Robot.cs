@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 # endregion
 
+// ReSharper disable NotAccessedField.Global
 namespace RobX.Simulator
 {
     /// <summary>
@@ -74,7 +75,6 @@ namespace RobX.Simulator
         /// Turn on/off speed regulation: If the required speed is not being achieved, increase power to the motors 
         /// until it reaches the desired rate (or the motors reach the maximum output).
         /// </summary>
-        // ReSharper disable once NotAccessedField.Global
         public bool Regulator;
 
         /// <summary>

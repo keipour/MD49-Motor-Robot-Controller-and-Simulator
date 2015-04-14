@@ -16,6 +16,15 @@ namespace RobX.Library.Robot
     /// </summary>
     public class MotorDriver
     {
+        # region Public Variables
+
+        /// <summary>
+        /// Indicates whether the controller is connected to the robot (via network) or not.
+        /// </summary>
+        public bool IsConnected;
+
+        # endregion
+
         # region Protected Variables
 
         /// <summary>
@@ -30,7 +39,6 @@ namespace RobX.Library.Robot
         /// <summary>
         /// Motor encoder count per turn for EMG49 motors used in RobX robot.
         /// </summary>
-        // ReSharper disable once MemberCanBeProtected.Global
         public const int EncoderCountPerTurn = 980;
 
         /// <summary>
@@ -219,7 +227,8 @@ namespace RobX.Library.Robot
             RobotClient.BeforeSendingData += RobotBeforeSendingData;
             RobotClient.ErrorOccured += RobotErrorOccured;
 
-            return connectFunction();
+            IsConnected = connectFunction();
+            return IsConnected;
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace RobX.Controller
+﻿namespace RobX.Library.Robot
 {
     /// <summary>
     /// Class that contains a controller command.

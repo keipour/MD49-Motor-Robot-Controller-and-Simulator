@@ -5,6 +5,7 @@ using System.Drawing;
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
 namespace RobX.Library.Commons
 {
     /// <summary>

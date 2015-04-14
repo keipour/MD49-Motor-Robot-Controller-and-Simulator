@@ -7,10 +7,11 @@ using System.Linq;
 using System.Windows.Forms;
 using RobX.Library.Commons;
 using RobX.Library.Properties;
-// ReSharper disable UnusedMember.Global
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
+// ReSharper disable NotAccessedField.Global
 namespace RobX.Library.Tools
 {
     /// <summary>
@@ -44,7 +45,6 @@ namespace RobX.Library.Tools
         /// <summary>
         /// Complete type of the log.
         /// </summary>
-        // ReSharper disable once NotAccessedField.Global
         public string Text = "";
 
         /// <summary>

@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using RobX.Controller.Properties;
 using RobX.Library.Commons;
 using RobX.Library.Communication;
+using RobX.Library.Communication.TCP;
+using RobX.Library.Robot;
 using RobX.Library.Tools;
 
 # endregion
@@ -24,7 +26,7 @@ namespace RobX.Controller
 
         private readonly Log _communicationLog = new Log();
         private readonly Log _messageLog = new Log();
-        private Controller _controller = new Controller(Library.Robot.Robot.RobotType.Simulation);
+        private Library.Robot.Controller _controller = new Library.Robot.Controller(Robot.RobotType.Simulation);
         private Thread _executionThread;
         private readonly Color _logBackColor = Color.Linen;
         private readonly Color _userLogBackColor = Color.Khaki;
@@ -55,7 +57,7 @@ namespace RobX.Controller
             _messageLog.LogCleared += lstMessageClear;
             _controller.ReceivedData += RobotReceivedData;
             _controller.SentData += RobotSentData;
-            _controller.CommunicationStatusChanged += RobotCommunicationStatusChanged;
+            _controller.StatusChanged += RobotCommunicationStatusChanged;
             _controller.RobotStatusChanged += RobotStatusChanged;
 
             // Read help and about files
@@ -165,7 +167,8 @@ namespace RobX.Controller
         {
             SaveProperties();
             if (!CheckInputErrors()) return;
-            _controller.Connect(txtIPAddress.Text, Int32.Parse(txtPort.Text));
+            var robotClient = new TCPClient();
+            _controller.Connect(robotClient, () => robotClient.Connect(txtIPAddress.Text, Int32.Parse(txtPort.Text)));
         }
 
         private void LoadProperties()
@@ -251,6 +254,7 @@ namespace RobX.Controller
             _executionThread = new Thread(StartExecution) {IsBackground = true};
 
             var simSpeed = (ushort) (Math.Round(Settings.Default.SimulationSpeed*10));
+            Settings.Default.SimulationSpeed = simSpeed/10F;
             if (simSpeed != 10)
                 _controller.SetSimulationSpeed(simSpeed);
             _executionThread.Start();

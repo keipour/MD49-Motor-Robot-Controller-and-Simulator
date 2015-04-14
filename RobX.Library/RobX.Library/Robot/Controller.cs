@@ -3,40 +3,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using RobX.Controller.Properties;
 using RobX.Library.Communication;
-using RobX.Library.Communication.TCP;
-using RobX.Library.Robot;
+// ReSharper disable UnusedMember.Global
 
 # endregion
 
-namespace RobX.Controller
+namespace RobX.Library.Robot
 {
     /// <summary>
     /// Class to control robot at high level.
     /// </summary>
-    public class Controller
+    public class Controller : Robot
     {
-        # region Public Fields
-
-        /// <summary>
-        /// Low-level interface for robot control.
-        /// </summary>
-        public readonly Robot Robot;
-
-        /// <summary>
-        /// Type of robot: Real robot / Simulation.
-        /// </summary>
-        // ReSharper disable once NotAccessedField.Global
-        public Robot.RobotType RobotType;
-
-        /// <summary>
-        /// Indicates whether the controller is connected to the robot (via network) or not.
-        /// </summary>
-        public bool IsConnected;
-
-        # endregion
-
         # region Private Fields
 
         /// <summary>
@@ -51,39 +29,16 @@ namespace RobX.Controller
 
         private readonly object _commandsLock = new object();
 
+        private double _simulationSpeed = 1.0F;
+
         # endregion
 
-        # region Events
+        # region RobotStatusChanged Event Handler
 
         /// <summary>
-        /// ReceivedData event (will be invoked after data is received).
-        /// </summary>
-        public event CommunicationEventHandler ReceivedData;
-
-        /// <summary>
-        /// SentData event (will be invoked after data is sent).
-        /// </summary>
-        public event CommunicationEventHandler SentData;
-
-        /// <summary>
-        /// BeforeSendingData event (will be invoked when server is ready to send data).
-        /// </summary>
-        public event CommunicationEventHandler BeforeSendingData;
-
-        /// <summary>
-        /// CommunicationStatusChanged event (will be invoked after anything new happens in the communications).
-        /// </summary>
-        public event CommunicationStatusEventHandler CommunicationStatusChanged;
-
-        /// <summary>
-        /// RobotStatusChanged event (will be invoked after anything new happens to the robot).
+        /// RobotStatusChanged event (will be invoked after anything new happens to the robot in the controller).
         /// </summary>
         public event CommunicationStatusEventHandler RobotStatusChanged;
-
-        /// <summary>
-        /// Event that is invoked when an error is occured.
-        /// </summary>
-        public event EventHandler ErrorOccured;
 
         # endregion
 
@@ -93,98 +48,11 @@ namespace RobX.Controller
         /// Constructor for the Controller class.
         /// </summary>
         /// <param name="robotType">Specifies robot type (Simulation vs. Real).</param>
-        public Controller(Robot.RobotType robotType)
-        {
-            RobotType = robotType;
-            Robot = new Robot(robotType);
-
-            // Add event handlers
-            Robot.ReceivedData += RobotReceivedData;
-            Robot.SentData += RobotSentData;
-            Robot.StatusChanged += RobotCommunicationStatusChanged;
-            Robot.BeforeSendingData += RobotBeforeSendingData;
-            Robot.ErrorOccured += RobotErrorOccured;
-        }
-
-        # endregion
-
-        # region Controller Event Handlers
-
-        /// <summary>
-        /// Invokes the ReceivedData event when data is received from the robot (over the network).
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event arguments including the received data.</param>
-        private void RobotReceivedData(object sender, CommunicationEventArgs e)
-        {
-            if (ReceivedData != null)
-                ReceivedData(this, e);
-        }
-
-        /// <summary>
-        /// Invokes the SentData event when data is sent to the robot (over the network).
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event arguments including the sent data.</param>
-        private void RobotSentData(object sender, CommunicationEventArgs e)
-        {
-            if (SentData != null)
-                SentData(this, e);
-        }
-
-        /// <summary>
-        /// Invokes the StatusChanged event when the robot connection state is changed.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event arguments including the status change message.</param>
-        private void RobotCommunicationStatusChanged(object sender, CommunicationStatusEventArgs e)
-        {
-            if (CommunicationStatusChanged != null)
-                CommunicationStatusChanged(this, e);
-        }
-
-        /// <summary>
-        /// Invokes the BeforeSendingData event when data is ready to be sent to the robot (over the network).
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event arguments including the sent data.</param>
-        private void RobotBeforeSendingData(object sender, CommunicationEventArgs e)
-        {
-            if (BeforeSendingData != null)
-                BeforeSendingData(this, e);
-        }
-
-        /// <summary>
-        /// Invokes the ErrorOccured event when any error occures in the robot or connection.
-        /// </summary>
-        /// <param name="sender">The sender object.</param>
-        /// <param name="e">Event argument.</param>
-        private void RobotErrorOccured(object sender, EventArgs e)
-        {
-            if (ErrorOccured != null)
-                ErrorOccured(this, e);
-
-            // Stop execution when error occures
-            StopExecution();
-        }
+        public Controller(RobotType robotType) : base(robotType) { }
 
         # endregion
 
         # region Public Functions
-
-        /// <summary>
-        /// Connect to robot or simulator over the network.
-        /// </summary>
-        /// <param name="ipAddress">IP address of the robot (or simulator).</param>
-        /// <param name="port">Port number of the robot (or simulator).</param>
-        /// <returns>Returns true if successfully connected to the robot.</returns>
-        // ReSharper disable once UnusedMethodReturnValue.Global
-        public bool Connect(String ipAddress, int port)
-        {
-            var robotClient = new TCPClient();
-            IsConnected = Robot.Connect(robotClient, () => robotClient.Connect(ipAddress, port));
-            return IsConnected;
-        }
 
         /// <summary>
         /// Adds a command to the command processing queue.
@@ -282,8 +150,8 @@ namespace RobX.Controller
         /// </summary>
         public void PrepareForExecution()
         {
-            Robot.DisableTimeout();
-            Robot.SetMode(MotorDriver.SpeedModes.Mode0);
+            DisableTimeout();
+            SetMode(SpeedModes.Mode0);
         }
 
         /// <summary>
@@ -302,13 +170,13 @@ namespace RobX.Controller
             if (showMessage && RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Setting the speed of the left wheel to " + wheel1Speed +
-                    " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
-                    wheel2Speed + " (" + (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " (" + (wheel1Speed*RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
+                    wheel2Speed + " (" + (wheel2Speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
-            Robot.SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
+            SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
             if (time > 0)
-                Thread.Sleep(TimeSpan.FromMilliseconds(time/Settings.Default.SimulationSpeed));
+                Thread.Sleep(TimeSpan.FromMilliseconds(time/_simulationSpeed));
         }
 
         /// <summary>
@@ -324,15 +192,15 @@ namespace RobX.Controller
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot " + ((wheel1Speed < wheel2Speed) ? "counter-" : "") + "clockwise " +
                     degrees.ToString("0.0") + " degrees with the speed of the left wheel set to " +
-                    wheel1Speed + " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    wheel1Speed + " (" + (wheel1Speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) and the right wheel set to " + wheel2Speed + " (" +
-                    (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
+                    (wheel2Speed*RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
-            var deltaV = (wheel1Speed - wheel2Speed)*Robot.RobotSpeedToMmpS/1000F;
+            var deltaV = (wheel1Speed - wheel2Speed)*RobotSpeedToMmpS/1000F;
             var radians = degrees*Math.PI/180F;
-            var milliseconds = Math.Abs(2*Robot.Radius*radians/deltaV);
+            var milliseconds = Math.Abs(2*Radius*radians/deltaV);
 
-            Robot.SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
+            SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
             SetSpeedMilliseconds(milliseconds, wheel1Speed, wheel2Speed, false);
         }
 
@@ -351,8 +219,8 @@ namespace RobX.Controller
             if (RobotStatusChanged != null && showMessage)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Setting the speed of the left wheel to " + wheel1Speed +
-                    " (" + (wheel1Speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
-                    wheel2Speed + " (" + (wheel2Speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    " (" + (wheel1Speed*RobotSpeedToMmpS).ToString("0.0") + " mm/s) and the right wheel to " +
+                    wheel2Speed + " (" + (wheel2Speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
             throw new NotImplementedException("Error! This function is not implemented yet!");
@@ -365,7 +233,7 @@ namespace RobX.Controller
         {
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs("Stopping robot."));
-            Robot.SetMode(MotorDriver.SpeedModes.Mode0);
+            SetMode(SpeedModes.Mode0);
             SetSpeedMilliseconds(0, 0, 0, false);
         }
 
@@ -382,7 +250,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(time, speed, speed, false);
@@ -401,7 +269,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(time, (sbyte) (-speed), (sbyte) (-speed), false);
@@ -420,10 +288,10 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight forward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
-            var timeout = distance/(Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
+            var timeout = distance/(RobotSpeedToMmpS*Math.Abs(speed))*1000F;
             SetSpeedMilliseconds(timeout, speed, speed, false);
         }
 
@@ -440,10 +308,10 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Moving straight backward with the speed of both wheels set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) for " + distance.ToString("0.0") + " millimeters."));
 
-            var timeout = distance/(Robot.RobotSpeedToMmpS*Math.Abs(speed))*1000F;
+            var timeout = distance/(RobotSpeedToMmpS*Math.Abs(speed))*1000F;
             SetSpeedMilliseconds(timeout, (sbyte) (-speed), (sbyte) (-speed), false);
         }
 
@@ -458,7 +326,7 @@ namespace RobX.Controller
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot counter-clockwise around center of robot " +
                     degrees.ToString("0.0") + " degrees with the speed set to " + speed +
-                    " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
+                    " (" + (speed*RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
             SetSpeedDegrees(degrees, (sbyte) (-speed), speed, false);
         }
@@ -474,7 +342,7 @@ namespace RobX.Controller
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot " +
                     degrees.ToString("0.0") + " degrees with the speed set to " + speed +
-                    " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
+                    " (" + (speed*RobotSpeedToMmpS).ToString("0.0") + " mm/s)."));
 
             SetSpeedDegrees(degrees, speed, (sbyte) (-speed), false);
         }
@@ -492,7 +360,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot counter-clockwise around center of robot with the speed set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) + for " + time.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(time, (sbyte) (-speed), speed, false);
@@ -511,7 +379,7 @@ namespace RobX.Controller
             if (RobotStatusChanged != null)
                 RobotStatusChanged(this, new CommunicationStatusEventArgs(
                     "Turning robot clockwise around center of robot with the speed set to " +
-                    speed + " (" + (speed*Robot.RobotSpeedToMmpS).ToString("0.0") +
+                    speed + " (" + (speed*RobotSpeedToMmpS).ToString("0.0") +
                     " mm/s) + for " + time.ToString("0.00") + " milliseconds."));
 
             SetSpeedMilliseconds(time, speed, (sbyte) (-speed), false);
@@ -530,7 +398,7 @@ namespace RobX.Controller
             bool motor2Trip, motor1Short, motor2Short;
             _errorString = "";
 
-            if (Robot.GetError(out voltsUnder16, out voltsOver30, out motor1Trip,
+            if (GetError(out voltsUnder16, out voltsOver30, out motor1Trip,
                 out motor2Trip, out motor1Short, out motor2Short)) return true;
 
             if (voltsOver30)
@@ -552,32 +420,19 @@ namespace RobX.Controller
         /// Returns a string containing the errors occured in the recent <see cref="CheckHealth"/> function call.
         /// </summary>
         /// <returns>The string describing the error occured.</returns>
-        // ReSharper disable once UnusedMember.Global
         public string GetErrorDescription()
         {
             return _errorString;
         }
 
         /// <summary>
-        /// Estimates the delay of communication with robot by sending a single command and calculating the responce time.
-        /// </summary>
-        /// <returns>Estimated delay of communication with robot in milliseconds.</returns>
-        // ReSharper disable once UnusedMember.Global
-        public TimeSpan CalculateDelay()
-        {
-            var now = DateTime.Now;
-            Robot.GetVersion();
-            return DateTime.Now - now;
-        }
-
-        /// <summary>
         /// Sets the simulator's simulation speed. Works only when connected to simulator.
         /// </summary>
         /// <param name="speed">Simulation speed (Real-time simulation speed = 1.0).</param>
-        public void SetSimulationSpeed(ushort speed)
+        public new void SetSimulationSpeed(ushort speed)
         {
-            Settings.Default.SimulationSpeed = speed/10F;
-            Robot.SetSimulationSpeed(speed);
+            _simulationSpeed = speed/10F;
+            base.SetSimulationSpeed(speed);
         }
 
         # endregion

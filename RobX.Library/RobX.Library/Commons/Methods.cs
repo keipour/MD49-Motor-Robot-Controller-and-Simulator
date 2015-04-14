@@ -9,6 +9,7 @@ using System.Xml;
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
 namespace RobX.Library.Commons
 {
     /// <summary>

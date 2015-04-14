@@ -6,6 +6,7 @@ using System.Net.Sockets;
 
 # endregion
 
+// ReSharper disable UnusedMember.Global
 namespace RobX.Library.Communication.TCP
 {
     /// <summary>
