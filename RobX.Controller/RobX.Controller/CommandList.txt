@@ -1,0 +1,11 @@
+﻿MoveForwardForDistance, 2400, 20
+SetSpeedForDegrees, 90, 30, 10
+MoveForwardForDistance, 3020, 20
+SetSpeedForDegrees, -90, 10, 25
+MoveForwardForDistance, 1000, 20
+MoveBackwardForDistance, 1000, 20
+SetSpeedForDegrees, 90, -10, -25
+MoveBackwardForDistance, 3020, 20
+SetSpeedForDegrees, -90, -30, -10
+MoveBackwardForDistance, 2000, 20
+Stop
