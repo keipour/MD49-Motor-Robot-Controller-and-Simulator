@@ -1,4 +1,7 @@
-﻿namespace RobX.Library.Robot
+﻿using System;
+// ReSharper disable UnusedMember.Global
+
+namespace RobX.Library.Robot
 {
     /// <summary>
     /// Class that contains a controller command.
@@ -103,7 +106,7 @@
         /// <para>Works as follows:</para>
         /// <para>1. For timed commands it is interpreted as the time in milliseconds.</para>
         /// <para>2. For distanced commands it is interpreted as the distance in millimeters.</para>
-        /// <para>3. For degree commands it is interpreted as the degree.</para>
+        /// <para>3. For degree commands it is interpreted as the amount of degrees.</para>
         /// <para>4. For stop command it has no effect.</para>
         /// </summary>
         public readonly double Amount;
@@ -118,7 +121,7 @@
         /// <param name="type">Type of controller command.</param>
         /// <param name="amount"><para>1. For timed commands it is interpreted as the time in milliseconds.</para>
         /// <para>2. For distanced commands it is interpreted as the distance in millimeters.</para>
-        /// <para>3. For degree commands it is interpreted as ten times the degree (i.e. 1 = 0.1 degrees).</para>
+        /// <para>3. For degree commands it is interpreted as the amount of degrees.</para>
         /// <para>4. For stop command it has no effect.</para></param>
         /// <param name="speed1"><para>Works as follows (range: -127 to +127):</para>
         /// <para>1. For forward and backward movement is the speed of both wheels in the forward/backward direction.</para>
@@ -129,12 +132,54 @@
         /// <param name="speed2"><para>Works as follows (range: -127 to +127):</para>
         /// <para>1. For SetSpeed commands is the speed of the right wheel.</para>
         /// <para>2. For other commands it has no effect.</para></param>
-        public Command(Types type, int amount = 100, sbyte speed1 = 0, sbyte speed2 = 0)
+        public Command(Types type, double amount = 100, sbyte speed1 = 0, sbyte speed2 = 0)
         {
             Type = type;
             Amount = amount;
             Speed1 = speed1;
             Speed2 = speed2;
+        }
+
+        # endregion
+
+        # region Public and Static Functions
+
+        /// <summary>
+        /// Number of parameters for a given command type.
+        /// </summary>
+        /// <param name="type">The input command type.</param>
+        /// <returns>Returns the number of parameters of the given command type.</returns>
+        public static int NumberOfParameters(Types type)
+        {
+            switch (type)
+            {
+                case Types.SetSpeedForTime:
+                case Types.SetSpeedForDistance:
+                case Types.SetSpeedForDegrees:
+                    return 3;
+                case Types.MoveForwardForTime:
+                case Types.MoveForwardForDistance:
+                case Types.MoveBackwardForTime:
+                case Types.MoveBackwardForDistance:
+                case Types.RotateLeftForTime:
+                case Types.RotateLeftForDegrees:
+                case Types.RotateRightForTime:
+                case Types.RotateRightForDegrees:
+                    return 2;
+                case Types.Stop:
+                    return 0;
+                default:
+                    throw new Exception("Parameter number for the command is not assigned yet!");
+            }
+        }
+
+        /// <summary>
+        /// Number of parameters for the current command.
+        /// </summary>
+        /// <returns>Returns the number of parameters of the current command.</returns>
+        public int NumberOfParameters()
+        {
+            return NumberOfParameters(Type);
         }
 
         # endregion
