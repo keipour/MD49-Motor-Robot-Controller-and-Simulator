@@ -182,6 +182,111 @@ namespace RobX.Library.Robot
             return NumberOfParameters(Type);
         }
 
+        /// <summary>
+        /// Tries to parse the input string as a command.
+        /// </summary>
+        /// <param name="parseString">The input string that should be parsed.</param>
+        /// <param name="command">Output command that is the result of parsing the input string.
+        /// This parameter will be null if parsing fails.</param>
+        /// <returns>Returns true if the input string is parsed successfully; otherwise returns false.</returns>
+        public static bool TryParse(string parseString, out Command command)
+        {
+            command = null;
+            var tokens = parseString.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Parse the command type
+            Types type;
+            try
+            {
+                type = (Types)Enum.Parse(typeof(Types), tokens[0], true);
+            }
+            catch
+            {
+                return false;
+            }
+
+            // Get the number of parameters for the read command type
+            var numOfParams = NumberOfParameters(type);
+
+            // Our work is done if there are no parameters
+            if (numOfParams == 0)
+            {
+                command = new Command(type);
+                return true;
+            }
+
+            // Parse the amount (which is double)
+            double amount;
+            if (Double.TryParse(tokens[1], out amount) == false)
+                return false;
+
+            // Our work is done if there is only 1 parameter needed
+            if (numOfParams == 1)
+            {
+                command = new Command(type, amount);
+                return true;
+            }
+
+            // Parse speed1 (which is sbyte)
+            sbyte speed1;
+            if (SByte.TryParse(tokens[2], out speed1) == false)
+                return false;
+
+            // Our work is done if there are only 2 parameters for the command type
+            if (numOfParams == 2)
+            {
+                command = new Command(type, amount, speed1);
+                return true;
+            }
+
+            // Parse speed2 (which is sbyte)
+            sbyte speed2;
+            if (SByte.TryParse(tokens[3], out speed2) == false)
+                return false;
+
+            command = new Command(type, amount, speed1, speed2);
+            return true;
+        }
+
+        /// <summary>
+        /// Parses the input string as a command.
+        /// </summary>
+        /// <param name="parseString">The input string that should be parsed.</param>
+        /// <returns>Returns the command instance that is the result of parsing the input string.</returns>
+        public static Command Parse(string parseString)
+        {
+            var tokens = parseString.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Parse the command type
+            var type = (Types)Enum.Parse(typeof(Types), tokens[0], true);
+
+            // Get the number of parameters for the read command type
+            var numOfParams = NumberOfParameters(type);
+
+            // Our work is done if there are no parameters
+            if (numOfParams == 0)
+                return new Command(type);
+
+            // Parse the amount (which is double)
+            var amount = Double.Parse(tokens[1]);
+
+            // Our work is done if there is only 1 parameter needed
+            if (numOfParams == 1)
+                return new Command(type, amount);
+
+            // Parse speed1 (which is sbyte)
+            var speed1 = SByte.Parse(tokens[2]);
+
+            // Our work is done if there are only 2 parameters for the command type
+            if (numOfParams == 2)
+                return new Command(type, amount, speed1);
+
+            // Parse speed2 (which is sbyte)
+            var speed2 = SByte.Parse(tokens[3]);
+
+            return new Command(type, amount, speed1, speed2);
+        }
+
         # endregion
     }
 }
