@@ -253,10 +253,8 @@ namespace RobX.Controller
 
             _executionThread = new Thread(StartExecution) {IsBackground = true};
 
-            var simSpeed = (ushort) (Math.Round(Settings.Default.SimulationSpeed*10));
-            Settings.Default.SimulationSpeed = simSpeed/10F;
-            if (simSpeed != 10)
-                _controller.SetSimulationSpeed(simSpeed);
+            if (Math.Abs(Settings.Default.SimulationSpeed - 1) >= 0.05)
+                _controller.SetSimulationSpeed(Settings.Default.SimulationSpeed);
             _executionThread.Start();
         }
 

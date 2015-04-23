@@ -2,6 +2,7 @@
 
 using System;
 using System.Threading;
+using RobX.Library.Commons;
 using RobX.Library.Communication;
 
 # endregion
@@ -70,42 +71,51 @@ namespace RobX.Library.Robot
 
                 switch (cmd.Type)
                 {
+                    // Controller commands
                     case Command.Types.SetSpeedForTime:
-                        SetSpeedMilliseconds(cmd.Amount, cmd.Speed1, cmd.Speed2);
+                        SetSpeedMilliseconds(cmd.DblAmount, cmd.Speed1, cmd.Speed2);
                         break;
                     case Command.Types.SetSpeedForDistance:
-                        SetSpeedMillimeters(cmd.Amount, cmd.Speed1, cmd.Speed2);
+                        SetSpeedMillimeters(cmd.DblAmount, cmd.Speed1, cmd.Speed2);
                         break;
                     case Command.Types.SetSpeedForDegrees:
-                        SetSpeedDegrees(cmd.Amount, cmd.Speed1, cmd.Speed2);
+                        SetSpeedDegrees(cmd.DblAmount, cmd.Speed1, cmd.Speed2);
                         break;
                     case Command.Types.MoveForwardForTime:
-                        MoveForwardMilliseconds(cmd.Amount, cmd.Speed1);
+                        MoveForwardMilliseconds(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.MoveForwardForDistance:
-                        MoveForwardMillimeters(cmd.Amount, cmd.Speed1);
+                        MoveForwardMillimeters(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.MoveBackwardForTime:
-                        MoveBackwardMilliseconds(cmd.Amount, cmd.Speed1);
+                        MoveBackwardMilliseconds(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.MoveBackwardForDistance:
-                        MoveBackwardMillimeters(cmd.Amount, cmd.Speed1);
+                        MoveBackwardMillimeters(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.RotateLeftForTime:
-                        RotateLeftMilliseconds(cmd.Amount, cmd.Speed1);
+                        RotateLeftMilliseconds(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.RotateLeftForDegrees:
-                        RotateLeftDegrees(cmd.Amount, cmd.Speed1);
+                        RotateLeftDegrees(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.RotateRightForTime:
-                        RotateRightMilliseconds(cmd.Amount, cmd.Speed1);
+                        RotateRightMilliseconds(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.RotateRightForDegrees:
-                        RotateRightDegrees(cmd.Amount, cmd.Speed1);
+                        RotateRightDegrees(cmd.DblAmount, cmd.Speed1);
                         break;
                     case Command.Types.Stop:
                         StopRobot();
                         break;
+
+                    // Simulator commands
+                    //case Command.Types.SetX:
+                      //  SetX(cmd.);
+
+
+                    default:
+                        throw new NotImplementedException("Execution of " + cmd.Type + " command is not implemented!");
                 }
             }
         }
@@ -398,16 +408,6 @@ namespace RobX.Library.Robot
         public string GetErrorDescription()
         {
             return _errorString;
-        }
-
-        /// <summary>
-        /// Sets the simulator's simulation speed. Works only when connected to simulator.
-        /// </summary>
-        /// <param name="speed">Simulation speed (Real-time simulation speed = 1.0).</param>
-        public new void SetSimulationSpeed(ushort speed)
-        {
-            _simulationSpeed = speed/10F;
-            base.SetSimulationSpeed(speed);
         }
 
         # endregion

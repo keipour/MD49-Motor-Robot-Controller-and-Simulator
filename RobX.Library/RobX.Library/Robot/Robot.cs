@@ -247,10 +247,12 @@ namespace RobX.Library.Robot
         /// <summary>
         /// Set angle of the robot in the environment in degrees (works only in simulation mode).
         /// </summary>
-        /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
-        public void SetAngle(short angle)
+        /// <param name="dblAngle">The angle of the robot in the environment in degrees. Will be rounded 
+        /// to the nearest tenth value (i.e. 0.1).</param>
+        public void SetAngle(double dblAngle)
         {
             if (_robotType == RobotType.Real) return;
+            var angle = (short) Math.Round(dblAngle * 10);
             byte[] buffer = { 0x00, 0x43, (byte)(angle >> 8), (byte)(angle & 0xFF) };
             RobotClient.SendData(buffer);
         }
@@ -277,10 +279,12 @@ namespace RobX.Library.Robot
         /// </summary>
         /// <param name="x">X position of the robot in the environment in millimeters.</param>
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>
-        /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
-        public void SetPose(short x, short y, short angle)
+        /// <param name="dblAngle">The angle of the robot in the environment in degrees. Will be rounded 
+        /// to the nearest tenth value (i.e. 0.1).</param>
+        public void SetPose(short x, short y, double dblAngle)
         {
             if (_robotType == RobotType.Real) return;
+            var angle = (short)Math.Round(dblAngle * 10);
             byte[] buffer =
             {
                 0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
@@ -293,10 +297,12 @@ namespace RobX.Library.Robot
         /// <summary>
         /// Set simulation speed on simulator (works only in simulation mode).
         /// </summary>
-        /// <param name="speed">Ten times the new simulation speed (1 = 0.1x).</param>
-        public void SetSimulationSpeed(ushort speed)
+        /// <param name="dblSpeed">New simulation speed (1 = 0.1x). Must be a positive decimal. Will be rounded to 
+        /// the nearest tenth value (i.e. 0.1).</param>
+        public void SetSimulationSpeed(double dblSpeed)
         {
             if (_robotType == RobotType.Real) return;
+            var speed = (ushort) Math.Round(dblSpeed*10);
             byte[] buffer = { 0x00, 0x51, (byte)(speed >> 8), (byte)(speed & 0xFF) };
             RobotClient.SendData(buffer);
         }
@@ -304,8 +310,8 @@ namespace RobX.Library.Robot
         /// <summary>
         /// Get simulation speed of simulator (works only in simulation mode).
         /// </summary>
-        /// <returns>Ten time the simulation speed of the simulator (1 = 0.1x).</returns>
-        public ushort GetSimulationSpeed()
+        /// <returns>The simulation speed of the simulator.</returns>
+        public double GetSimulationSpeed()
         {
             if (_robotType == RobotType.Real) return 0;
             byte[] buffer = { 0x00, 0x52 };
@@ -314,7 +320,7 @@ namespace RobX.Library.Robot
             buffer = ReadBytes(2);
             ushort result = buffer[1];
             result += (ushort)(buffer[0] << 8);
-            return result;
+            return result / 10F;
         }
 
         /// <summary>
