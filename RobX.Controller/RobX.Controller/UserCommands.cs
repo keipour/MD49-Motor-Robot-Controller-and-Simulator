@@ -18,7 +18,7 @@ namespace RobX.Controller
             controller.PrepareForExecution();
             controller.ResetEncoders();
 
-            controller.SetXyAngle(1500, 7550 - 2500, 0);
+            controller.SetPose(1500, 7550 - 2500, 0);
 
             controller.Commands.AddCommandsFromString(File.ReadAllText("CommandList.txt"), false);
 

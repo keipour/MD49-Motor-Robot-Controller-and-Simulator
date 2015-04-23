@@ -260,7 +260,7 @@ namespace RobX.Library.Robot
         /// </summary>
         /// <param name="x">X position of the robot in the environment in millimeters.</param>
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>
-        public void SetXy(short x, short y)
+        public void SetPosition(short x, short y)
         {
             if (_robotType == RobotType.Real) return;
             byte[] buffer =
@@ -277,7 +277,7 @@ namespace RobX.Library.Robot
         /// <param name="x">X position of the robot in the environment in millimeters.</param>
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>
         /// <param name="angle">Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).</param>
-        public void SetXyAngle(short x, short y, short angle)
+        public void SetPose(short x, short y, short angle)
         {
             if (_robotType == RobotType.Real) return;
             byte[] buffer =
