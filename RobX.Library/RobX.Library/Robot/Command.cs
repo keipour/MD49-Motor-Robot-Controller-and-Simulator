@@ -5,14 +5,14 @@
 namespace RobX.Library.Robot
 {
     /// <summary>
-    /// Class that contains a controller command.
+    /// Class that contains a command.
     /// </summary>
     public class Command
     {
-        # region Public Enum (Types)
+        # region Public Enums
 
         /// <summary>
-        /// Enum that specifies the type of controller command.
+        /// Enum that specifies the type of a command.
         /// </summary>
         public enum Types
         {
@@ -77,6 +77,28 @@ namespace RobX.Library.Robot
             Stop
         }
 
+        /// <summary>
+        /// Enum that specifies the level of the command (low-level, high-level, simulator, etc).
+        /// </summary>
+        public enum Levels
+        {
+            /// <summary>
+            /// The command is a low-level command that motor driver can understand directly.
+            /// </summary>
+            MotorDriver,
+
+            /// <summary>
+            /// The command is a high-level command that will be converted to other low-level commands
+            /// for motor driver to understand.
+            /// </summary>
+            Controller,
+
+            /// <summary>
+            /// The command is not a valid robot command; it only works for simulator.
+            /// </summary>
+            Simulator
+        }
+
         # endregion
 
         # region Public Fields
@@ -112,6 +134,42 @@ namespace RobX.Library.Robot
         /// </summary>
         public readonly double Amount;
 
+        /// <summary>
+        /// The level (low, high, simulator-leels, etc.) of the current command.
+        /// </summary>
+        public Levels Level
+        {
+            get { return GetCommandLevel(Type); }
+        }
+
+        /// <summary>
+        /// The description of parameters of the current command.
+        /// </summary>
+        public string[] ParameterDescriptions
+        {
+            get { return GetParameterDescriptions(Type); }
+        }
+
+        /// <summary>
+        /// <para>The types of the parameters for the current command.</para>
+        /// <para>D stands for <see cref="double"/> type.</para>
+        /// <para>S stands for <see cref="sbyte"/> type.</para>
+        /// <para>B stands for <see cref="byte"/> type.</para>
+        /// <para>I stands for <see cref="int"/> type.</para>
+        /// </summary>
+        public string ParameterTypes
+        {
+            get { return GetParameterTypes(Type); }
+        }
+
+        /// <summary>
+        /// The names of the parameters for the current command.
+        /// </summary>
+        public string[] ParameterNames
+        {
+            get { return GetParameterNames(Type); }
+        }
+
         # endregion
 
         # region Constructor
@@ -143,7 +201,7 @@ namespace RobX.Library.Robot
 
         # endregion
 
-        # region Public and Static Functions
+        # region Static Functions
 
         /// <summary>
         /// Get types of parameters for a given command.
@@ -177,20 +235,6 @@ namespace RobX.Library.Robot
                 default:
                     throw new Exception("Parameter number for the command is not assigned yet!");
             }
-        }
-
-        /// <summary>
-        /// Gets types of parameters for the current command.
-        /// </summary>
-        /// <returns><para>Returns the types of parameters of the current command.</para>
-        /// <para>D stands for <see cref="double"/> type.</para>
-        /// <para>S stands for <see cref="sbyte"/> type.</para>
-        /// <para>B stands for <see cref="byte"/> type.</para>
-        /// <para>I stands for <see cref="int"/> type.</para>
-        /// </returns>
-        public string GetParameterTypes()
-        {
-            return GetParameterTypes(Type);
         }
 
         /// <summary>
@@ -235,15 +279,6 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Get names of parameters for the current command.
-        /// </summary>
-        /// <returns>Returns the parameter names of the current command.</returns>
-        public string[] GetParameterNames()
-        {
-            return GetParameterNames(Type);
-        }
-
-        /// <summary>
         /// Get description of parameters for a given command.
         /// </summary>
         /// <param name="type">The input command type.</param>
@@ -285,12 +320,30 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Get description of parameters for the current command.
+        /// Get level of a given command.
         /// </summary>
-        /// <returns>Returns the parameter descriptions of the current command.</returns>
-        public string[] GetParameterDescriptions()
+        /// <param name="type">The input command type.</param>
+        /// <returns>Returns the level of the given command.</returns>
+        public static Levels GetCommandLevel(Types type)
         {
-            return GetParameterDescriptions(Type);
+            switch (type)
+            {
+                case Types.SetSpeedForTime:
+                case Types.SetSpeedForDistance:
+                case Types.SetSpeedForDegrees:
+                case Types.MoveForwardForTime:
+                case Types.MoveBackwardForTime:
+                case Types.MoveForwardForDistance:
+                case Types.MoveBackwardForDistance:
+                case Types.RotateLeftForTime:
+                case Types.RotateRightForTime:
+                case Types.RotateLeftForDegrees:
+                case Types.RotateRightForDegrees:
+                case Types.Stop:
+                    return Levels.Controller;
+                default:
+                    throw new Exception("Parameter number for the command is not assigned yet!");
+            }
         }
 
         # endregion
