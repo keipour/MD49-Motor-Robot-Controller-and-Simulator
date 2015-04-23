@@ -256,7 +256,7 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Set x and y positions of the robot in the environment in millimeters (works only in simulation mode)
+        /// Set x and y positions of the robot in the environment in millimeters (works only in simulation mode).
         /// </summary>
         /// <param name="x">X position of the robot in the environment in millimeters.</param>
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>
@@ -272,7 +272,8 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Set angle (in degrees), x and y positions (in millimeters) of the robot in the environment (works only in simulation mode).
+        /// Set angle (in degrees), x and y positions (in millimeters) of the robot in the environment 
+        /// (works only in simulation mode).
         /// </summary>
         /// <param name="x">X position of the robot in the environment in millimeters.</param>
         /// <param name="y">Y position of the robot in the environment in millimeters.</param>

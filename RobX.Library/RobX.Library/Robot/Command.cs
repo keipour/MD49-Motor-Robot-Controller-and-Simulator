@@ -74,7 +74,43 @@ namespace RobX.Library.Robot
             /// <summary>
             /// Stop the robot.
             /// </summary>
-            Stop
+            Stop,
+
+            /// <summary>
+            /// Set x position of the robot in the environment in millimeters (works only in simulation mode).
+            /// </summary>
+            SetX,
+
+            /// <summary>
+            /// Set y position of the robot in the environment in millimeters (works only in simulation mode).
+            /// </summary>
+            SetY,
+
+            /// <summary>
+            /// Set angle of the robot in the environment in degrees (works only in simulation mode).
+            /// </summary>
+            SetAngle,
+
+            /// <summary>
+            /// Set x and y positions of the robot in the environment in millimeters (works only in simulation mode).
+            /// </summary>
+            SetPosition,
+
+            /// <summary>
+            /// Set angle (in degrees), x and y positions (in millimeters) of the robot in the environment 
+            /// (works only in simulation mode).
+            /// </summary>
+            SetPose,
+
+            /// <summary>
+            /// Get simulation speed of simulator (works only in simulation mode).
+            /// </summary>
+            GetSimulationSpeed,
+
+            /// <summary>
+            /// Set simulation speed on simulator (works only in simulation mode).
+            /// </summary>
+            SetSimulationSpeed
         }
 
         /// <summary>
@@ -212,11 +248,15 @@ namespace RobX.Library.Robot
         /// <para>S stands for <see cref="sbyte"/> type.</para>
         /// <para>B stands for <see cref="byte"/> type.</para>
         /// <para>I stands for <see cref="int"/> type.</para>
+        /// <para>U stands for <see cref="uint"/> type.</para>
+        /// <para>s stands for <see cref="short"/> type.</para>
+        /// <para>u stands for <see cref="ushort"/> type.</para>
         /// </returns>
         public static string GetParameterTypes(Types type)
         {
             switch (type)
             {
+                // Controller commands
                 case Types.SetSpeedForTime:
                 case Types.SetSpeedForDistance:
                 case Types.SetSpeedForDegrees:
@@ -232,8 +272,23 @@ namespace RobX.Library.Robot
                     return "DS";
                 case Types.Stop:
                     return "";
+
+                // Simulator commands
+                case Types.SetX:
+                case Types.SetY:
+                case Types.SetAngle:
+                    return "s";
+                case Types.SetPosition:
+                    return "ss";
+                case Types.SetPose:
+                    return "sss";
+                case Types.SetSimulationSpeed:
+                    return "u";
+                case Types.GetSimulationSpeed:
+                    return "";
+
                 default:
-                    throw new Exception("Parameter number for the command is not assigned yet!");
+                    throw new Exception("Parameter types for the " + type + " command is not assigned yet!");
             }
         }
 
@@ -244,12 +299,19 @@ namespace RobX.Library.Robot
         /// <returns>Returns the parameter names of the given command.</returns>
         public static string[] GetParameterNames(Types type)
         {
+            // Controller parameters
             const string strSpeed = "BothWheelSpeeds";
             const string strSpeed1 = "LeftWheelSpeed";
             const string strSpeed2 = "RightWheelSpeed";
             const string strTime = "Time";
             const string strDistance = "Distance";
             const string strDegrees = "Degrees";
+
+            // Simulator parameters
+            const string strX = "X";
+            const string strY = "Y";
+            const string strAngle = "Angle";
+            const string strSimSpeed = "SimulationSpeed";
 
             switch (type)
             {
@@ -273,8 +335,25 @@ namespace RobX.Library.Robot
                     return new[] { strDegrees, strSpeed };
                 case Types.Stop:
                     return new string[0];
+
+                // Simulator commands
+                case Types.SetX:
+                    return new[] { strX };
+                case Types.SetY:
+                    return new[] { strY };
+                case Types.SetAngle:
+                    return new[] { strAngle };
+                case Types.SetPosition:
+                    return new[] { strX, strY };
+                case Types.SetPose:
+                    return new[] { strX, strY, strAngle };
+                case Types.SetSimulationSpeed:
+                    return new[] { strSimSpeed };
+                case Types.GetSimulationSpeed:
+                    return new string[0];
+
                 default:
-                    throw new Exception("Parameter number for the command is not assigned yet!");
+                    throw new Exception("Parameter names for the " + type + " command is not assigned yet!");
             }
         }
 
@@ -285,15 +364,22 @@ namespace RobX.Library.Robot
         /// <returns>Returns the parameter descriptions of the given command.</returns>
         public static string[] GetParameterDescriptions(Types type)
         {
+            // Controller parameters
             const string strSpeed = "Speed of the both wheels; should be an integer in the range -127 to +127.";
             const string strSpeed1 = "Speed of the left wheel; should be an integer in the range -127 to +127.";
             const string strSpeed2 = "Speed of the right wheel; should be an integer in the range -127 to +127.";
             const string strTime = "Time to move in milliseconds; should be a non-negative double number.";
             const string strDistance = "Distance to move in millimeters; should be a non-negative double number.";
             const string strDegrees = "Amount of degrees to turn; should be a double number.";
+            // Simulator parameters
+            const string strX = "X position of the robot in the environment in millimeters.";
+            const string strY = "Y position of the robot in the environment in millimeters.";
+            const string strAngle = "Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).";
+            const string strSimSpeed = "Ten times the new simulation speed (1 = 0.1x).";
 
             switch (type)
             {
+                // Controller commands
                 case Types.SetSpeedForTime:
                     return new[] { strTime, strSpeed1, strSpeed2 };
                 case Types.SetSpeedForDistance:
@@ -314,8 +400,25 @@ namespace RobX.Library.Robot
                     return new[] { strDegrees, strSpeed };
                 case Types.Stop:
                     return new string[0];
+
+                // Simulator commands
+                case Types.SetX:
+                    return new[] { strX };
+                case Types.SetY:
+                    return new[] { strY };
+                case Types.SetAngle:
+                    return new[] { strAngle };
+                case Types.SetPosition:
+                    return new[] { strX, strY };
+                case Types.SetPose:
+                    return new[] { strX, strY, strAngle };
+                case Types.SetSimulationSpeed:
+                    return new[] { strSimSpeed };
+                case Types.GetSimulationSpeed:
+                    return new string[0];
+
                 default:
-                    throw new Exception("Parameter number for the command is not assigned yet!");
+                    throw new Exception("Parameter descriptions for the " + type + " command is not assigned yet!");
             }
         }
 
@@ -341,8 +444,18 @@ namespace RobX.Library.Robot
                 case Types.RotateRightForDegrees:
                 case Types.Stop:
                     return Levels.Controller;
+
+                case Types.SetX:
+                case Types.SetY:
+                case Types.SetAngle:
+                case Types.SetPosition:
+                case Types.SetPose:
+                case Types.SetSimulationSpeed:
+                case Types.GetSimulationSpeed:
+                    return Levels.Simulator;
+
                 default:
-                    throw new Exception("Parameter number for the command is not assigned yet!");
+                    throw new Exception("Level for the " + type + " command is not assigned yet!");
             }
         }
 
@@ -408,6 +521,15 @@ namespace RobX.Library.Robot
                         break;
                     case 'I':
                         parameters[i] = Int32.Parse(tokens[i + 1]);
+                        break;
+                    case 'U':
+                        parameters[i] = UInt32.Parse(tokens[i + 1]);
+                        break;
+                    case 's':
+                        parameters[i] = Int16.Parse(tokens[i + 1]);
+                        break;
+                    case 'u':
+                        parameters[i] = UInt16.Parse(tokens[i + 1]);
                         break;
                     default:
                         throw new NotImplementedException("The method for '" + parameterTypes[i] +
