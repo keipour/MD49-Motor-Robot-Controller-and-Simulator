@@ -86,16 +86,22 @@ namespace RobX.Library.Robot
         /// Each command should be in a separate line.
         /// </summary>
         /// <param name="commandList">Command list.</param>
-        public void AddCommandsFromString(string commandList)
+        /// <param name="skipErrors">If true, skips command lines that contain errors; otherwise throws an exception 
+        /// indicating the kind of error occured during the parsing of the commands.</param>
+        public void AddCommandsFromString(string commandList, bool skipErrors = true)
         {
             var lines = commandList.Split(new[] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var line in lines)
             {
-                Command cmd;
-                if (Command.TryParse(line, out cmd) == false)
-                    continue;
-                Enqueue(cmd);
+                if (skipErrors)
+                {
+                    Command cmd;
+                    if (Command.TryParse(line, out cmd))
+                        Enqueue(cmd);
+                }
+                else
+                    Enqueue(Command.Parse(line));
             }
         }
 

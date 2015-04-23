@@ -78,7 +78,7 @@ namespace RobX.Library.Robot
 
         # endregion
 
-        # region Public Fields 
+        # region Public Fields
 
         /// <summary>
         /// Type of controller command.
@@ -119,25 +119,25 @@ namespace RobX.Library.Robot
         /// Constructor for Command class.
         /// </summary>
         /// <param name="type">Type of controller command.</param>
-        /// <param name="amount"><para>1. For timed commands it is interpreted as the time in milliseconds.</para>
+        /// <param name="doubleAmount"><para>1. For timed commands it is interpreted as the time in milliseconds.</para>
         /// <para>2. For distanced commands it is interpreted as the distance in millimeters.</para>
         /// <para>3. For degree commands it is interpreted as the amount of degrees.</para>
         /// <para>4. For stop command it has no effect.</para></param>
-        /// <param name="speed1"><para>Works as follows (range: -127 to +127):</para>
+        /// <param name="sbyteSpeed1"><para>Works as follows (range: -127 to +127):</para>
         /// <para>1. For forward and backward movement is the speed of both wheels in the forward/backward direction.</para>
         /// <para>2. For SetSpeed commands is the speed of the left wheel.</para>
         /// <para>3. For right (clockwise) rotation the speed of left wheel will be Speed1 and the speed of right wheel will be -Speed1.</para>
         /// <para>4. For left (counter-clockwise) rotation the speed of left wheel will be -Speed1 and the speed of right wheel will be Speed1.</para>
         /// <para>5. For stop command it has no effect.</para></param>
-        /// <param name="speed2"><para>Works as follows (range: -127 to +127):</para>
+        /// <param name="sbyteSpeed2"><para>Works as follows (range: -127 to +127):</para>
         /// <para>1. For SetSpeed commands is the speed of the right wheel.</para>
         /// <para>2. For other commands it has no effect.</para></param>
-        public Command(Types type, double amount = 100, sbyte speed1 = 0, sbyte speed2 = 0)
+        public Command(Types type, object doubleAmount = null, object sbyteSpeed1 = null, object sbyteSpeed2 = null)
         {
             Type = type;
-            Amount = amount;
-            Speed1 = speed1;
-            Speed2 = speed2;
+            if (doubleAmount != null) Amount = (double) doubleAmount;
+            if (sbyteSpeed1 != null) Speed1 = (sbyte) sbyteSpeed1;
+            if (sbyteSpeed2 != null) Speed2 = (sbyte) sbyteSpeed2;
         }
 
         # endregion
@@ -145,18 +145,23 @@ namespace RobX.Library.Robot
         # region Public and Static Functions
 
         /// <summary>
-        /// Number of parameters for a given command type.
+        /// Get types of parameters for a given command.
         /// </summary>
         /// <param name="type">The input command type.</param>
-        /// <returns>Returns the number of parameters of the given command type.</returns>
-        public static int NumberOfParameters(Types type)
+        /// <returns><para>Returns the parameter types of the given command.</para>
+        /// <para>D stands for <see cref="double"/> type.</para>
+        /// <para>S stands for <see cref="sbyte"/> type.</para>
+        /// <para>B stands for <see cref="byte"/> type.</para>
+        /// <para>I stands for <see cref="int"/> type.</para>
+        /// </returns>
+        public static string GetParameterTypes(Types type)
         {
             switch (type)
             {
                 case Types.SetSpeedForTime:
                 case Types.SetSpeedForDistance:
                 case Types.SetSpeedForDegrees:
-                    return 3;
+                    return "DSS";
                 case Types.MoveForwardForTime:
                 case Types.MoveForwardForDistance:
                 case Types.MoveBackwardForTime:
@@ -165,22 +170,31 @@ namespace RobX.Library.Robot
                 case Types.RotateLeftForDegrees:
                 case Types.RotateRightForTime:
                 case Types.RotateRightForDegrees:
-                    return 2;
+                    return "DS";
                 case Types.Stop:
-                    return 0;
+                    return "";
                 default:
                     throw new Exception("Parameter number for the command is not assigned yet!");
             }
         }
 
         /// <summary>
-        /// Number of parameters for the current command.
+        /// Gets types of parameters for the current command.
         /// </summary>
-        /// <returns>Returns the number of parameters of the current command.</returns>
-        public int NumberOfParameters()
+        /// <returns><para>Returns the types of parameters of the current command.</para>
+        /// <para>D stands for <see cref="double"/> type.</para>
+        /// <para>S stands for <see cref="sbyte"/> type.</para>
+        /// <para>B stands for <see cref="byte"/> type.</para>
+        /// <para>I stands for <see cref="int"/> type.</para>
+        /// </returns>
+        public string GetParameterTypes()
         {
-            return NumberOfParameters(Type);
+            return GetParameterTypes(Type);
         }
+
+        # endregion
+
+        # region Parse and TryParse Functions
 
         /// <summary>
         /// Tries to parse the input string as a command.
@@ -191,60 +205,15 @@ namespace RobX.Library.Robot
         /// <returns>Returns true if the input string is parsed successfully; otherwise returns false.</returns>
         public static bool TryParse(string parseString, out Command command)
         {
-            command = null;
-            var tokens = parseString.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            // Parse the command type
-            Types type;
             try
             {
-                type = (Types)Enum.Parse(typeof(Types), tokens[0], true);
+                command = Parse(parseString);
             }
             catch
             {
+                command = null;
                 return false;
             }
-
-            // Get the number of parameters for the read command type
-            var numOfParams = NumberOfParameters(type);
-
-            // Our work is done if there are no parameters
-            if (numOfParams == 0)
-            {
-                command = new Command(type);
-                return true;
-            }
-
-            // Parse the amount (which is double)
-            double amount;
-            if (Double.TryParse(tokens[1], out amount) == false)
-                return false;
-
-            // Our work is done if there is only 1 parameter needed
-            if (numOfParams == 1)
-            {
-                command = new Command(type, amount);
-                return true;
-            }
-
-            // Parse speed1 (which is sbyte)
-            sbyte speed1;
-            if (SByte.TryParse(tokens[2], out speed1) == false)
-                return false;
-
-            // Our work is done if there are only 2 parameters for the command type
-            if (numOfParams == 2)
-            {
-                command = new Command(type, amount, speed1);
-                return true;
-            }
-
-            // Parse speed2 (which is sbyte)
-            sbyte speed2;
-            if (SByte.TryParse(tokens[3], out speed2) == false)
-                return false;
-
-            command = new Command(type, amount, speed1, speed2);
             return true;
         }
 
@@ -253,6 +222,8 @@ namespace RobX.Library.Robot
         /// </summary>
         /// <param name="parseString">The input string that should be parsed.</param>
         /// <returns>Returns the command instance that is the result of parsing the input string.</returns>
+        /// <exception cref="FormatException">This exception is thrown when the number of arguments for the 
+        /// command specified in the input string is not the number required by the specified command.</exception>
         public static Command Parse(string parseString)
         {
             var tokens = parseString.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
@@ -261,30 +232,36 @@ namespace RobX.Library.Robot
             var type = (Types)Enum.Parse(typeof(Types), tokens[0], true);
 
             // Get the number of parameters for the read command type
-            var numOfParams = NumberOfParameters(type);
+            var parameterTypes = GetParameterTypes(type);
 
-            // Our work is done if there are no parameters
-            if (numOfParams == 0)
-                return new Command(type);
+            if (tokens.Length != parameterTypes.Length + 1)
+                throw new FormatException("The " + type + " command requires exactly " + parameterTypes.Length + " arguments!");
 
-            // Parse the amount (which is double)
-            var amount = Double.Parse(tokens[1]);
+            var parameters = new object[3];
 
-            // Our work is done if there is only 1 parameter needed
-            if (numOfParams == 1)
-                return new Command(type, amount);
+            for (var i = 0; i < parameterTypes.Length; ++i)
+            {
+                switch (parameterTypes[i])
+                {
+                    case 'D':
+                        parameters[i] = Double.Parse(tokens[i + 1]);
+                        break;
+                    case 'S':
+                        parameters[i] = SByte.Parse(tokens[i + 1]);
+                        break;
+                    case 'B':
+                        parameters[i] = Byte.Parse(tokens[i + 1]);
+                        break;
+                    case 'I':
+                        parameters[i] = Int32.Parse(tokens[i + 1]);
+                        break;
+                    default:
+                        throw new NotImplementedException("The method for '" + parameterTypes[i] +
+                            "' identifier type is not implemented!");
+                }
+            }
 
-            // Parse speed1 (which is sbyte)
-            var speed1 = SByte.Parse(tokens[2]);
-
-            // Our work is done if there are only 2 parameters for the command type
-            if (numOfParams == 2)
-                return new Command(type, amount, speed1);
-
-            // Parse speed2 (which is sbyte)
-            var speed2 = SByte.Parse(tokens[3]);
-
-            return new Command(type, amount, speed1, speed2);
+            return new Command(type, parameters[0], parameters[1], parameters[2]);
         }
 
         # endregion
