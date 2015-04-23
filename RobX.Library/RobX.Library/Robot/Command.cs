@@ -1,4 +1,5 @@
 ﻿using System;
+
 // ReSharper disable UnusedMember.Global
 
 namespace RobX.Library.Robot
@@ -190,6 +191,106 @@ namespace RobX.Library.Robot
         public string GetParameterTypes()
         {
             return GetParameterTypes(Type);
+        }
+
+        /// <summary>
+        /// Get names of parameters for a given command.
+        /// </summary>
+        /// <param name="type">The input command type.</param>
+        /// <returns>Returns the parameter names of the given command.</returns>
+        public static string[] GetParameterNames(Types type)
+        {
+            const string strSpeed = "BothWheelSpeeds";
+            const string strSpeed1 = "LeftWheelSpeed";
+            const string strSpeed2 = "RightWheelSpeed";
+            const string strTime = "Time";
+            const string strDistance = "Distance";
+            const string strDegrees = "Degrees";
+
+            switch (type)
+            {
+                case Types.SetSpeedForTime:
+                    return new[] { strTime, strSpeed1, strSpeed2 };
+                case Types.SetSpeedForDistance:
+                    return new[] { strDistance, strSpeed1, strSpeed2 };
+                case Types.SetSpeedForDegrees:
+                    return new[] { strDegrees, strSpeed1, strSpeed2 };
+                case Types.MoveForwardForTime:
+                case Types.MoveBackwardForTime:
+                    return new[] { strTime, strSpeed };
+                case Types.MoveForwardForDistance:
+                case Types.MoveBackwardForDistance:
+                    return new[] { strDistance, strSpeed };
+                case Types.RotateLeftForTime:
+                case Types.RotateRightForTime:
+                    return new[] { strTime, strSpeed };
+                case Types.RotateLeftForDegrees:
+                case Types.RotateRightForDegrees:
+                    return new[] { strDegrees, strSpeed };
+                case Types.Stop:
+                    return new string[0];
+                default:
+                    throw new Exception("Parameter number for the command is not assigned yet!");
+            }
+        }
+
+        /// <summary>
+        /// Get names of parameters for the current command.
+        /// </summary>
+        /// <returns>Returns the parameter names of the current command.</returns>
+        public string[] GetParameterNames()
+        {
+            return GetParameterNames(Type);
+        }
+
+        /// <summary>
+        /// Get description of parameters for a given command.
+        /// </summary>
+        /// <param name="type">The input command type.</param>
+        /// <returns>Returns the parameter descriptions of the given command.</returns>
+        public static string[] GetParameterDescriptions(Types type)
+        {
+            const string strSpeed = "Speed of the both wheels; should be an integer in the range -127 to +127.";
+            const string strSpeed1 = "Speed of the left wheel; should be an integer in the range -127 to +127.";
+            const string strSpeed2 = "Speed of the right wheel; should be an integer in the range -127 to +127.";
+            const string strTime = "Time to move in milliseconds; should be a non-negative double number.";
+            const string strDistance = "Distance to move in millimeters; should be a non-negative double number.";
+            const string strDegrees = "Amount of degrees to turn; should be a double number.";
+
+            switch (type)
+            {
+                case Types.SetSpeedForTime:
+                    return new[] { strTime, strSpeed1, strSpeed2 };
+                case Types.SetSpeedForDistance:
+                    return new[] { strDistance, strSpeed1, strSpeed2 };
+                case Types.SetSpeedForDegrees:
+                    return new[] { strDegrees, strSpeed1, strSpeed2 };
+                case Types.MoveForwardForTime:
+                case Types.MoveBackwardForTime:
+                    return new[] { strTime, strSpeed };
+                case Types.MoveForwardForDistance:
+                case Types.MoveBackwardForDistance:
+                    return new[] { strDistance, strSpeed };
+                case Types.RotateLeftForTime:
+                case Types.RotateRightForTime:
+                    return new[] { strTime, strSpeed };
+                case Types.RotateLeftForDegrees:
+                case Types.RotateRightForDegrees:
+                    return new[] { strDegrees, strSpeed };
+                case Types.Stop:
+                    return new string[0];
+                default:
+                    throw new Exception("Parameter number for the command is not assigned yet!");
+            }
+        }
+
+        /// <summary>
+        /// Get description of parameters for the current command.
+        /// </summary>
+        /// <returns>Returns the parameter descriptions of the current command.</returns>
+        public string[] GetParameterDescriptions()
+        {
+            return GetParameterDescriptions(Type);
         }
 
         # endregion
