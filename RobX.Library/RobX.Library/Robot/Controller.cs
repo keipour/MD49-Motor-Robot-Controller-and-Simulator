@@ -43,13 +43,25 @@ namespace RobX.Library.Robot
 
         # endregion
 
+        # region ErrorOccured Event
+
+        private void OnErrorOccured(object sender, EventArgs e)
+        {
+            StopExecution();
+        }
+
+        # endregion
+
         # region Constructor
 
         /// <summary>
         /// Constructor for the Controller class.
         /// </summary>
         /// <param name="robotType">Specifies robot type (Simulation vs. Real).</param>
-        public Controller(RobotType robotType) : base(robotType) { }
+        public Controller(RobotType robotType) : base(robotType)
+        {
+            ErrorOccured += OnErrorOccured;
+        }
 
         # endregion
 
