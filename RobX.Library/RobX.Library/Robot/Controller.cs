@@ -2,7 +2,6 @@
 
 using System;
 using System.Threading;
-using RobX.Library.Commons;
 using RobX.Library.Communication;
 
 # endregion
@@ -73,46 +72,69 @@ namespace RobX.Library.Robot
                 {
                     // Controller commands
                     case Command.Types.SetSpeedForTime:
-                        SetSpeedMilliseconds(cmd.DblAmount, cmd.Speed1, cmd.Speed2);
+                        SetSpeedMilliseconds(cmd.Amount, cmd.Speed1, cmd.Speed2);
                         break;
                     case Command.Types.SetSpeedForDistance:
-                        SetSpeedMillimeters(cmd.DblAmount, cmd.Speed1, cmd.Speed2);
+                        SetSpeedMillimeters(cmd.Amount, cmd.Speed1, cmd.Speed2);
                         break;
                     case Command.Types.SetSpeedForDegrees:
-                        SetSpeedDegrees(cmd.DblAmount, cmd.Speed1, cmd.Speed2);
+                        SetSpeedDegrees(cmd.Amount, cmd.Speed1, cmd.Speed2);
                         break;
                     case Command.Types.MoveForwardForTime:
-                        MoveForwardMilliseconds(cmd.DblAmount, cmd.Speed1);
+                        MoveForwardMilliseconds(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.MoveForwardForDistance:
-                        MoveForwardMillimeters(cmd.DblAmount, cmd.Speed1);
+                        MoveForwardMillimeters(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.MoveBackwardForTime:
-                        MoveBackwardMilliseconds(cmd.DblAmount, cmd.Speed1);
+                        MoveBackwardMilliseconds(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.MoveBackwardForDistance:
-                        MoveBackwardMillimeters(cmd.DblAmount, cmd.Speed1);
+                        MoveBackwardMillimeters(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.RotateLeftForTime:
-                        RotateLeftMilliseconds(cmd.DblAmount, cmd.Speed1);
+                        RotateLeftMilliseconds(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.RotateLeftForDegrees:
-                        RotateLeftDegrees(cmd.DblAmount, cmd.Speed1);
+                        RotateLeftDegrees(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.RotateRightForTime:
-                        RotateRightMilliseconds(cmd.DblAmount, cmd.Speed1);
+                        RotateRightMilliseconds(cmd.Amount, cmd.Speed1);
                         break;
                     case Command.Types.RotateRightForDegrees:
-                        RotateRightDegrees(cmd.DblAmount, cmd.Speed1);
+                        RotateRightDegrees(cmd.Amount, cmd.Speed1);
+                        break;
+                    case Command.Types.DoNothing:
+                        DoNothing(cmd.Amount);
                         break;
                     case Command.Types.Stop:
                         StopRobot();
                         break;
 
                     // Simulator commands
-                    //case Command.Types.SetX:
-                      //  SetX(cmd.);
-
+                    case Command.Types.SetX:
+                        SetX(cmd.Amount1);
+                        break;
+                    case Command.Types.SetY:
+                        SetY(cmd.Amount1);
+                        break;
+                    case Command.Types.SetAngle:
+                        SetAngle(cmd.Amount);
+                        break;
+                    case Command.Types.SetPosition:
+                        SetPosition(cmd.Amount1, cmd.Amount2);
+                        break;
+                    case Command.Types.SetPose:
+                        SetPose(cmd.Amount1, cmd.Amount2, cmd.Amount);
+                        break;
+                    case Command.Types.SetSimulationSpeed:
+                        SetSimulationSpeed(cmd.Amount);
+                        break;
+                    case Command.Types.GetSimulationSpeed:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Current simulation speed is " + 
+                                GetSimulationSpeed().ToString("##.0") + "."));
+                        break;
 
                     default:
                         throw new NotImplementedException("Execution of " + cmd.Type + " command is not implemented!");
@@ -138,6 +160,24 @@ namespace RobX.Library.Robot
             DisableTimeout();
             SetMode(SpeedModes.Mode0);
         }
+        
+        /// <summary>
+        /// Robot will keep its current state for the specified amount of time.
+        /// </summary>
+        /// <param name="time">Execution time in milliseconds.</param>
+        /// <param name="showMessage">If true, invoke RobotStatusChanged event with a message.</param>
+        /// <exception cref="ArgumentOutOfRangeException">This exception is thrown when the input time is negative.</exception>
+        public void DoNothing(double time = 0, bool showMessage = true)
+        {
+            if (time < 0) throw new ArgumentOutOfRangeException("time", @"Error! Time can't be negative!");
+
+            if (showMessage && RobotStatusChanged != null)
+                RobotStatusChanged(this, new CommunicationStatusEventArgs(
+                    "Robot will keep the current state for " + time.ToString("0.00") + " milliseconds."));
+
+            if (time > 0)
+                Thread.Sleep(TimeSpan.FromMilliseconds(time / _simulationSpeed));
+        }
 
         /// <summary>
         /// Sets robot wheel speeds for a specified amount of time.
@@ -160,8 +200,8 @@ namespace RobX.Library.Robot
                     " mm/s) for " + time.ToString("0.00") + " milliseconds."));
 
             SetSpeeds((byte) (wheel1Speed + 128), (byte) (wheel2Speed + 128));
-            if (time > 0)
-                Thread.Sleep(TimeSpan.FromMilliseconds(time/_simulationSpeed));
+
+            DoNothing(time, false);
         }
 
         /// <summary>
@@ -408,6 +448,16 @@ namespace RobX.Library.Robot
         public string GetErrorDescription()
         {
             return _errorString;
+        }
+
+        /// <summary>
+        /// Sets the simulator's simulation speed. Works only when connected to simulator.
+        /// </summary>
+        /// <param name="speed">Simulation speed (Real-time simulation speed = 1.0).</param>
+        public new void SetSimulationSpeed(double speed)
+        {
+            _simulationSpeed = speed;
+            base.SetSimulationSpeed(speed);
         }
 
         # endregion

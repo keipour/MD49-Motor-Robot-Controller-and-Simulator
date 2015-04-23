@@ -77,6 +77,11 @@ namespace RobX.Library.Robot
             Stop,
 
             /// <summary>
+            /// Robot will keep its current state for the specified amount of time.
+            /// </summary>
+            DoNothing,
+
+            /// <summary>
             /// Set x position of the robot in the environment in millimeters (works only in simulation mode).
             /// </summary>
             SetX,
@@ -150,7 +155,7 @@ namespace RobX.Library.Robot
         /// <para>2. For SetSpeed commands is the speed of the left wheel.</para>
         /// <para>3. For right (clockwise) rotation the speed of left wheel will be Speed1 and the speed of right wheel will be -Speed1.</para>
         /// <para>4. For left (counter-clockwise) rotation the speed of left wheel will be -Speed1 and the speed of right wheel will be Speed1.</para>
-        /// <para>5. For stop command it has no effect.</para>
+        /// <para>5. For other commands it has no effect.</para>
         /// </summary>
         public readonly sbyte Speed1;
 
@@ -163,12 +168,28 @@ namespace RobX.Library.Robot
 
         /// <summary>
         /// <para>Works as follows:</para>
-        /// <para>1. For timed commands it is interpreted as the time in milliseconds.</para>
-        /// <para>2. For distanced commands it is interpreted as the distance in millimeters.</para>
-        /// <para>3. For degree commands it is interpreted as the amount of degrees.</para>
-        /// <para>4. For stop command it has no effect.</para>
+        /// <para>1. For timed controller commands it is interpreted as the time in milliseconds.</para>
+        /// <para>2. For distanced controller commands it is interpreted as the distance in millimeters.</para>
+        /// <para>3. For degree controller commands, SetAngle and SetPose it is interpreted as the angle in degrees.</para>
+        /// <para>4. For SetSimulationSpeed command it is interpreted as the simulation speed amount.</para>
+        /// <para>5. For other commands it has no effect.</para>
         /// </summary>
         public readonly double Amount;
+
+        /// <summary>
+        /// <para>Works as follows:</para>
+        /// <para>1. For SetX, SetPosition and SetPose commands it is interpreted as the X position in millimeters.</para>
+        /// <para>2. For SetY command it is interpreted as the Y position in millimeters.</para>
+        /// <para>3. For other commands it has no effect.</para>
+        /// </summary>
+        public readonly short Amount1;
+
+        /// <summary>
+        /// <para>Works as follows:</para>
+        /// <para>1. For SetPosition and SetPose commands it is interpreted as the Y position in millimeters.</para>
+        /// <para>2. For other commands it has no effect.</para>
+        /// </summary>
+        public readonly short Amount2;
 
         /// <summary>
         /// The level (low, high, simulator-leels, etc.) of the current command.
@@ -214,25 +235,74 @@ namespace RobX.Library.Robot
         /// Constructor for Command class.
         /// </summary>
         /// <param name="type">Type of controller command.</param>
-        /// <param name="doubleAmount"><para>1. For timed commands it is interpreted as the time in milliseconds.</para>
-        /// <para>2. For distanced commands it is interpreted as the distance in millimeters.</para>
-        /// <para>3. For degree commands it is interpreted as the amount of degrees.</para>
-        /// <para>4. For stop command it has no effect.</para></param>
-        /// <param name="sbyteSpeed1"><para>Works as follows (range: -127 to +127):</para>
-        /// <para>1. For forward and backward movement is the speed of both wheels in the forward/backward direction.</para>
-        /// <para>2. For SetSpeed commands is the speed of the left wheel.</para>
-        /// <para>3. For right (clockwise) rotation the speed of left wheel will be Speed1 and the speed of right wheel will be -Speed1.</para>
-        /// <para>4. For left (counter-clockwise) rotation the speed of left wheel will be -Speed1 and the speed of right wheel will be Speed1.</para>
-        /// <para>5. For stop command it has no effect.</para></param>
-        /// <param name="sbyteSpeed2"><para>Works as follows (range: -127 to +127):</para>
-        /// <para>1. For SetSpeed commands is the speed of the right wheel.</para>
-        /// <para>2. For other commands it has no effect.</para></param>
-        public Command(Types type, object doubleAmount = null, object sbyteSpeed1 = null, object sbyteSpeed2 = null)
+        /// <param name="param1">
+        /// <para>1. For timed commands it is interpreted as the time in milliseconds (non-negative 
+        /// <see cref="double"/>).</para>
+        /// <para>2. For distanced commands it is interpreted as the distance in millimeters (non-negative <see cref="double"/>).</para>
+        /// <para>3. For controller degree commands and SetAngle command it is interpreted as the amount of degrees (<see cref="double"/>).</para>
+        /// <para>4. For SetSimulationSpeed command it is interpreted as the simulation speed amount (positive <see cref="double"/>).</para>
+        /// <para>5. For SetX, SetPosition and SetPose commands it is interpreted as the X position in millimeters (<see cref="short"/>).</para>
+        /// <para>6. For SetY command it is interpreted as the Y position in millimeters (<see cref="short"/>).</para>
+        /// <para>7. For other commands it is null.</para>
+        /// </param>
+        /// <param name="param2">
+        /// <para>Works as follows:</para>
+        /// <para>1. For forward and backward movement is the speed of both wheels in the forward/backward 
+        /// direction (<see cref="sbyte"/> with range: -127 to +127).</para>
+        /// <para>2. For SetSpeed commands is the speed of the left wheel (<see cref="sbyte"/> with range: -127 to +127).</para>
+        /// <para>3. For right (clockwise) rotation the speed of left wheel will be param2 and the speed 
+        /// of right wheel will be -param2 (<see cref="sbyte"/> with range: -127 to +127).</para>
+        /// <para>4. For left (counter-clockwise) rotation the speed of left wheel will be -param2 and 
+        /// the speed of right wheel will be param2 (<see cref="sbyte"/> with range: -127 to +127).</para>
+        /// <para>5. For SetPosition and SetPose commands it is interpreted as the Y position in millimeters (<see cref="short"/>).</para>
+        /// <para>6. For other commands it is null.</para>
+        /// </param>
+        /// <param name="param3">
+        /// <para>Works as follows:</para>
+        /// <para>1. For SetSpeed commands is the speed of the right wheel (<see cref="sbyte"/> with range: -127 to +127).</para>
+        /// <para>2. For SetPose command is the angle in degrees (<see cref="double"/>).</para>
+        /// <para>3. For other commands it is null.</para>
+        /// </param>
+        public Command(Types type, object param1 = null, object param2 = null, object param3 = null)
         {
             Type = type;
-            if (doubleAmount != null) Amount = (double) doubleAmount;
-            if (sbyteSpeed1 != null) Speed1 = (sbyte) sbyteSpeed1;
-            if (sbyteSpeed2 != null) Speed2 = (sbyte) sbyteSpeed2;
+            switch (type)
+            {
+                // Controller commands
+                case Types.SetSpeedForTime:
+                case Types.SetSpeedForDistance:
+                case Types.SetSpeedForDegrees:
+                case Types.MoveForwardForTime:
+                case Types.MoveForwardForDistance:
+                case Types.MoveBackwardForTime:
+                case Types.MoveBackwardForDistance:
+                case Types.RotateLeftForTime:
+                case Types.RotateLeftForDegrees:
+                case Types.RotateRightForTime:
+                case Types.RotateRightForDegrees:
+                case Types.DoNothing:
+                case Types.Stop:
+                case Types.SetAngle:
+                case Types.SetSimulationSpeed:
+                case Types.GetSimulationSpeed:
+                    if (param1 != null) Amount = (double)param1;
+                    if (param2 != null) Speed1 = (sbyte) param2;
+                    if (param3 != null) Speed2 = (sbyte) param3;
+                    break;
+
+                // Simulator commands
+                case Types.SetX:
+                case Types.SetY:
+                case Types.SetPosition:
+                case Types.SetPose:
+                    if (param1 != null) Amount1 = (short)param1;
+                    if (param2 != null) Amount2 = (short)param2;
+                    if (param3 != null) Amount = (double) param3;
+                    break;
+
+                default:
+                    throw new NotImplementedException("The constructor for " + type + " command is not implemented!");
+            }
         }
 
         # endregion
@@ -270,20 +340,23 @@ namespace RobX.Library.Robot
                 case Types.RotateRightForTime:
                 case Types.RotateRightForDegrees:
                     return "DS";
+                case Types.DoNothing:
+                    return "D";
                 case Types.Stop:
                     return "";
 
                 // Simulator commands
                 case Types.SetX:
                 case Types.SetY:
-                case Types.SetAngle:
                     return "s";
+                case Types.SetAngle:
+                    return "D";
                 case Types.SetPosition:
                     return "ss";
                 case Types.SetPose:
-                    return "sss";
+                    return "ssD";
                 case Types.SetSimulationSpeed:
-                    return "u";
+                    return "D";
                 case Types.GetSimulationSpeed:
                     return "";
 
@@ -333,6 +406,8 @@ namespace RobX.Library.Robot
                 case Types.RotateLeftForDegrees:
                 case Types.RotateRightForDegrees:
                     return new[] { strDegrees, strSpeed };
+                case Types.DoNothing:
+                    return new[] { strTime };
                 case Types.Stop:
                     return new string[0];
 
@@ -398,6 +473,8 @@ namespace RobX.Library.Robot
                 case Types.RotateLeftForDegrees:
                 case Types.RotateRightForDegrees:
                     return new[] { strDegrees, strSpeed };
+                case Types.DoNothing:
+                    return new[] { strTime };
                 case Types.Stop:
                     return new string[0];
 
@@ -443,6 +520,7 @@ namespace RobX.Library.Robot
                 case Types.RotateLeftForDegrees:
                 case Types.RotateRightForDegrees:
                 case Types.Stop:
+                case Types.DoNothing:
                     return Levels.Controller;
 
                 case Types.SetX:

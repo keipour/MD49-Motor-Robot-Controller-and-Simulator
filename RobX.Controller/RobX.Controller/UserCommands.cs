@@ -17,8 +17,6 @@ namespace RobX.Controller
             controller.PrepareForExecution();
             controller.ResetEncoders();
 
-            controller.SetPose(1500, 7550 - 2500, 0);
-
             controller.Commands.AddCommandsFromString(File.ReadAllText("CommandList.txt"), false);
 
             //controller.Commands.Enqueue(new Command(Command.Types.MoveForwardForDistance, 2400, 20));
