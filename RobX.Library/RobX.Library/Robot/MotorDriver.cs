@@ -4,6 +4,7 @@ using System;
 using System.IO.Ports;
 using System.Linq;
 using RobX.Library.Communication;
+
 // ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable UnusedMember.Global
 
@@ -244,9 +245,9 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Get current drawn by the motor 1 of the robot (1 Amperes = 10).
+        /// Get current drawn by the left motor of the robot (1 Amperes = 10).
         /// </summary>
-        /// <returns>Ten times the amperage of the robot motor 1.</returns>
+        /// <returns>Ten times the amperage of the robot left motor.</returns>
         public byte GetCurrent1()
         {
             byte[] buffer = { 0x00, 0x27 };
@@ -256,9 +257,9 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Get current drawn by the motor 2 of the robot (1 Amperes = 10).
+        /// Get current drawn by the right motor of the robot (1 Amperes = 10).
         /// </summary>
-        /// <returns>Ten times the amperage of the robot motor 2.</returns>
+        /// <returns>Ten times the amperage of the robot right motor.</returns>
         public byte GetCurrent2()
         {
             byte[] buffer = { 0x00, 0x28 };
@@ -271,18 +272,34 @@ namespace RobX.Library.Robot
         /// Get the voltage of the batteries and the current drawn by the robot motors.
         /// </summary>
         /// <param name="volts">Voltage of the robot batteries.</param>
-        /// <param name="current1">Ten times the amperage of the robot motor 1.</param>
-        /// <param name="current2">Ten times the amperage of the robot motor 2.</param>
-        public void GetVi(out int volts, out int current1, out int current2)
+        /// <param name="current1">Ten times the amperage of the robot left motor.</param>
+        /// <param name="current2">Ten times the amperage of the robot right motor.</param>
+        // ReSharper disable once InconsistentNaming
+        public void GetVI(out int volts, out int current1, out int current2)
         {
-            byte[] buffer = { 0x00, 0x2C };
-            RobotClient.SendData(buffer);
-
-            buffer = ReadBytes(3);
+            var buffer = GetVI();
 
             volts = buffer[0];
             current1 = buffer[1];
             current2 = buffer[2];
+        }
+
+        
+        /// <summary>
+        /// Get the voltage of the batteries and the current drawn by the robot motors.
+        /// </summary>
+        /// <returns>Returns an array of 3 bytes as follows:
+        /// <para>Byte 0: Voltage of the robot batteries.</para>
+        /// <para>Byte 1: Ten times the amperage of the robot left motor.</para>
+        /// <para>Byte 2: Ten times the amperage of the robot right motor.</para>
+        /// </returns>
+        // ReSharper disable once InconsistentNaming
+        public byte[] GetVI()
+        {
+            byte[] buffer = { 0x00, 0x2C };
+            RobotClient.SendData(buffer);
+
+            return ReadBytes(3);
         }
 
         /// <summary>
@@ -299,7 +316,7 @@ namespace RobX.Library.Robot
 
         /// <summary>
         /// Get the Speed1 value of the robot. 
-        /// In mode 0 or 1 gets the speed and direction of wheel 1. 
+        /// In mode 0 or 1 gets the speed and direction of left wheel. 
         /// In mode 2 or 3 gets the speed and direction of both wheels (subject to effect of turn register).
         /// </summary>
         /// <returns>Speed1 value of the robot.</returns>
@@ -313,7 +330,7 @@ namespace RobX.Library.Robot
 
         /// <summary>
         /// Get the Speed2 value of the robot. 
-        /// In mode 0 or 1 gets the speed and direction of wheel 2. 
+        /// In mode 0 or 1 gets the speed and direction of right wheel. 
         /// In mode 2 or 3 becomes a Turn value, and is combined with Speed 1 to steer the device. 
         /// </summary>
         /// <returns>Speed2 value of the robot.</returns>
@@ -326,9 +343,9 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Get the encoder value of wheel 1 of the robot.
+        /// Get the encoder value of left wheel of the robot.
         /// </summary>
-        /// <returns>Encoder value of wheel 1 of the robot.</returns>
+        /// <returns>Encoder value of left wheel of the robot.</returns>
         public int GetEncoder1()
         {
             byte[] buffer = { 0x00, 0x23 };
@@ -344,9 +361,9 @@ namespace RobX.Library.Robot
         }
 
         /// <summary>
-        /// Get the encoder value of wheel 2 of the robot.
+        /// Get the encoder value of right wheel of the robot.
         /// </summary>
-        /// <returns>Encoder value of wheel 2 of the robot.</returns>
+        /// <returns>Encoder value of right wheel of the robot.</returns>
         public int GetEncoder2()
         {
             byte[] buffer = { 0x00, 0x24 };
@@ -364,24 +381,40 @@ namespace RobX.Library.Robot
         /// <summary>
         /// Get the encoder values of both wheels of the robot.
         /// </summary>
-        /// <param name="encoder1">Encoder value of wheel 1 of the robot.</param>
-        /// <param name="encoder2">Encoder value of wheel 2 of the robot.</param>
+        /// <param name="encoder1">Encoder value of the left wheel of the robot.</param>
+        /// <param name="encoder2">Encoder value of the right wheel of the robot.</param>
         public void GetEncoders(out int encoder1, out int encoder2)
+        {
+            var encoders = GetEncoders();
+            encoder1 = encoders[0];
+            encoder2 = encoders[1];
+        }
+
+        /// <summary>
+        /// Get the encoder values of both wheels of the robot.
+        /// </summary>
+        /// <returns><para>Returns an array of 2 integers as below:</para>
+        /// <para>Int 0: Encoder value of the left wheel of the robot.</para>
+        /// <para>Int 1: Encoder value of the right wheel of the robot.</para>
+        /// </returns>
+        public int[] GetEncoders()
         {
             byte[] buffer = { 0x00, 0x25 };
             RobotClient.SendData(buffer);
 
             buffer = ReadBytes(8);
 
-            encoder1 = buffer[3];
+            int encoder1 = buffer[3];
             encoder1 += buffer[2] << 8;
             encoder1 += buffer[1] << 16;
             encoder1 += buffer[0] << 24;
 
-            encoder2 = buffer[7];
+            int encoder2 = buffer[7];
             encoder2 += buffer[6] << 8;
             encoder2 += buffer[5] << 16;
             encoder2 += buffer[4] << 24;
+
+            return new[] {encoder1, encoder2};
         }
 
         /// <summary>
@@ -427,18 +460,33 @@ namespace RobX.Library.Robot
         public bool GetError(out bool voltsUnder16, out bool voltsOver30, out bool motor1Trip,
             out bool motor2Trip, out bool motor1Short, out bool motor2Short)
         {
+            var errorByte = GetError();
+            voltsUnder16 = (errorByte & (1 << 7)) == 1;
+            voltsOver30 = (errorByte & (1 << 6)) == 1;
+            motor1Trip = (errorByte & (1 << 2)) == 1;
+            motor2Trip = (errorByte & (1 << 3)) == 1;
+            motor1Short = (errorByte & (1 << 4)) == 1;
+            motor2Short = (errorByte & (1 << 5)) == 1;
+            return (voltsOver30 && voltsUnder16 && motor1Short && motor1Trip && motor2Short && motor2Trip);
+        }
+
+        /// <summary>
+        /// Get the error state of the robot.
+        /// </summary>
+        /// <returns>
+        /// <para>Returns 0 if no errors occured; otherwise returns an 8-bit number as below:</para>
+        /// <para>Bit 2: If 1, left wheel of the robot is tripping.</para>
+        /// <para>Bit 3: If 1, right wheel of the robot is tripping.</para>
+        /// <para>Bit 4: If 1, left motor of the robot is short-circuited (draws large current).</para>
+        /// <para>Bit 5: If 1, right motor of the robot is short-circuited (draws large current).</para>
+        /// <para>Bit 6: If 1, voltage of the robot batteries is over 30 volts.</para>
+        /// <para>Bit 7: If 1, voltage of the robot batteries is under 16 volts.</para>
+        /// </returns>
+        public byte GetError()
+        {
             byte[] buffer = { 0x00, 0x2D };
             RobotClient.SendData(buffer);
-
-            buffer = ReadBytes(1);
-
-            voltsUnder16 = (buffer[0] & (1 << 7)) == 1;
-            voltsOver30 = (buffer[0] & (1 << 6)) == 1;
-            motor1Trip = (buffer[0] & (1 << 2)) == 1;
-            motor2Trip = (buffer[0] & (1 << 3)) == 1;
-            motor1Short = (buffer[0] & (1 << 4)) == 1;
-            motor2Short = (buffer[0] & (1 << 5)) == 1;
-            return (voltsOver30 && voltsUnder16 && motor1Short && motor1Trip && motor2Short && motor2Trip);
+            return ReadBytes(1)[0];
         }
 
         /// <summary>
@@ -498,7 +546,20 @@ namespace RobX.Library.Robot
         /// <returns>Mode of the motor (0 - 3).</returns>
         public void SetMode(SpeedModes mode)
         {
-            byte[] buffer = { 0x00, 0x34, (byte)mode };
+            SetMode((byte) mode);
+        }
+
+        /// <summary>
+        /// Get mode of the motor:
+        /// 0 (Default) : The speeds of wheels are in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
+        /// 1 : The speeds of wheels are in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
+        /// 2 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
+        /// 3 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
+        /// </summary>
+        /// <returns>Mode of the motor (0 - 3).</returns>
+        public void SetMode(byte mode)
+        {
+            byte[] buffer = { 0x00, 0x34, mode };
             RobotClient.SendData(buffer);
         }
 

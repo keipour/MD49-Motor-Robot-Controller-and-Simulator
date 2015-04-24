@@ -26,7 +26,7 @@ namespace RobX.Controller
 
         private readonly Log _communicationLog = new Log();
         private readonly Log _messageLog = new Log();
-        private Library.Robot.Controller _controller = new Library.Robot.Controller(Robot.RobotType.Simulation);
+        private readonly Library.Robot.Controller _controller = new Library.Robot.Controller(Robot.RobotType.Simulation);
         private Thread _executionThread;
         private readonly Color _logBackColor = Color.Linen;
         private readonly Color _userLogBackColor = Color.Khaki;
@@ -143,7 +143,8 @@ namespace RobX.Controller
             // Return if still is not connected
             if (_controller.IsConnected == false) return;
 
-            UserCommands.AddCommands(ref _controller);
+            _controller.PrepareForExecution();
+            _controller.Commands.AddCommandsFromString(File.ReadAllText("CommandList.txt"), false);
 
             _controller.ExecuteCommandQueue();
             //_messageLog.AddItem("Encoder 1: " + _controller.Robot.GetEncoder1());

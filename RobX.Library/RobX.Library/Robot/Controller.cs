@@ -148,6 +148,133 @@ namespace RobX.Library.Robot
                                 GetSimulationSpeed().ToString("##.0") + "."));
                         break;
 
+                    // MotorDriver commands
+
+                    case Command.Types.GetVolts:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Voltage of the motor batteries is " +
+                                GetVolts() + " volts."));
+                        break;
+
+                    case Command.Types.GetCurrent1:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Current driven by the left motor is " +
+                                (GetCurrent1() / 10F).ToString("##.0") + " amperes."));
+                        break;
+
+                    case Command.Types.GetCurrent2:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Current driven by the right motor is " +
+                                (GetCurrent2() / 10F).ToString("##.0") + " amperes."));
+                        break;
+
+                    case Command.Types.GetVI:
+                        if (RobotStatusChanged != null)
+                        {
+                            var vi = GetVI();
+                            RobotStatusChanged(this,
+                                new CommunicationStatusEventArgs(
+                                    "Voltage of the motor batteries is " + vi[0] + " volts. " + Environment.NewLine +
+                                    "Current driven by the left motor is " + (vi[1]/10F).ToString("##.0") + " amperes. " +
+                                    Environment.NewLine +
+                                    "Current driven by the right motor is " + (vi[2]/10F).ToString("##.0") + " amperes."));
+                        }
+                        break;
+
+                    case Command.Types.GetVersion:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Version of the MD49 firmware is " +
+                                GetVersion() + "."));
+                        break;
+
+                    case Command.Types.GetSpeed1:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Speed of the motor's Speed1 register is " +
+                                GetSpeed1() + "."));
+                        break;
+
+                    case Command.Types.GetSpeed2:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Speed of the motor's Speed2 register is " +
+                                GetSpeed2() + "."));
+                        break;
+
+                    case Command.Types.GetEncoder1:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Encoder count of the left wheel is " +
+                                GetEncoder1() + "."));
+                        break;
+
+                    case Command.Types.GetEncoder2:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Encoder count of the right wheel is " +
+                                GetEncoder2() + "."));
+                        break;
+
+                    case Command.Types.GetEncoders:
+                        if (RobotStatusChanged != null)
+                        {
+                            var encoders = GetEncoders();
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs(
+                                "Encoder count of the left wheel is " + encoders[0] + "." + Environment.NewLine +
+                                "Encoder count of the right wheel is " + encoders[1] + "."));
+                        }
+                        break;
+
+                    case Command.Types.GetAcceleration:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Acceleration of the motor is " +
+                                GetAcceleration() + "."));
+                        break;
+
+                    case Command.Types.GetError:
+                        if (RobotStatusChanged != null)
+                        {
+                            if (CheckHealth() == false)
+                                RobotStatusChanged(this, new CommunicationStatusEventArgs("The robot works without errors."));
+                            else
+                                RobotStatusChanged(this, new CommunicationStatusEventArgs("An error found in robot's work. " + 
+                                    Environment.NewLine + _errorString));
+                        }
+                        break;
+
+                    case Command.Types.GetMode:
+                        if (RobotStatusChanged != null)
+                            RobotStatusChanged(this, new CommunicationStatusEventArgs("Mode of the motor driver is " +
+                                GetMode() + "."));
+                        break;
+
+                    case Command.Types.SetSpeed1:
+                        SetSpeed1(cmd.Amount1);
+                        break;
+                    case Command.Types.SetSpeed2:
+                        SetSpeed2(cmd.Amount1);
+                        break;
+                    case Command.Types.SetSpeeds:
+                        SetSpeeds(cmd.Amount1, cmd.Amount2);
+                        break;
+                    case Command.Types.SetAcceleration:
+                        SetAcceleration(cmd.AmountByte);
+                        break;
+                    case Command.Types.SetMode:
+                        SetMode(cmd.AmountByte);
+                        break;
+                    case Command.Types.ResetEncoders:
+                        ResetEncoders();
+                        break;
+                    case Command.Types.DisableRegulator:
+                        DisableRegulator();
+                        break;
+                    case Command.Types.EnableRegulator:
+                        EnableRegulator();
+                        break;
+                    case Command.Types.DisableTimeout:
+                        DisableTimeout();
+                        break;
+                    case Command.Types.EnableTimeout:
+                        EnableTimeout();
+                        break;
+
                     default:
                         throw new NotImplementedException("Execution of " + cmd.Type + " command is not implemented!");
                 }

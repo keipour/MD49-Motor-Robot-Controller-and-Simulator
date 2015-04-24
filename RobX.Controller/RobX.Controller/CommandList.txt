@@ -1,4 +1,6 @@
-﻿SetPose 1500, 5050, 0
+﻿ResetEncoders
+GetVI
+SetPose 1500, 5050, 0
 SetSimulationSpeed 2.0
 MoveForwardForDistance, 2400, 20
 SetSpeedForDegrees, 90, 30, 10

@@ -115,7 +115,145 @@ namespace RobX.Library.Robot
             /// <summary>
             /// Set simulation speed on simulator (works only in simulation mode).
             /// </summary>
-            SetSimulationSpeed
+            SetSimulationSpeed,
+
+            /// <summary>
+            /// Get voltage of the robot batteries.
+            /// </summary>
+            GetVolts,
+
+            /// <summary>
+            /// Get current drawn by the left motor of the robot (1 Amperes = 10).
+            /// </summary>
+            GetCurrent1,
+            /// <summary>
+            /// Get current drawn by the right motor of the robot (1 Amperes = 10).
+            /// </summary>
+            GetCurrent2,
+            
+            /// <summary>
+            /// Get the voltage of the batteries and the current drawn by the robot motors.
+            /// </summary>
+            // ReSharper disable once InconsistentNaming
+            GetVI,
+
+            /// <summary>
+            /// Get the version of the robot motor firmware.
+            /// </summary>
+            GetVersion,
+
+            /// <summary>
+            /// Get the Speed1 value of the robot. 
+            /// In mode 0 or 1 gets the speed and direction of left wheel.
+            /// In mode 2 or 3 gets the speed and direction of both wheels (subject to effect of turn register).
+            /// </summary>
+            GetSpeed1,
+
+            /// <summary>
+            /// Get the Speed2 value of the robot. 
+            /// In mode 0 or 1 gets the speed and direction of right wheel.
+            /// In mode 2 or 3 becomes a Turn value, and is combined with Speed 1 to steer the device. 
+            /// </summary>
+            GetSpeed2,
+
+            /// <summary>
+            /// Get the encoder value of left wheel of the robot.
+            /// </summary>
+            GetEncoder1,
+
+            /// <summary>
+            /// Get the encoder value of right wheel of the robot.
+            /// </summary>
+            GetEncoder2,
+
+            /// <summary>
+            /// Get the encoder values of both wheels of the robot.
+            /// </summary>
+            GetEncoders,
+
+            /// <summary>
+            /// Get acceleration level (1 - 10) for robot motors.
+            /// </summary>
+            GetAcceleration,
+            
+            /// <summary>
+            /// Get the error state of the robot.
+            /// </summary>
+            GetError,
+
+            /// <summary>
+            /// <para>Get mode of the motor:</para>
+            /// <para>0 (Default) : The speeds of wheels are in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).</para>
+            /// <para>1 : The speeds of wheels are in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).</para>
+            /// <para>2 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. 
+            /// Data is in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).</para>
+            /// <para>3 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. 
+            /// Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).</para>
+            /// </summary>
+            GetMode,
+
+            /// <summary>
+            /// Set the Speed1 value of the robot. 
+            /// In mode 0 or 1 sets the speed and direction of wheel 1. 
+            /// In mode 2 or 3 sets the speed and direction of both wheels (subject to effect of turn register).
+            /// </summary>
+            SetSpeed1,
+
+            /// <summary>
+            /// Set the Speed2 value of the robot. 
+            /// In mode 0 or 1 sets the speed and direction of wheel 2. 
+            /// In mode 2 or 3 becomes a turn value, and is combined with Speed 1 to steer the device. 
+            /// </summary>
+            SetSpeed2,
+
+            /// <summary>
+            /// Set both Speed1 and Speed2 simultaneously for the robot. 
+            /// In mode 0 or 1 Speed1 sets the speed and direction of wheel 1 and Speed2 sets the speed and direction of wheel 2. 
+            /// In mode 2 or 3 Speed1 sets the speed and direction of both wheels (subject to effect of Spees2 register) and Speed 2
+            /// becomes a turn value, and is combined with Speed1 to steer the device.
+            /// </summary>
+            SetSpeeds,
+            
+            /// <summary>
+            /// Set acceleration level (1 - 10) for robot motors.
+            /// </summary>
+            SetAcceleration,
+            
+            /// <summary>
+            /// Get mode of the motor:
+            /// 0 (Default) : The speeds of wheels are in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
+            /// 1 : The speeds of wheels are in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
+            /// 2 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of 0 (Full Reverse) 128 (Stop) 255 (Full Forward).
+            /// 3 :	Uses SPEED 1 for both motors, and SPEED 2 for turn value. Data is in the range of -128 (Full Reverse) 0 (Stop) 127 (Full Forward).
+            /// </summary>
+            SetMode,
+
+            /// <summary>
+            /// Reset (set to zero) the values of robot wheel encoders.
+            /// </summary>
+            ResetEncoders,
+
+            /// <summary>
+            /// Turn off speed regulation: If the required speed is not being achieved, increase power to the motors 
+            /// until it reaches the desired rate (or the motors reach the maximum output).
+            /// </summary>
+            DisableRegulator,
+
+            /// <summary>
+            /// Turn on speed regulation: If the required speed is not being achieved, increase power to the motors 
+            /// until it reaches the desired rate (or the motors reach the maximum output).
+            /// </summary>
+            EnableRegulator,
+            
+            /// <summary>
+            /// Turn off motor timeout: Robot will automatically stop if there is no serial communications within 2 seconds.
+            /// </summary>
+            DisableTimeout,
+
+            /// <summary>
+            /// Turn on motor timeout: Robot will automatically stop if there is no serial communications within 2 seconds.
+            /// </summary>
+            EnableTimeout
         }
 
         /// <summary>
@@ -161,7 +299,7 @@ namespace RobX.Library.Robot
 
         /// <summary>
         /// <para>Works as follows (range: -127 to +127):</para>
-        /// <para>1. For SetSpeed commands is the speed of the right wheel.</para>
+        /// <para>1. For SetSpeed controller commands is the speed of the right wheel.</para>
         /// <para>2. For other commands it has no effect.</para>
         /// </summary>
         public readonly sbyte Speed2;
@@ -180,16 +318,27 @@ namespace RobX.Library.Robot
         /// <para>Works as follows:</para>
         /// <para>1. For SetX, SetPosition and SetPose commands it is interpreted as the X position in millimeters.</para>
         /// <para>2. For SetY command it is interpreted as the Y position in millimeters.</para>
-        /// <para>3. For other commands it has no effect.</para>
+        /// <para>3. For SetSpeed1 and SetSpeeds commands it is interpreted as the left wheel speed (in range -127 to +255).</para>
+        /// <para>3. For SetSpeed2 command it is interpreted as the right wheel speed (in range -127 to +255).</para>
+        /// <para>4. For other commands it has no effect.</para>
         /// </summary>
         public readonly short Amount1;
 
         /// <summary>
         /// <para>Works as follows:</para>
         /// <para>1. For SetPosition and SetPose commands it is interpreted as the Y position in millimeters.</para>
-        /// <para>2. For other commands it has no effect.</para>
+        /// <para>2. For SetSpeeds command it is interpreted as the right wheel speed (in range -127 to +255).</para>
+        /// <para>3. For other commands it has no effect.</para>
         /// </summary>
         public readonly short Amount2;
+
+        /// <summary>
+        /// <para>Works as follows:</para>
+        /// <para>1. For SetAcceleration command is the acceleration (in range 1 to 10).</para>
+        /// <para>2. For SetMode command is the mode of the motor driver (in range 0 to 3).</para>
+        /// <para>3. For other commands it has no effect.</para>
+        /// </summary>
+        public readonly byte AmountByte;
 
         /// <summary>
         /// The level (low, high, simulator-leels, etc.) of the current command.
@@ -243,7 +392,11 @@ namespace RobX.Library.Robot
         /// <para>4. For SetSimulationSpeed command it is interpreted as the simulation speed amount (positive <see cref="double"/>).</para>
         /// <para>5. For SetX, SetPosition and SetPose commands it is interpreted as the X position in millimeters (<see cref="short"/>).</para>
         /// <para>6. For SetY command it is interpreted as the Y position in millimeters (<see cref="short"/>).</para>
-        /// <para>7. For other commands it is null.</para>
+        /// <para>7. For SetSpeed1 and SetSpeeds commands it is interpreted as the left wheel speed (<see cref="short"/> in range -127 to +255).</para>
+        /// <para>8. For SetSpeed2 command it is interpreted as the right wheel speed (<see cref="short"/> in range -127 to +255).</para>
+        /// <para>9. For SetAcceleration command is the acceleration (<see cref="byte"/> in range 1 to 10).</para>
+        /// <para>10. For SetMode command is the mode of the motor driver (<see cref="byte"/> in range 0 to 3).</para>
+        /// <para>11. For other commands it is null.</para>
         /// </param>
         /// <param name="param2">
         /// <para>Works as follows:</para>
@@ -255,7 +408,8 @@ namespace RobX.Library.Robot
         /// <para>4. For left (counter-clockwise) rotation the speed of left wheel will be -param2 and 
         /// the speed of right wheel will be param2 (<see cref="sbyte"/> with range: -127 to +127).</para>
         /// <para>5. For SetPosition and SetPose commands it is interpreted as the Y position in millimeters (<see cref="short"/>).</para>
-        /// <para>6. For other commands it is null.</para>
+        /// <para>6. For SetSpeeds command it is interpreted as the right wheel speed (<see cref="short"/> in range -127 to +255).</para>
+        /// <para>7. For other commands it is null.</para>
         /// </param>
         /// <param name="param3">
         /// <para>Works as follows:</para>
@@ -268,7 +422,7 @@ namespace RobX.Library.Robot
             Type = type;
             switch (type)
             {
-                // Controller commands
+                // Commands with "D", "DS" and "DSS" parameters
                 case Types.SetSpeedForTime:
                 case Types.SetSpeedForDistance:
                 case Types.SetSpeedForDegrees:
@@ -281,25 +435,54 @@ namespace RobX.Library.Robot
                 case Types.RotateRightForTime:
                 case Types.RotateRightForDegrees:
                 case Types.DoNothing:
-                case Types.Stop:
                 case Types.SetAngle:
                 case Types.SetSimulationSpeed:
+
+                // Commands without parameters
+                case Types.Stop:
                 case Types.GetSimulationSpeed:
+                case Types.ResetEncoders:
+                case Types.DisableRegulator:
+                case Types.EnableRegulator:
+                case Types.DisableTimeout:
+                case Types.EnableTimeout:
+                case Types.GetVolts:
+                case Types.GetCurrent1:
+                case Types.GetCurrent2:
+                case Types.GetVI:
+                case Types.GetVersion:
+                case Types.GetSpeed1:
+                case Types.GetSpeed2:
+                case Types.GetEncoder1:
+                case Types.GetEncoder2:
+                case Types.GetEncoders:
+                case Types.GetAcceleration:
+                case Types.GetError:
+                case Types.GetMode:
                     if (param1 != null) Amount = (double)param1;
                     if (param2 != null) Speed1 = (sbyte) param2;
                     if (param3 != null) Speed2 = (sbyte) param3;
                     break;
 
-                // Simulator commands
+                // Commands with "s", "ss" and "ssD" parameters
                 case Types.SetX:
                 case Types.SetY:
                 case Types.SetPosition:
                 case Types.SetPose:
+                case Types.SetSpeed1:
+                case Types.SetSpeed2:
+                case Types.SetSpeeds:
                     if (param1 != null) Amount1 = (short)param1;
                     if (param2 != null) Amount2 = (short)param2;
                     if (param3 != null) Amount = (double) param3;
                     break;
 
+                // Commands with "B" parameters
+                case Types.SetAcceleration:
+                case Types.SetMode:
+                    if (param1 != null) AmountByte = (byte)param1;
+                    break;
+                
                 default:
                     throw new NotImplementedException("The constructor for " + type + " command is not implemented!");
             }
@@ -360,6 +543,35 @@ namespace RobX.Library.Robot
                 case Types.GetSimulationSpeed:
                     return "";
 
+                // Motor Driver commands
+                case Types.SetSpeed1:
+                case Types.SetSpeed2:
+                    return "s";
+                case Types.SetSpeeds:
+                    return "ss";
+                case Types.SetAcceleration:
+                case Types.SetMode:
+                    return "B";
+                case Types.ResetEncoders:
+                case Types.DisableRegulator:
+                case Types.EnableRegulator:
+                case Types.DisableTimeout:
+                case Types.EnableTimeout:
+                case Types.GetVolts:
+                case Types.GetCurrent1:
+                case Types.GetCurrent2:
+                case Types.GetVI:
+                case Types.GetVersion:
+                case Types.GetSpeed1:
+                case Types.GetSpeed2:
+                case Types.GetEncoder1:
+                case Types.GetEncoder2:
+                case Types.GetEncoders:
+                case Types.GetAcceleration:
+                case Types.GetError:
+                case Types.GetMode:
+                    return "";
+
                 default:
                     throw new Exception("Parameter types for the " + type + " command is not assigned yet!");
             }
@@ -385,6 +597,10 @@ namespace RobX.Library.Robot
             const string strY = "Y";
             const string strAngle = "Angle";
             const string strSimSpeed = "SimulationSpeed";
+
+            // MotorDriver parameters
+            const string strAcceleration = "Acceleration";
+            const string strMode = "Mode";
 
             switch (type)
             {
@@ -427,8 +643,39 @@ namespace RobX.Library.Robot
                 case Types.GetSimulationSpeed:
                     return new string[0];
 
+                // Motor Driver commands
+                case Types.SetSpeed1:
+                    return new[] { strSpeed1 };
+                case Types.SetSpeed2:
+                    return new[] { strSpeed2 };
+                case Types.SetSpeeds:
+                    return new[] { strSpeed1, strSpeed2 };
+                case Types.SetAcceleration:
+                    return new[] { strAcceleration };
+                case Types.SetMode:
+                    return new[] { strMode };
+                case Types.ResetEncoders:
+                case Types.DisableRegulator:
+                case Types.EnableRegulator:
+                case Types.DisableTimeout:
+                case Types.EnableTimeout:
+                case Types.GetVolts:
+                case Types.GetCurrent1:
+                case Types.GetCurrent2:
+                case Types.GetVI:
+                case Types.GetVersion:
+                case Types.GetSpeed1:
+                case Types.GetSpeed2:
+                case Types.GetEncoder1:
+                case Types.GetEncoder2:
+                case Types.GetEncoders:
+                case Types.GetAcceleration:
+                case Types.GetError:
+                case Types.GetMode:
+                    return new string[0];
+
                 default:
-                    throw new Exception("Parameter names for the " + type + " command is not assigned yet!");
+                    throw new Exception("Parameter names for the " + type + " command is not assigned!");
             }
         }
 
@@ -446,11 +693,18 @@ namespace RobX.Library.Robot
             const string strTime = "Time to move in milliseconds; should be a non-negative double number.";
             const string strDistance = "Distance to move in millimeters; should be a non-negative double number.";
             const string strDegrees = "Amount of degrees to turn; should be a double number.";
+
             // Simulator parameters
             const string strX = "X position of the robot in the environment in millimeters.";
             const string strY = "Y position of the robot in the environment in millimeters.";
             const string strAngle = "Ten times the angle of the robot in the environment in degrees (1 = 0.1 degrees).";
             const string strSimSpeed = "Ten times the new simulation speed (1 = 0.1x).";
+
+            // MotorDriver parameters
+            const string strMotorSpeed1 = "Speed of the left wheel; should be an integer in the range -127 to +255.";
+            const string strMotorSpeed2 = "Speed of the right wheel; should be an integer in the range -127 to +255.";
+            const string strAcceleration = "Acceleration";
+            const string strMode = "Mode";
 
             switch (type)
             {
@@ -494,8 +748,39 @@ namespace RobX.Library.Robot
                 case Types.GetSimulationSpeed:
                     return new string[0];
 
+                // Motor Driver commands
+                case Types.SetSpeed1:
+                    return new[] { strMotorSpeed1 };
+                case Types.SetSpeed2:
+                    return new[] { strMotorSpeed2 };
+                case Types.SetSpeeds:
+                    return new[] { strMotorSpeed1, strMotorSpeed2 };
+                case Types.SetAcceleration:
+                    return new[] { strAcceleration };
+                case Types.SetMode:
+                    return new[] { strMode };
+                case Types.ResetEncoders:
+                case Types.DisableRegulator:
+                case Types.EnableRegulator:
+                case Types.DisableTimeout:
+                case Types.EnableTimeout:
+                case Types.GetVolts:
+                case Types.GetCurrent1:
+                case Types.GetCurrent2:
+                case Types.GetVI:
+                case Types.GetVersion:
+                case Types.GetSpeed1:
+                case Types.GetSpeed2:
+                case Types.GetEncoder1:
+                case Types.GetEncoder2:
+                case Types.GetEncoders:
+                case Types.GetAcceleration:
+                case Types.GetError:
+                case Types.GetMode:
+                    return new string[0];
+
                 default:
-                    throw new Exception("Parameter descriptions for the " + type + " command is not assigned yet!");
+                    throw new Exception("Parameter descriptions for the " + type + " command is not assigned!");
             }
         }
 
@@ -532,8 +817,33 @@ namespace RobX.Library.Robot
                 case Types.GetSimulationSpeed:
                     return Levels.Simulator;
 
+                case Types.GetVolts:
+                case Types.GetCurrent1:
+                case Types.GetCurrent2:
+                case Types.GetVI:
+                case Types.GetVersion:
+                case Types.GetSpeed1:
+                case Types.GetSpeed2:
+                case Types.GetEncoder1:
+                case Types.GetEncoder2:
+                case Types.GetEncoders:
+                case Types.GetAcceleration:
+                case Types.GetError:
+                case Types.GetMode:
+                case Types.SetSpeed1:
+                case Types.SetSpeed2:
+                case Types.SetSpeeds:
+                case Types.SetAcceleration:
+                case Types.SetMode:
+                case Types.ResetEncoders:
+                case Types.DisableRegulator:
+                case Types.EnableRegulator:
+                case Types.DisableTimeout:
+                case Types.EnableTimeout:
+                    return Levels.MotorDriver;
+
                 default:
-                    throw new Exception("Level for the " + type + " command is not assigned yet!");
+                    throw new Exception("Level for the " + type + " command is not assigned!");
             }
         }
 
