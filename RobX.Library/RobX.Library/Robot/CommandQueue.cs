@@ -24,6 +24,18 @@ namespace RobX.Library.Robot
 
         # endregion
 
+        # region Public Variables
+
+        /// <summary>
+        /// This property returns the number of commands in the command processing queue.
+        /// </summary>
+        public int Count
+        {
+            get { return _commands.Count; }
+        }
+
+        # endregion
+
         # region Public Queue Functions
 
         /// <summary>

@@ -1,9 +1,5 @@
-﻿# region Includes
-
-using System;
+﻿using System;
 using RobX.Library.Commons;
-
-# endregion
 
 // ReSharper disable UnusedMember.Global
 namespace RobX.Library.Robot
@@ -41,26 +37,6 @@ namespace RobX.Library.Robot
         /// Converts encoder count to distance in millimeters for EMG49 motor set used in RobX robot.
         /// </summary>
         public const double EncoderCountToDistance = WheelDiameter * Math.PI / EncoderCountPerTurn;
-
-        # endregion
-
-        # region Public Enums
-
-        /// <summary>
-        /// Robot types: Real Robot / Simulation.
-        /// </summary>
-        public enum RobotType
-        {
-            /// <summary>
-            /// Real robot type.
-            /// </summary>
-            Real = 0,
-
-            /// <summary>
-            /// Simulated robot type.
-            /// </summary>
-            Simulation = 1
-        }
 
         # endregion
 
@@ -201,127 +177,7 @@ namespace RobX.Library.Robot
 
         # endregion
 
-        # region Private Variables
-
-        private readonly RobotType _robotType;
-
-        # endregion
-
-        # region Constructor
-
-        /// <summary>
-        /// Constructor for the robot class.
-        /// </summary>
-        /// <param name="robotType">Specifies robot type (Simulation vs. Real).</param>
-        public Robot(RobotType robotType)
-        {
-            _robotType = robotType;
-        }
-
-        # endregion
-
-        # region Public Functions
-
-        /// <summary>
-        /// Set x position of the robot in the environment in millimeters (works only in simulation mode).
-        /// </summary>
-        /// <param name="x">X position of the robot in the environment in millimeters.</param>
-        public void SetX(short x)
-        {
-            if (_robotType == RobotType.Real) return;
-            byte[] buffer = { 0x00, 0x41, (byte)(x >> 8), (byte)(x & 0xFF) };
-            RobotClient.SendData(buffer);
-        }
-
-        /// <summary>
-        /// Set y position of the robot in the environment in millimeters (works only in simulation mode)
-        /// </summary>
-        /// <param name="y">Y position of the robot in the environment in millimeters.</param>
-        public void SetY(short y)
-        {
-            if (_robotType == RobotType.Real) return;
-            byte[] buffer = { 0x00, 0x42, (byte)(y >> 8), (byte)(y & 0xFF) };
-            RobotClient.SendData(buffer);
-        }
-
-        /// <summary>
-        /// Set angle of the robot in the environment in degrees (works only in simulation mode).
-        /// </summary>
-        /// <param name="dblAngle">The angle of the robot in the environment in degrees. Will be rounded 
-        /// to the nearest tenth value (i.e. 0.1).</param>
-        public void SetAngle(double dblAngle)
-        {
-            if (_robotType == RobotType.Real) return;
-            var angle = (short) Math.Round(dblAngle * 10);
-            byte[] buffer = { 0x00, 0x43, (byte)(angle >> 8), (byte)(angle & 0xFF) };
-            RobotClient.SendData(buffer);
-        }
-
-        /// <summary>
-        /// Set x and y positions of the robot in the environment in millimeters (works only in simulation mode).
-        /// </summary>
-        /// <param name="x">X position of the robot in the environment in millimeters.</param>
-        /// <param name="y">Y position of the robot in the environment in millimeters.</param>
-        public void SetPosition(short x, short y)
-        {
-            if (_robotType == RobotType.Real) return;
-            byte[] buffer =
-            {
-                0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
-                0x00, 0x42, (byte) (y >> 8), (byte) (y & 0xFF)
-            };
-            RobotClient.SendData(buffer);
-        }
-
-        /// <summary>
-        /// Set angle (in degrees), x and y positions (in millimeters) of the robot in the environment 
-        /// (works only in simulation mode).
-        /// </summary>
-        /// <param name="x">X position of the robot in the environment in millimeters.</param>
-        /// <param name="y">Y position of the robot in the environment in millimeters.</param>
-        /// <param name="dblAngle">The angle of the robot in the environment in degrees. Will be rounded 
-        /// to the nearest tenth value (i.e. 0.1).</param>
-        public void SetPose(short x, short y, double dblAngle)
-        {
-            if (_robotType == RobotType.Real) return;
-            var angle = (short)Math.Round(dblAngle * 10);
-            byte[] buffer =
-            {
-                0x00, 0x41, (byte) (x >> 8), (byte) (x & 0xFF),
-                0x00, 0x42, (byte) (y >> 8), (byte) (y & 0xFF),
-                0x00, 0x43, (byte) (angle >> 8), (byte) (angle & 0xFF)
-            };
-            RobotClient.SendData(buffer);
-        }
-
-        /// <summary>
-        /// Set simulation speed on simulator (works only in simulation mode).
-        /// </summary>
-        /// <param name="dblSpeed">New simulation speed (1 = 0.1x). Must be a positive decimal. Will be rounded to 
-        /// the nearest tenth value (i.e. 0.1).</param>
-        public void SetSimulationSpeed(double dblSpeed)
-        {
-            if (_robotType == RobotType.Real) return;
-            var speed = (ushort) Math.Round(dblSpeed*10);
-            byte[] buffer = { 0x00, 0x51, (byte)(speed >> 8), (byte)(speed & 0xFF) };
-            RobotClient.SendData(buffer);
-        }
-
-        /// <summary>
-        /// Get simulation speed of simulator (works only in simulation mode).
-        /// </summary>
-        /// <returns>The simulation speed of the simulator.</returns>
-        public double GetSimulationSpeed()
-        {
-            if (_robotType == RobotType.Real) return 0;
-            byte[] buffer = { 0x00, 0x52 };
-            RobotClient.SendData(buffer);
-
-            buffer = ReadBytes(2);
-            ushort result = buffer[1];
-            result += (ushort)(buffer[0] << 8);
-            return result / 10F;
-        }
+        # region CalculateDelay Function
 
         /// <summary>
         /// Estimates the delay of communication with robot by sending a single command and calculating the responce time.

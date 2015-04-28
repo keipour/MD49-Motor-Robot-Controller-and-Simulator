@@ -26,7 +26,7 @@ namespace RobX.Controller
 
         private readonly Log _communicationLog = new Log();
         private readonly Log _messageLog = new Log();
-        private readonly Library.Robot.Controller _controller = new Library.Robot.Controller(Robot.RobotType.Simulation);
+        private readonly Library.Robot.Controller _controller = new Library.Robot.Controller(RobotType.Simulation);
         private Thread _executionThread;
         private readonly Color _logBackColor = Color.Linen;
         private readonly Color _userLogBackColor = Color.Khaki;
