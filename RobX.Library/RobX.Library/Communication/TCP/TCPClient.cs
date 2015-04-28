@@ -65,7 +65,7 @@ namespace RobX.Library.Communication.TCP
 
         # endregion
 
-        # region Public Events
+        # region Event Handlers
 
         /// <summary>
         /// This event is invoked after data is received from the server.
@@ -87,6 +87,12 @@ namespace RobX.Library.Communication.TCP
         /// </summary>
         public event CommunicationStatusEventHandler StatusChanged;
 
+        private void ChangeStatus(string status)
+        {
+            if (StatusChanged != null)
+                StatusChanged(this, new CommunicationStatusEventArgs(status));
+        }
+
         /// <summary>
         /// This event is invoked when an error occures in the connection with the server.
         /// </summary>
@@ -107,9 +113,7 @@ namespace RobX.Library.Communication.TCP
             try
             {
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connecting to " + ip +
-                        " on port " + port + "..."));
+                ChangeStatus("Connecting to " + ip +" on port " + port + "...");
 
                 _tcpClient = new TcpClient();
 
@@ -130,11 +134,9 @@ namespace RobX.Library.Communication.TCP
                 ClientPort = ((IPEndPoint)_tcpClient.Client.LocalEndPoint).Port;
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connected to server " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")." +
-                        Environment.NewLine + "The client connected from port " + ClientPort +
-                        " to " + RemoteClientIpAddress + " (port " + RemoteClientPort + ")."));
+                ChangeStatus("Connected to server " + RemoteServerIpAddress + " (port " + RemoteServerPort + ")." +
+                             Environment.NewLine + "The client connected from port " + ClientPort +
+                             " to " + RemoteClientIpAddress + " (port " + RemoteClientPort + ").");
 
                 return true;
             }
@@ -147,9 +149,7 @@ namespace RobX.Library.Communication.TCP
                 ClientPort = -1;
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connection error! Could not connect to " +
-                        ip + " (port " + port + "). " + e.Message + "."));
+                ChangeStatus("Connection error! Could not connect to " + ip + " (port " + port + "). " + e.Message + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
@@ -183,9 +183,7 @@ namespace RobX.Library.Communication.TCP
                 _clientStream.Flush();
 
                 // Invoke StatusChanged event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Sent data to server " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")."));
+                ChangeStatus("Sent data to server " + RemoteServerIpAddress + " (port " + RemoteServerPort + ").");
 
                 // Invoke SentData event
                 if (SentData != null)
@@ -196,9 +194,8 @@ namespace RobX.Library.Communication.TCP
             catch (Exception e)
             {
                 // Invoke StatusChanged event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error sending data to server " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")! " + e.Message + "."));
+                ChangeStatus("Error sending data to server " + RemoteServerIpAddress + " (port " + RemoteServerPort +
+                             ")! " + e.Message + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
@@ -228,9 +225,8 @@ namespace RobX.Library.Communication.TCP
                 if (checkAvailableData && _clientStream.DataAvailable == false)
                 {
                     // Invoke StatusChanged event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Warning! There is no data to read from " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ") server."));
+                    ChangeStatus("Warning! There is no data to read from " +
+                                 RemoteServerIpAddress + " (port " + RemoteServerPort + ") server.");
 
                     return false;
                 }
@@ -238,9 +234,8 @@ namespace RobX.Library.Communication.TCP
             catch (Exception e)
             {
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Socket Error! Error receiving data from server " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")! " + e.Message + "."));
+                ChangeStatus("Socket Error! Error receiving data from server " +
+                             RemoteServerIpAddress + " (port " + RemoteServerPort + ")! " + e.Message + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
@@ -263,9 +258,8 @@ namespace RobX.Library.Communication.TCP
                 if (bytesRead == 0)
                 {
                     // Invoke StatusChanged event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Error! Probably the connection to " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ") is closed by the server."));
+                    ChangeStatus("Error! Probably the connection to " + RemoteServerIpAddress +
+                                 " (port " + RemoteServerPort + ") is closed by the server.");
 
                     // Invoke ErrorOccured event
                     if (ErrorOccured != null)
@@ -280,9 +274,8 @@ namespace RobX.Library.Communication.TCP
                 if (bytesRead < numOfBytes)
                 {
                     // Invoke StatusChanged event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Warning! Not enough bytes read from " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")."));
+                    ChangeStatus("Warning! Not enough bytes read from " + RemoteServerIpAddress +
+                                 " (port " + RemoteServerPort + ").");
 
                     // Invoke ErrorOccured event
                     if (ErrorOccured != null)
@@ -292,9 +285,7 @@ namespace RobX.Library.Communication.TCP
                 }
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Received data from server " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")."));
+                ChangeStatus("Received data from server " + RemoteServerIpAddress + " (port " + RemoteServerPort + ").");
 
                 // Invoke ReceivedData event
                 if (ReceivedData != null)
@@ -305,9 +296,8 @@ namespace RobX.Library.Communication.TCP
             catch (Exception e)
             {
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error receiving data from server " +
-                        RemoteServerIpAddress + " (port " + RemoteServerPort + ")! " + e.Message + "."));
+                ChangeStatus("Error receiving data from server " + RemoteServerIpAddress +
+                             " (port " + RemoteServerPort + ")! " + e.Message + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)

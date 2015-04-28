@@ -51,7 +51,7 @@ namespace RobX.Library.Communication.COM
 
         # endregion
 
-        # region Events
+        # region Event Handlers
 
         /// <summary>
         /// Event handler for ReceivedData event (will be invoked after data is received).
@@ -73,6 +73,12 @@ namespace RobX.Library.Communication.COM
         /// </summary>
         public event CommunicationStatusEventHandler StatusChanged;
 
+        private void ChangeStatus(string status)
+        {
+            if (StatusChanged != null)
+                StatusChanged(this, new CommunicationStatusEventArgs(status));
+        }
+
         /// <summary>
         /// This event is invoked when an error occures in the connection with the communication.
         /// </summary>
@@ -91,7 +97,7 @@ namespace RobX.Library.Communication.COM
             Parity = Parity.None;
             StopBits = StopBits.One;
             BaudRate = 9600;
-            PortName = "";
+            PortName = String.Empty;
             IsListeningForData = false;
             // Initialize serial port
             SerialPort = new SerialPort();
@@ -113,9 +119,7 @@ namespace RobX.Library.Communication.COM
             try
             {
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connecting to " + portName + 
-                        " with baud rate " + baudRate + "..."));
+                ChangeStatus("Connecting to " + portName + " with baud rate " + baudRate + "...");
 
                 // Assign class fields
                 BaudRate = baudRate;
@@ -137,17 +141,14 @@ namespace RobX.Library.Communication.COM
                 SerialPort.Open();
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Successfully connected to " + portName + " with baud rate " + 
-                        baudRate + ".")); 
+                ChangeStatus("Successfully connected to " + portName + " with baud rate " + baudRate + ".");
                 
                 return true;
             }
             catch (Exception e)
             {
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Connection Error! " + e.Message.Replace("PortName", PortName) + "."));
+                ChangeStatus("Connection Error! " + e.Message.Replace("PortName", PortName) + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
@@ -177,9 +178,7 @@ namespace RobX.Library.Communication.COM
                 if (checkAvailableData && SerialPort.BytesToRead == 0)
                 {
                     // Invoke StatusChanged event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Warning! No data is available to read from " 
-                            + PortName + " port!"));
+                    ChangeStatus("Warning! No data is available to read from " + PortName + " port!");
 
                     return false;
                 }
@@ -187,9 +186,7 @@ namespace RobX.Library.Communication.COM
             catch (Exception e)
             {
                 // Invoke StatusChanged event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error reading data from " + PortName + " port! "
-                        + e.Message.Replace("PortName", PortName) + "."));
+                ChangeStatus("Error reading data from " + PortName + " port! " + e.Message.Replace("PortName", PortName) + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
@@ -212,8 +209,7 @@ namespace RobX.Library.Communication.COM
                     SerialPort.Read(readBuffer, i, 1);
                     
                     // Invoke StatusChange event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Recieved bytes from " + PortName + " port."));
+                    ChangeStatus("Recieved bytes from " + PortName + " port.");
 
                     // Invoke ReceivedData event
                     if (ReceivedData != null)
@@ -222,9 +218,7 @@ namespace RobX.Library.Communication.COM
                 catch (Exception e)
                 {
                     // Invoke StatusChange event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Error reading data from " + PortName + " port! " 
-                            + e.Message.Replace("PortName", PortName) + "."));
+                    ChangeStatus("Error reading data from " + PortName + " port! " + e.Message.Replace("PortName", PortName) + ".");
 
                     // Invoke ErrorOccured event
                     if (ErrorOccured != null)
@@ -262,8 +256,7 @@ namespace RobX.Library.Communication.COM
                 SerialPort.Write(data, 0, data.Length);
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Sent bytes to " + PortName + " port."));
+                ChangeStatus("Wrote bytes to " + PortName + " port.");
 
                 // Invoke SentData event
                 if (SentData != null)
@@ -274,9 +267,7 @@ namespace RobX.Library.Communication.COM
             catch (Exception e)
             {
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error writing data to " + PortName + " port! "
-                        + e.Message.Replace("PortName", PortName) + "."));
+                ChangeStatus("Error writing data to " + PortName + " port! " + e.Message.Replace("PortName", PortName) + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)

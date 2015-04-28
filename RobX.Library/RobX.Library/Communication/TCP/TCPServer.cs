@@ -3,6 +3,7 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 
 # endregion
@@ -25,8 +26,12 @@ namespace RobX.Library.Communication.TCP
         private TcpClient _tcpClientTemp;     // A temporary client variable
         private bool _startedListening;       // Indicates if tcpListener successfully started listening
 
+        # endregion
+
+        # region Constructor
+
         /// <summary>
-        /// TCP Server class initializer.
+        /// TCP Server class constructor.
         /// </summary>
         public TCPServer()
         {
@@ -35,7 +40,7 @@ namespace RobX.Library.Communication.TCP
 
         # endregion
 
-        # region Public Events
+        # region Event Handlers
 
         /// <summary>
         /// Event for ReceivedData event (is invoked after data is received from a client).
@@ -56,6 +61,22 @@ namespace RobX.Library.Communication.TCP
         /// Event for StatusChanged event (is invoked when something happens in the server).
         /// </summary>
         public event CommunicationStatusEventHandler StatusChanged;
+
+        private void ChangeStatus(string status)
+        {
+            if (StatusChanged != null)
+                StatusChanged(this, new CommunicationStatusEventArgs(status));
+        }
+
+        // Invokes StatusChanged event for all IPv4 servers. 
+        // Replaces "_ip_" string with the ip address of the server
+        private void ChangeStatusForAllServers(string status, int port = 0)
+        {
+            // ReSharper disable once LoopCanBePartlyConvertedToQuery
+            foreach (var ipAddress in IpAddresses)
+                if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
+                    ChangeStatus(status.Replace("_ip_", ipAddress.ToString()));
+        }
 
         # endregion
 
@@ -90,12 +111,7 @@ namespace RobX.Library.Communication.TCP
                 // Don't proceed if the server is running on the same port
                 if (port == Port)
                 {
-                    // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                    foreach (var ipAddress in IpAddresses)
-                        if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                            if (StatusChanged != null)
-                                StatusChanged(this, new CommunicationStatusEventArgs("Warning! TCP server is already running on " +
-                                                                                     ipAddress + " (port " + port + ")."));
+                    ChangeStatusForAllServers("Warning! TCP server is already running on _ip_ (port " + port + ").");
                     return true;
                 }
 
@@ -112,12 +128,7 @@ namespace RobX.Library.Communication.TCP
                 IpAddresses = GetHostIpAddresses();
 
                 // Invoke StatusChange event for each new server
-                // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                foreach (var ipAddress in IpAddresses)
-                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                        if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Starting TCP server on " +
-                                ipAddress + " (port " + port + ")."));
+                ChangeStatusForAllServers("Starting TCP server on _ip_ (port " + port + ").");
 
                 // Start the TCP server on a new thread
                 _listenThread = new Thread(ListenForClients) { IsBackground = true };
@@ -133,9 +144,8 @@ namespace RobX.Library.Communication.TCP
                     StopServer();
 
                     // Invoke StatusChange event
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Timeout error! Could not start TCP server on port "
-                            + port + " in " + timeout + " milliseconds."));
+                    ChangeStatus("Timeout error! Could not start TCP server on port "
+                                 + port + " in " + timeout + " milliseconds.");
 
                     break;
                 }
@@ -143,12 +153,7 @@ namespace RobX.Library.Communication.TCP
                 if (!IsRunning()) return false;
                 
                 // Invoke StatusChange event for each new server
-                // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                foreach (var ipAddress in IpAddresses)
-                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                        if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Successfully started TCP server on " +
-                                                                                 ipAddress + " (port " + port + ")."));
+                ChangeStatusForAllServers("Successfully started TCP server on _ip_ (port " + port + ").");
                 return true;
             }
             catch (Exception e)
@@ -156,9 +161,7 @@ namespace RobX.Library.Communication.TCP
                 Port = -1;
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("Error! Could not start TCP server on port " 
-                        + port + ". " + e.Message + "."));
+                ChangeStatus("Error! Could not start TCP server on port " + port + ". " + e.Message + ".");
 
                 return false;
             }
@@ -183,12 +186,7 @@ namespace RobX.Library.Communication.TCP
             Port = -1;
 
             // Invoke StatusChange event
-            // ReSharper disable once LoopCanBePartlyConvertedToQuery
-            foreach (var ipAddress in IpAddresses)
-                if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                    if (StatusChanged != null)
-                        StatusChanged(this, new CommunicationStatusEventArgs("Stopped TCP server on " +
-                                                                             ipAddress + " (port " + port + ")."));
+            ChangeStatusForAllServers("Stopped TCP server on _ip_ (port " + port + ").");
         }
 
         /// <summary>
@@ -228,12 +226,7 @@ namespace RobX.Library.Communication.TCP
                 clientStream.Flush();
 
                 // Invoke StatusChange event for each new server
-                // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                foreach (var ipAddress in IpAddresses)
-                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                        if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Successfully sent data to " +
-                                ipAddress + " (port " + Port + ")."));
+                ChangeStatusForAllServers("Successfully sent data to _ip_ (port " + Port + ").");
 
                 // Invoke SentData event
                 if (SentData != null)
@@ -242,12 +235,7 @@ namespace RobX.Library.Communication.TCP
             catch (Exception e)
             {
                 // Invoke StatusChange event for each new server
-                // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                foreach (var ipAddress in IpAddresses)
-                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                        if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Error sending data to " +
-                                ipAddress + " (port " + Port + "). " + e.Message + "."));
+                ChangeStatusForAllServers("Error sending data to _ip_ (port " + Port + "). " + e.Message + ".");
             }
         }
 
@@ -283,11 +271,7 @@ namespace RobX.Library.Communication.TCP
 
                         // Invoke StatusChange event
                         // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                        foreach (var ipAddress in IpAddresses)
-                            if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                                if (StatusChanged != null)
-                                    StatusChanged(this, new CommunicationStatusEventArgs("Successfully received data from " +
-                                        ipAddress + " (port " + Port + ")."));
+                        ChangeStatusForAllServers("Successfully received data from _ip_ (port " + Port + ").");
 
                         // Invoke ReceivedData event
                         if (ReceivedData != null)
@@ -296,12 +280,8 @@ namespace RobX.Library.Communication.TCP
                     catch (Exception e) // A socket error has occured
                     {
                         // Invoke StatusChange event for each new server
-                        // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                        foreach (var ipAddress in IpAddresses)
-                            if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                                if (StatusChanged != null)
-                                    StatusChanged(this, new CommunicationStatusEventArgs("Socket error! Error receiving data from " +
-                                        ipAddress + " (port " + Port + "). " + e.Message + "."));
+                        ChangeStatusForAllServers("Socket error! Error receiving data from _ip_ (port " 
+                            + Port + "). " + e.Message + ".");
                         return -1;
                     }
 
@@ -309,12 +289,8 @@ namespace RobX.Library.Communication.TCP
                     if (bytesRead == 0)
                     {
                         // Invoke StatusChange event
-                        // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                        foreach (var ipAddress in IpAddresses)
-                            if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                                if (StatusChanged != null)
-                                    StatusChanged(this, new CommunicationStatusEventArgs("Error receiving data! " +
-                                        "Client is disconnected from " + ipAddress + " (port " + Port + ")."));
+                        ChangeStatusForAllServers("Error receiving data! " + 
+                            "Client is disconnected from _ip_ (port " + Port + ").");
                         return -1;
                     }
                 }
@@ -324,12 +300,7 @@ namespace RobX.Library.Communication.TCP
                 bytesRead = -1;
 
                 // Invoke StatusChange event
-                // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                foreach (var ipAddress in IpAddresses)
-                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                        if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Error receiving data from " +
-                                ipAddress + " (port " + Port + "). " + e.Message));
+                ChangeStatusForAllServers("Error receiving data from _ip_ (port " + Port + "). " + e.Message);
             }
 
             return bytesRead;
@@ -370,12 +341,7 @@ namespace RobX.Library.Communication.TCP
                 Port = -1;
 
                 // Invoke StatusChange event
-                // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                foreach (var ipAddress in IpAddresses)
-                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork) // Show only IPv4 addresses
-                        if (StatusChanged != null)
-                            StatusChanged(this, new CommunicationStatusEventArgs("Error starting listening on " +
-                                ipAddress + " (port " + tempport + "). " + e.Message + "."));
+                ChangeStatusForAllServers("Error starting listening on _ip_ (port " + tempport + "). " + e.Message + ".");
                 return;
             }
 
@@ -396,10 +362,8 @@ namespace RobX.Library.Communication.TCP
                 _tcpClient = _tcpClientTemp;
 
                 // Invoke StatusChange event
-                if (StatusChanged != null)
-                    StatusChanged(this, new CommunicationStatusEventArgs("A client connected from " +
-                        ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Address +
-                        " (port " + ((IPEndPoint)_tcpClient.Client.RemoteEndPoint).Port + ")."));
+                ChangeStatus("A client connected from " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
+                             " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port + ").");
 
                 // Create a thread to handle communication with connected client
                 var clientThread = new Thread(HandleClientComm) { IsBackground = true };
