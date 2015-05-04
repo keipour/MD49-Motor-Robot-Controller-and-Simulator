@@ -1,4 +1,6 @@
-﻿// ReSharper disable UnusedMemberInSuper.Global
+﻿using System;
+
+// ReSharper disable UnusedMemberInSuper.Global
 namespace RobX.Library.Communication
 {
     /// <summary>
@@ -28,6 +30,11 @@ namespace RobX.Library.Communication
         /// </summary>
         event CommunicationStatusEventHandler StatusChanged;
 
+        /// <summary>
+        /// This event is invoked when an error occures in the server's workflow.
+        /// </summary>
+        event EventHandler ErrorOccured;
+
         # endregion
 
         # region Public Methods
@@ -50,16 +57,18 @@ namespace RobX.Library.Communication
         /// <param name="timeout">Timeout for send operation (in milliseconds). 
         /// The operation fails if sending the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        void SendData(byte[] data, int timeout = 1000);
+        /// <returns>Returns true if data successfully sent; otherwise returns false.</returns>
+        bool SendData(byte[] data, int timeout = 1000);
 
         /// <summary>
         /// Receives data from the connection.
         /// </summary>
-        /// <param name="buffer">Buffer in which the received data will be returned.</param>
+        /// <param name="buffer">Buffer in which the received data will be returned. The buffer size 
+        /// determines the maximum number of bytes to read.</param>
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        /// <returns>The number of bytes read from the TCP connection. 
+        /// <returns>The number of bytes read from the connection. 
         /// Return value -1 indicates that some connection/socket error has occured.</returns>
         int ReceiveData(ref byte[] buffer, int timeout = 1000);
 

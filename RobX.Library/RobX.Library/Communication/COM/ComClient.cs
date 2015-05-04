@@ -8,7 +8,9 @@ using System.IO.Ports;
 namespace RobX.Library.Communication.COM
 {
     /// <summary>
-    /// A class that can connect to a COM serial port and transmit/read data to/from a COM device.
+    /// <para>A class that can connect to a COM serial port and transmit/read data to/from a COM device.</para>
+    /// <para>This module is a <see cref="SerialPort"/> wraper which implements 
+    /// <see cref="IClientInterface"/> interface.</para>
     /// </summary>
     public class ComClient : IClientInterface
     {
@@ -147,8 +149,10 @@ namespace RobX.Library.Communication.COM
             }
             catch (Exception e)
             {
+                PortName = String.Empty;
+
                 // Invoke StatusChange event
-                ChangeStatus("Connection Error! " + e.Message.Replace("PortName", PortName) + ".");
+                ChangeStatus("Connection Error! " + e.Message.Replace("PortName", portName) + ".");
 
                 // Invoke ErrorOccured event
                 if (ErrorOccured != null)
@@ -217,6 +221,8 @@ namespace RobX.Library.Communication.COM
                 }
                 catch (Exception e)
                 {
+                    readBuffer = null;
+
                     // Invoke StatusChange event
                     ChangeStatus("Error reading data from " + PortName + " port! " + e.Message.Replace("PortName", PortName) + ".");
 
@@ -224,7 +230,6 @@ namespace RobX.Library.Communication.COM
                     if (ErrorOccured != null)
                         ErrorOccured(this, new EventArgs());
 
-                    readBuffer = null;
                     return false;
                 }
             }

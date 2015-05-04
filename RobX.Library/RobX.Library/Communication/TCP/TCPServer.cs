@@ -65,6 +65,11 @@ namespace RobX.Library.Communication.TCP
                     ChangeStatus(status.Replace("_ip_", ipAddress.ToString()));
         }
 
+        /// <summary>
+        /// This event is invoked when an error occures in the server's workflow.
+        /// </summary>
+        public event EventHandler ErrorOccured;
+
         # endregion
 
         # region Public Fields
@@ -120,14 +125,14 @@ namespace RobX.Library.Communication.TCP
 
                 Port = port;
 
-                // Define new TCP listener
-                _tcpListener = new TcpListener(IPAddress.Any, port);
-
                 // Obtain IP addresses for the current host
                 IpAddresses = GetHostIpAddresses();
 
+                // Define new TCP listener
+                _tcpListener = new TcpListener(IPAddress.Any, port);
+
                 // Invoke StatusChange event for each new server
-                ChangeStatusForAllServers("Starting TCP server on _ip_ (port " + port + ").");
+                ChangeStatusForAllServers("Starting TCP server on _ip_ (port " + port + ")...");
 
                 // Start the TCP server on a new thread
                 _listenThread = new Thread(ListenForClients) { IsBackground = true };
@@ -143,8 +148,12 @@ namespace RobX.Library.Communication.TCP
                     StopServer();
 
                     // Invoke StatusChange event
-                    ChangeStatus("Timeout error! Could not start TCP server on port "
-                                 + port + " in " + timeout + " milliseconds.");
+                    ChangeStatus("Error starting TCP server on _ip_ (port "
+                                 + port + "). The server could not start in " + timeout + " milliseconds.");
+
+                    // Invoke ErrorOccured event
+                    if (ErrorOccured != null)
+                        ErrorOccured(this, new EventArgs());
 
                     break;
                 }
@@ -152,7 +161,7 @@ namespace RobX.Library.Communication.TCP
                 if (!IsRunning()) return false;
                 
                 // Invoke StatusChange event for each new server
-                ChangeStatusForAllServers("Successfully started TCP server on _ip_ (port " + port + ").");
+                ChangeStatusForAllServers("TCP server on _ip_ (port " + port + ") started successfully.");
                 return true;
             }
             catch (Exception e)
@@ -160,7 +169,11 @@ namespace RobX.Library.Communication.TCP
                 Port = -1;
 
                 // Invoke StatusChange event
-                ChangeStatus("Error! Could not start TCP server on port " + port + ". " + e.Message + ".");
+                ChangeStatus("Error starting TCP server on _ip_ (port " + port + "). " + e.Message + ".");
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
 
                 return false;
             }
@@ -185,7 +198,7 @@ namespace RobX.Library.Communication.TCP
             Port = -1;
 
             // Invoke StatusChange event
-            ChangeStatusForAllServers("Stopped TCP server on _ip_ (port " + port + ").");
+            ChangeStatusForAllServers("TCP server on _ip_ (port " + port + ") stopped.");
         }
 
         /// <summary>
@@ -208,10 +221,11 @@ namespace RobX.Library.Communication.TCP
         /// <param name="timeout">Timeout for send operation (in milliseconds). 
         /// The operation fails if sending the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
-        public void SendData(byte[] data, int timeout = 1000)
+        /// <returns>Returns true if data is succesfully sent; otherwise returns false.</returns>
+        public bool SendData(byte[] data, int timeout = 1000)
         {
             // Check if there is data to send
-            if (data == null || data.Length == 0) return;
+            if (data == null || data.Length == 0) return true;
 
             try
             {
@@ -225,23 +239,37 @@ namespace RobX.Library.Communication.TCP
                 clientStream.Flush();
 
                 // Invoke StatusChange event for each new server
-                ChangeStatusForAllServers("Successfully sent data to _ip_ (port " + Port + ").");
+                ChangeStatusForAllServers("TCP server on _ip_ (port " + Port + ") sent " + data.Length +
+                                          " bytes successfully. Data was sent via " +
+                                          " port " + ((IPEndPoint) _tcpClient.Client.LocalEndPoint).Port +
+                                          " to client on " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
+                                          " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port + ").");
 
                 // Invoke SentData event
                 if (SentData != null)
                     SentData(this, new CommunicationEventArgs(data));
+
+                return true;
             }
             catch (Exception e)
             {
                 // Invoke StatusChange event for each new server
-                ChangeStatusForAllServers("Error sending data to _ip_ (port " + Port + "). " + e.Message + ".");
+                ChangeStatusForAllServers("TCP server on _ip_ (port " + 
+                    Port + ") encountered an error sending data. " + e.Message + ".");
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
+
+                return false;
             }
         }
 
         /// <summary>
         /// Receives data from a TCP connection.
         /// </summary>
-        /// <param name="buffer">Buffer in which the received data will be returned.</param>
+        /// <param name="buffer">Buffer in which the received data will be returned. The buffer size 
+        /// determines the maximum number of bytes to read.</param>
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
@@ -249,60 +277,93 @@ namespace RobX.Library.Communication.TCP
         /// Return value -1 indicates that some connection/socket error has occured.</returns>
         public int ReceiveData(ref byte[] buffer, int timeout = 1000)
         {
-            var bytesRead = 0;
+            if (buffer == null)
+                throw new ArgumentNullException("buffer",
+                    "The input should not be null for receiving data by TCP server on _ip_ (port " + Port + ").");
+
+            if (buffer.Length == 0)
+            {
+                // Invoke StatusChanged event
+                ChangeStatusForAllServers("Warning! Buffer length is zero for reading data by TCP server on _ip_ (port " + 
+                              Port + ". No data can be read by the server with this buffer.");
+                return 0;
+            }
 
             try
             {
                 var clientStream = _tcpClient.GetStream();
 
                 // Don't try to read if there is nothing to read
-                if (clientStream.DataAvailable)
+                if (!clientStream.DataAvailable)
                 {
-                    try
-                    {
-                        // Set read timeout
-                        clientStream.ReadTimeout = timeout;
-
-                        // Read the received data from network stream
-                        bytesRead = clientStream.Read(buffer, 0, buffer.Length);
-                        var receivedBytes = new byte[bytesRead];
-                        Array.Copy(buffer, receivedBytes, bytesRead);
-
-                        // Invoke StatusChange event
-                        // ReSharper disable once LoopCanBePartlyConvertedToQuery
-                        ChangeStatusForAllServers("Successfully received data from _ip_ (port " + Port + ").");
-
-                        // Invoke ReceivedData event
-                        if (ReceivedData != null)
-                            ReceivedData(this, new CommunicationEventArgs(receivedBytes));
-                    }
-                    catch (Exception e) // A socket error has occured
-                    {
-                        // Invoke StatusChange event for each new server
-                        ChangeStatusForAllServers("Socket error! Error receiving data from _ip_ (port " 
-                            + Port + "). " + e.Message + ".");
-                        return -1;
-                    }
-
-                    // Check if the client has disconnected from the server
-                    if (bytesRead == 0)
-                    {
-                        // Invoke StatusChange event
-                        ChangeStatusForAllServers("Error receiving data! " + 
-                            "Client is disconnected from _ip_ (port " + Port + ").");
-                        return -1;
-                    }
+                    // Invoke StatusChanged event
+                    ChangeStatusForAllServers("Warning! No data is available to read for TCP server on _ip_ (port " + Port + ").");
+                    return 0;
                 }
+
+                int bytesRead;
+                try
+                {
+                    // Set read timeout
+                    clientStream.ReadTimeout = timeout;
+
+                    // Read the received data from network stream
+                    bytesRead = clientStream.Read(buffer, 0, buffer.Length);
+                    var receivedBytes = new byte[bytesRead];
+                    Array.Copy(buffer, receivedBytes, bytesRead);
+
+                    // Invoke StatusChange event
+                    // ReSharper disable once LoopCanBePartlyConvertedToQuery
+                    ChangeStatusForAllServers("TCP server on _ip_ (port " + Port + ") received " +
+                                              bytesRead + " bytes. The data was received via port " +
+                                              ((IPEndPoint) _tcpClient.Client.LocalEndPoint).Port +
+                                              " from client on " +
+                                              ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
+                                              " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port +
+                                              ").");
+
+                    // Invoke ReceivedData event
+                    if (ReceivedData != null)
+                        ReceivedData(this, new CommunicationEventArgs(receivedBytes));
+                }
+                catch (Exception e) // A socket error has occured
+                {
+                    // Invoke StatusChange event for each new server
+                    ChangeStatusForAllServers("TCP server on _ip_ (port " +
+                        Port + ") encountered a socket error receiving data. " + e.Message + ".");
+
+                    // Invoke ErrorOccured event
+                    if (ErrorOccured != null)
+                        ErrorOccured(this, new EventArgs());
+
+                    return -1;
+                }
+
+                // Check and return if read successfully
+                if (bytesRead != 0) return bytesRead;
+
+                // Invoke StatusChange event
+                ChangeStatusForAllServers("TCP server on _ip_ (port " + Port + 
+                    ") encountered an error receiving data. Remote client is disconnected.");
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
+
+                return -1;
             }
             catch (Exception e)
             {
-                bytesRead = -1;
-
                 // Invoke StatusChange event
-                ChangeStatusForAllServers("Error receiving data from _ip_ (port " + Port + "). " + e.Message);
-            }
+                ChangeStatusForAllServers("TCP server on _ip_ (port " +
+                    Port + ") encountered an error receiving data. " + e.Message + ".");
 
-            return bytesRead;
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
+
+                return -1;
+            }
         }
 
         # endregion
@@ -340,7 +401,12 @@ namespace RobX.Library.Communication.TCP
                 Port = -1;
 
                 // Invoke StatusChange event
-                ChangeStatusForAllServers("Error starting listening on _ip_ (port " + tempport + "). " + e.Message + ".");
+                ChangeStatusForAllServers("Error starting TCP server on _ip_ (port " + tempport + "). " + e.Message + ".");
+
+                // Invoke ErrorOccured event
+                if (ErrorOccured != null)
+                    ErrorOccured(this, new EventArgs());
+
                 return;
             }
 
@@ -361,8 +427,13 @@ namespace RobX.Library.Communication.TCP
                 _tcpClient = _tcpClientTemp;
 
                 // Invoke StatusChange event
-                ChangeStatus("A client connected from " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
-                             " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port + ").");
+                ChangeStatusForAllServers("TCP server on _ip_ (port " + Port +
+                                          ") received connection request from a client on " +
+                                          ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
+                                          " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port +
+                                          "). The server assigned local port " +
+                                          ((IPEndPoint) _tcpClient.Client.LocalEndPoint).Port +
+                                          " for this communication.");
 
                 // Create a thread to handle communication with connected client
                 var clientThread = new Thread(HandleClientComm) { IsBackground = true };
