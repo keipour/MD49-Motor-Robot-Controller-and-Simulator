@@ -1,8 +1,4 @@
-﻿# region Includes
-
-using System;
-
-# endregion
+﻿using System;
 
 namespace RobX.Library.Communication
 {
@@ -11,7 +7,7 @@ namespace RobX.Library.Communication
     /// </summary>
     public interface IClientInterface
     {
-        # region Public Events
+        # region Event Handlers
 
         /// <summary>
         /// This event is invoked after data is received from the remote client.

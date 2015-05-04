@@ -3,7 +3,6 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 
 # endregion
@@ -16,7 +15,7 @@ namespace RobX.Library.Communication.TCP
     /// When a new client connects to the server, previous connection (if any) is closed.
     /// </summary>
     // ReSharper disable once InconsistentNaming
-    public class TCPServer
+    public class TCPServer : IServerInterface
     {
         #region Private Variables
 
@@ -25,18 +24,6 @@ namespace RobX.Library.Communication.TCP
         private TcpClient _tcpClient;         // The most recent client that is connected to the server
         private TcpClient _tcpClientTemp;     // A temporary client variable
         private bool _startedListening;       // Indicates if tcpListener successfully started listening
-
-        # endregion
-
-        # region Constructor
-
-        /// <summary>
-        /// TCP Server class constructor.
-        /// </summary>
-        public TCPServer()
-        {
-            Port = -1;
-        }
 
         # endregion
 
@@ -70,7 +57,7 @@ namespace RobX.Library.Communication.TCP
 
         // Invokes StatusChanged event for all IPv4 servers. 
         // Replaces "_ip_" string with the ip address of the server
-        private void ChangeStatusForAllServers(string status, int port = 0)
+        private void ChangeStatusForAllServers(string status)
         {
             // ReSharper disable once LoopCanBePartlyConvertedToQuery
             foreach (var ipAddress in IpAddresses)
@@ -94,6 +81,18 @@ namespace RobX.Library.Communication.TCP
 
         # endregion
 
+        # region Constructor
+
+        /// <summary>
+        /// TCP Server class constructor.
+        /// </summary>
+        public TCPServer()
+        {
+            Port = -1;
+        }
+
+        # endregion
+
         # region Public Functions: Server Status
 
         /// <summary>
@@ -102,7 +101,7 @@ namespace RobX.Library.Communication.TCP
         /// </summary>
         /// <param name="port">Port on which the server should listen.</param>
         /// <param name="timeout">Timeout for starting the server (in milliseconds). 
-        /// The operation fails if sending the data could not start for the specified amount of time.</param>
+        /// The operation fails if the server could not start for the specified amount of time.</param>
         /// <returns>Returns true if server starts successfully, otherwise returns false.</returns>
         public bool StartServer(int port, int timeout = 1000)
         {
@@ -134,7 +133,7 @@ namespace RobX.Library.Communication.TCP
                 _listenThread = new Thread(ListenForClients) { IsBackground = true };
                 _listenThread.Start();
 
-                // Determine if the tcpListener started successfully in timeout milliseconds.
+                // Determine if the tcpListener started successfully in timeout milliseconds
                 _startedListening = false;
                 var now = DateTime.Now;
                 while (_startedListening == false && Port != -1)
