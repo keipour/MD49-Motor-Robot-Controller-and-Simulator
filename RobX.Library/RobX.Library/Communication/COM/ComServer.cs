@@ -291,9 +291,11 @@ namespace RobX.Library.Communication.COM
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
+        /// <param name="suppressWarning">If set to true, suppresses all warnings, otherwise will invoke StatusChanged event 
+        /// for warnings.</param>
         /// <returns>The number of bytes read from the COM connection. 
         /// Return value -1 indicates that some connection/socket error has occured.</returns>
-        public int ReceiveData(ref byte[] buffer, int timeout = 500)
+        public int ReceiveData(ref byte[] buffer, int timeout = 500, bool suppressWarning = false)
         {
             if (buffer == null)
                 throw new ArgumentNullException("buffer", "The input should not be null for receiving data by COM server on " 
@@ -302,7 +304,8 @@ namespace RobX.Library.Communication.COM
             if (buffer.Length == 0)
             {
                 // Invoke StatusChanged event
-                ChangeStatus("Warning! Buffer length is zero for reading data by COM server on " + PortName +
+                if (suppressWarning == false)
+                    ChangeStatus("Warning! Buffer length is zero for reading data by COM server on " + PortName +
                              " port. No data can be read by the server with this buffer.");
                 return 0;
             }
@@ -314,7 +317,8 @@ namespace RobX.Library.Communication.COM
                 if (numOfBytes == 0)
                 {
                     // Invoke StatusChanged event
-                    ChangeStatus("Warning! No data is available to read for COM server on " + PortName + " port!");
+                    if (suppressWarning == false)
+                        ChangeStatus("Warning! No data is available to read for COM server on " + PortName + " port!");
                     return 0;
                 }
             }
@@ -376,7 +380,7 @@ namespace RobX.Library.Communication.COM
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
             var readBuffer = new byte[4096];
-            ReceiveData(ref readBuffer);
+            ReceiveData(ref readBuffer, suppressWarning:true);
         }
 
         # endregion

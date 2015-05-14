@@ -273,9 +273,11 @@ namespace RobX.Library.Communication.TCP
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
+        /// <param name="suppressWarning">If set to true, suppresses all warnings, otherwise will invoke StatusChanged event 
+        /// for warnings.</param>
         /// <returns>The number of bytes read from the TCP connection. 
         /// Return value -1 indicates that some connection/socket error has occured.</returns>
-        public int ReceiveData(ref byte[] buffer, int timeout = 1000)
+        public int ReceiveData(ref byte[] buffer, int timeout = 1000, bool suppressWarning = false)
         {
             if (buffer == null)
                 throw new ArgumentNullException("buffer",
@@ -284,7 +286,8 @@ namespace RobX.Library.Communication.TCP
             if (buffer.Length == 0)
             {
                 // Invoke StatusChanged event
-                ChangeStatusForAllServers("Warning! Buffer length is zero for reading data by TCP server on _ip_ (port " + 
+                if (suppressWarning == false)
+                    ChangeStatusForAllServers("Warning! Buffer length is zero for reading data by TCP server on _ip_ (port " + 
                               Port + ". No data can be read by the server with this buffer.");
                 return 0;
             }
@@ -297,7 +300,9 @@ namespace RobX.Library.Communication.TCP
                 if (!clientStream.DataAvailable)
                 {
                     // Invoke StatusChanged event
-                    ChangeStatusForAllServers("Warning! No data is available to read for TCP server on _ip_ (port " + Port + ").");
+                    if (suppressWarning == false)
+                        ChangeStatusForAllServers("Warning! No data is available to read for TCP server on _ip_ (port " + 
+                            Port + ").");
                     return 0;
                 }
 
@@ -451,7 +456,7 @@ namespace RobX.Library.Communication.TCP
             while (true)
             {
                 // Read data from network stream if available
-                var bytesRead = ReceiveData(ref buffer);  // Number of bytes read from client stream
+                var bytesRead = ReceiveData(ref buffer, suppressWarning:true);  // Number of bytes read from client stream
 
                 // Break loop if there is a socket error or a connection is closed
                 if (bytesRead == -1) break;

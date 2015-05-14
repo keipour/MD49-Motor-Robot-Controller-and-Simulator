@@ -68,9 +68,11 @@ namespace RobX.Library.Communication
         /// <param name="timeout">Timeout for reading operation (in milliseconds). 
         /// The operation fails if reading the data could not start for the specified amount of time. 
         /// Value 0 indicates a blocking operation (no timeout).</param>
+        /// <param name="suppressWarning">If set to true, suppresses all warnings, otherwise will invoke StatusChanged event 
+        /// for warnings.</param>
         /// <returns>The number of bytes read from the connection. 
         /// Return value -1 indicates that some connection/socket error has occured.</returns>
-        int ReceiveData(ref byte[] buffer, int timeout = 1000);
+        int ReceiveData(ref byte[] buffer, int timeout = 1000, bool suppressWarning = false);
 
         # endregion
     }
