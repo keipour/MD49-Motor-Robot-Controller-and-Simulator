@@ -240,9 +240,8 @@ namespace RobX.Library.Communication.TCP
 
                 // Invoke StatusChange event for each new server
                 ChangeStatusForAllServers("TCP server on _ip_ (port " + Port + ") sent " + data.Length +
-                                          " bytes successfully. Data was sent via " +
-                                          " port " + ((IPEndPoint) _tcpClient.Client.LocalEndPoint).Port +
-                                          " to client on " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
+                                          " bytes successfully to client on " + 
+                                          ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
                                           " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port + ").");
 
                 // Invoke SentData event
@@ -320,9 +319,7 @@ namespace RobX.Library.Communication.TCP
                     // Invoke StatusChange event
                     // ReSharper disable once LoopCanBePartlyConvertedToQuery
                     ChangeStatusForAllServers("TCP server on _ip_ (port " + Port + ") received " +
-                                              bytesRead + " bytes. The data was received via port " +
-                                              ((IPEndPoint) _tcpClient.Client.LocalEndPoint).Port +
-                                              " from client on " +
+                                              bytesRead + " bytes from client on " +
                                               ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
                                               " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port +
                                               ").");
@@ -435,10 +432,7 @@ namespace RobX.Library.Communication.TCP
                 ChangeStatusForAllServers("TCP server on _ip_ (port " + Port +
                                           ") received connection request from a client on " +
                                           ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Address +
-                                          " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port +
-                                          "). The server assigned local port " +
-                                          ((IPEndPoint) _tcpClient.Client.LocalEndPoint).Port +
-                                          " for this communication.");
+                                          " (port " + ((IPEndPoint) _tcpClient.Client.RemoteEndPoint).Port + ").");
 
                 // Create a thread to handle communication with connected client
                 var clientThread = new Thread(HandleClientComm) { IsBackground = true };
